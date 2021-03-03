@@ -1,5 +1,6 @@
 # cyclonedx-go
 
+[![Build Status](https://github.com/CycloneDX/cyclonedx-go/actions/workflows/ci.yml/badge.svg)](https://github.com/CycloneDX/cyclonedx-go/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/nscuro/cyclonedx-go.svg)](https://pkg.go.dev/github.com/CycloneDX/cyclonedx-go)
 [![License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/https://-cyclonedx.org-blue.svg)](https://cyclonedx.org/)
