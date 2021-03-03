@@ -1,0 +1,28 @@
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ "^1.14", "^1.15", "^1.16" ]
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Setup CycloneDX CLI
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          wget -O "$HOME/.local/bin/cyclonedx" https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.14.0/cyclonedx-linux-x64
+          chmod +x "$HOME/.local/bin/cyclonedx"
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Build
+        run: make build
+      - name: Test
+        run: make test
