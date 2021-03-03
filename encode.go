@@ -32,7 +32,7 @@ func (j jsonBOMEncoder) Encode(bom *BOM) error {
 	return encoder.Encode(bom)
 }
 
-func (j jsonBOMEncoder) SetPretty(pretty bool) {
+func (j *jsonBOMEncoder) SetPretty(pretty bool) {
 	j.pretty = pretty
 }
 
@@ -53,6 +53,6 @@ func (x xmlBOMEncoder) Encode(bom *BOM) error {
 	return encoder.Encode(bom)
 }
 
-func (x xmlBOMEncoder) SetPretty(pretty bool) {
+func (x *xmlBOMEncoder) SetPretty(pretty bool) {
 	x.pretty = pretty
 }
