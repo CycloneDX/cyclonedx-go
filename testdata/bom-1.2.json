@@ -4,7 +4,7 @@
   "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
   "version": 1,
   "metadata": {
-    "timestamp": "2020-04-13T20:20:39+00:00",
+    "timestamp": "2020-04-07T07:01:00Z",
     "tools": [
       {
         "vendor": "Awesome Vendor",
@@ -31,7 +31,6 @@
     ],
     "component": {
       "type": "application",
-      "author": "Acme Super Heros",
       "name": "Acme Application",
       "version": "9.1.1",
       "swid": {
@@ -41,14 +40,15 @@
         "text": {
           "contentType": "text/xml",
           "encoding": "base64",
-          "content": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiID8+CjxTb2Z0d2FyZUlkZW50aXR5IHhtbDpsYW5nPSJFTiIgbmFtZT0iQWNtZSBBcHBsaWNhdGlvbiIgdmVyc2lvbj0iOS4xLjEiIAogdmVyc2lvblNjaGVtZT0ibXVsdGlwYXJ0bnVtZXJpYyIgCiB0YWdJZD0ic3dpZGdlbi1iNTk1MWFjOS00MmMwLWYzODItM2YxZS1iYzdhMmE0NDk3Y2JfOS4xLjEiIAogeG1sbnM9Imh0dHA6Ly9zdGFuZGFyZHMuaXNvLm9yZy9pc28vMTk3NzAvLTIvMjAxNS9zY2hlbWEueHNkIj4gCiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIiAKIHhzaTpzY2hlbWFMb2NhdGlvbj0iaHR0cDovL3N0YW5kYXJkcy5pc28ub3JnL2lzby8xOTc3MC8tMi8yMDE1LWN1cnJlbnQvc2NoZW1hLnhzZCBzY2hlbWEueHNkIiA+CiAgPE1ldGEgZ2VuZXJhdG9yPSJTV0lEIFRhZyBPbmxpbmUgR2VuZXJhdG9yIHYwLjEiIC8+IAogIDxFbnRpdHkgbmFtZT0iQWNtZSwgSW5jLiIgcmVnaWQ9ImV4YW1wbGUuY29tIiByb2xlPSJ0YWdDcmVhdG9yIiAvPiAKPC9Tb2Z0d2FyZUlkZW50aXR5Pg=="
+          "content": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiID8\u002BCjxTb2Z0d2FyZUlkZW50aXR5IHhtbDpsYW5nPSJFTiIgbmFtZT0iQWNtZSBBcHBsaWNhdGlvbiIgdmVyc2lvbj0iOS4xLjEiIAogdmVyc2lvblNjaGVtZT0ibXVsdGlwYXJ0bnVtZXJpYyIgCiB0YWdJZD0ic3dpZGdlbi1iNTk1MWFjOS00MmMwLWYzODItM2YxZS1iYzdhMmE0NDk3Y2JfOS4xLjEiIAogeG1sbnM9Imh0dHA6Ly9zdGFuZGFyZHMuaXNvLm9yZy9pc28vMTk3NzAvLTIvMjAxNS9zY2hlbWEueHNkIj4gCiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIiAKIHhzaTpzY2hlbWFMb2NhdGlvbj0iaHR0cDovL3N0YW5kYXJkcy5pc28ub3JnL2lzby8xOTc3MC8tMi8yMDE1LWN1cnJlbnQvc2NoZW1hLnhzZCBzY2hlbWEueHNkIiA\u002BCiAgPE1ldGEgZ2VuZXJhdG9yPSJTV0lEIFRhZyBPbmxpbmUgR2VuZXJhdG9yIHYwLjEiIC8\u002BIAogIDxFbnRpdHkgbmFtZT0iQWNtZSwgSW5jLiIgcmVnaWQ9ImV4YW1wbGUuY29tIiByb2xlPSJ0YWdDcmVhdG9yIiAvPiAKPC9Tb2Z0d2FyZUlkZW50aXR5Pg=="
         }
       }
     },
     "manufacture": {
       "name": "Acme, Inc.",
       "url": [
-        "https://example.com"
+        "https://example.com",
+        "https://example2.com"
       ],
       "contact": [
         {
@@ -72,12 +72,13 @@
   },
   "components": [
     {
-      "bom-ref": "pkg:npm/acme/component@1.0.0",
-      "type": "library",
+      "type": "application",
       "publisher": "Acme Inc",
       "group": "com.acme",
       "name": "tomcat-catalina",
       "version": "9.0.14",
+      "description": "Modified version of Apache Catalina",
+      "scope": "required",
       "hashes": [
         {
           "alg": "MD5",
@@ -100,70 +101,139 @@
         {
           "license": {
             "id": "Apache-2.0",
-            "text": {
-              "contentType": "text/plain",
-              "encoding": "base64",
-              "content": "License text here"
-            },
             "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
           }
         }
       ],
-      "purl": "pkg:npm/acme/component@1.0.0",
+      "purl": "pkg:maven/com.acme/tomcat-catalina@9.0.14?packaging=jar",
       "pedigree": {
         "ancestors": [
           {
-            "type": "library",
-            "publisher": "Acme Inc",
-            "group": "com.acme",
+            "type": "application",
+            "publisher": "Apache",
+            "group": "org.apache.tomcat",
             "name": "tomcat-catalina",
-            "version": "9.0.14"
-          },
-          {
-            "type": "library",
-            "publisher": "Acme Inc",
-            "group": "com.acme",
-            "name": "tomcat-catalina",
-            "version": "9.0.14"
+            "version": "9.0.14",
+            "description": "Apache Catalina",
+            "licenses": [
+              {
+                "license": {
+                  "id": "Apache-2.0"
+                }
+              }
+            ],
+            "purl": "pkg:maven/org.apache.tomcat/tomcat-catalina@9.0.14?packaging=jar"
           }
         ],
         "commits": [
           {
-            "uid": "123",
-            "url": "",
+            "uid": "7638417db6d59f3c431d3e1f261cc637155684cd",
+            "url": "https://location/to/7638417db6d59f3c431d3e1f261cc637155684cd",
             "author": {
-              "timestamp": "2018-11-13T20:20:39+00:00",
-              "name": "",
-              "email": ""
-            }
+              "timestamp": "2018-11-07T22:01:45Z",
+              "name": "John Doe",
+              "email": "john.doe@example.com"
+            },
+            "committer": {
+              "timestamp": "2018-11-07T22:01:45Z",
+              "name": "Jane Doe",
+              "email": "jane.doe@example.com"
+            },
+            "message": "Initial commit"
           }
-        ]
+        ],
+        "notes": "Commentary here"
       }
     },
     {
       "type": "library",
-      "supplier": {
-        "name": "Example, Inc.",
-        "url": [
-          "https://example.com",
-          "https://example.net"
-        ],
-        "contact": [
-          {
-            "name": "Example Support AMER Distribution",
-            "email": "support@example.com",
-            "phone": "800-555-1212"
-          },
-          {
-            "name": "Example Support APAC",
-            "email": "support@apac.example.com"
-          }
-        ]
-      },
-      "author": "Example Super Heros",
       "group": "org.example",
       "name": "mylibrary",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "2342c2eaf1feb9a80195dbaddf2ebaa3"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "68b78babe00a053f9e35ec6a2d9080f5b90122b0"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "708f1f53b41f11f02d12a11b1a38d2905d47b099afc71a0f1124ef8582ec7313"
+        },
+        {
+          "alg": "SHA-512",
+          "content": "387b7ae16b9cae45f830671541539bf544202faae5aac544a93b7b0a04f5f846fa2f4e81ef3f1677e13aed7496408a441f5657ab6d54423e56bf6f38da124aef"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "EPL-2.0 OR GPL-2.0-with-classpath-exception"
+        }
+      ],
+      "copyright": "Copyright Example Inc. All rights reserved.",
+      "cpe": "cpe:/a:example:myapplication:1.0.0",
+      "purl": "pkg:maven/com.example/myapplication@1.0.0?packaging=war",
+      "modified": false,
+      "externalReferences": [
+        {
+          "url": "http://example.org/docs",
+          "type": "documentation",
+          "comment": "All component versions are documented here"
+        },
+        {
+          "url": "http://example.org/security",
+          "type": "advisories"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "group": "com.example",
+      "name": "myframework",
+      "version": "1.0.0",
+      "description": "Example Inc, enterprise framework",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "MD5",
+          "content": "cfcb0b64aacd2f81c1cd546543de965a"
+        },
+        {
+          "alg": "SHA-1",
+          "content": "7fbeef2346c45d565c3341f037bce4e088af8a52"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "0384db3cec55d86a6898c489fdb75a8e75fe66b26639634983d2f3c3558493d1"
+        },
+        {
+          "alg": "SHA-512",
+          "content": "854909cdb9e3ca183056837144aab6d8069b377bd66445087cc7157bf0c3f620418705dd0b83bdc2f73a508c2bdb316ca1809d75ee6972d02023a3e7dd655c79"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Some random license"
+          }
+        }
+      ],
+      "purl": "pkg:maven/com.example/myframework@1.0.0?packaging=war",
+      "modified": false,
+      "externalReferences": [
+        {
+          "url": "http://example.com/myframework",
+          "type": "website"
+        },
+        {
+          "url": "http://example.com/security",
+          "type": "advisories"
+        }
+      ]
     }
   ],
   "services": [
@@ -194,43 +264,43 @@
       "x-trust-boundary": true,
       "data": [
         {
-          "classification": "PII",
-          "flow": "inbound"
+          "flow": "inbound",
+          "classification": "PII"
         },
         {
-          "classification": "PIFI",
-          "flow": "outbound"
+          "flow": "outbound",
+          "classification": "PIFI"
         },
         {
-          "classification": "pubic",
-          "flow": "bi-directional"
+          "flow": "bi-directional",
+          "classification": "pubic"
         }
       ],
       "licenses": [
         {
-          "license":
-          {
+          "license": {
             "name": "Partner license"
           }
         }
       ],
       "externalReferences": [
         {
-          "type": "website",
-          "url": "http://partner.org"
+          "url": "http://partner.org",
+          "type": "website"
         },
         {
-          "type": "documentation",
-          "url": "http://api.partner.org/swagger"
+          "url": "http://api.partner.org/swagger",
+          "type": "documentation"
         }
       ]
     }
   ],
   "dependencies": [
     {
-      "ref": "pkg:npm/acme/component@1.0.0",
+      "ref": "acme-app",
       "dependsOn": [
-        "pkg:npm/acme/common@1.0.0"
+        "pkg:maven/org.acme/web-framework@1.0.0",
+        "pkg:maven/org.acme/persistence@3.1.0"
       ]
     }
   ]
