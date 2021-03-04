@@ -12,6 +12,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestNewBOMEncoder(t *testing.T) {
+	assert.IsType(t, &jsonBOMEncoder{}, NewBOMEncoder(nil, BOMFileFormatJSON))
+	assert.IsType(t, &xmlBOMEncoder{}, NewBOMEncoder(nil, BOMFileFormatXML))
+}
+
 func TestJsonBOMEncoder_Encode(t *testing.T) {
 	// TODO: Build a BOM that includes all CycloneDX elements
 	writeAndValidateBOM(t, NewBOM(), BOMFileFormatJSON)

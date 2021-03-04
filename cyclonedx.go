@@ -80,6 +80,9 @@ type Commit struct {
 }
 
 type Component struct {
+	BOMRef             string                `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	MIMEType           string                `json:"mime-type,omitempty" xml:"mime-type,attr,omitempty"`
+	Type               ComponentType         `json:"type" xml:"type,attr"`
 	Supplier           *OrganizationalEntity `json:"supplier,omitempty" xml:"supplier,omitempty"`
 	Author             string                `json:"author,omitempty" xml:"author,omitempty"`
 	Publisher          string                `json:"publisher,omitempty" xml:"publisher,omitempty"`
@@ -98,9 +101,6 @@ type Component struct {
 	Pedigree           *Pedigree             `json:"pedigree,omitempty" xml:"pedigree,omitempty"`
 	ExternalReferences *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 	Components         *[]Component          `json:"components,omitempty" xml:"components>component,omitempty"`
-	BOMRef             string                `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
-	MIMEType           string                `json:"mime-type,omitempty" xml:"mime-type,attr,omitempty"`
-	Type               ComponentType         `json:"type" xml:"type,attr"`
 }
 
 type DataClassification struct {
@@ -349,6 +349,7 @@ const (
 )
 
 type Service struct {
+	BOMRef               string                `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
 	Provider             *OrganizationalEntity `json:"provider,omitempty" xml:"provider,omitempty"`
 	Group                string                `json:"group,omitempty" xml:"group,omitempty"`
 	Name                 string                `json:"name" xml:"name"`
@@ -361,7 +362,6 @@ type Service struct {
 	Licenses             *[]LicenseChoice      `json:"licenses,omitempty" xml:"licenses>license,omitempty"`
 	ExternalReferences   *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 	Services             *[]Service            `json:"services,omitempty" xml:"services>service,omitempty"`
-	BOMRef               string                `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
 }
 
 type Source struct {
