@@ -118,14 +118,14 @@ const (
 )
 
 type Dependency struct {
-	Ref          string        `json:"-" xml:"ref,attr"`
-	Dependencies *[]Dependency `json:"-" xml:"dependency,omitempty"`
+	Ref          string        `xml:"ref,attr"`
+	Dependencies *[]Dependency `xml:"dependency,omitempty"`
 }
 
 // dependencyJSON is temporarily used for marshalling and unmarshalling Dependency instances to and from JSON
 type dependencyJSON struct {
-	Ref       string   `json:"ref" xml:"-"`
-	DependsOn []string `json:"dependsOn,omitempty" xml:"-"`
+	Ref       string   `json:"ref"`
+	DependsOn []string `json:"dependsOn,omitempty"`
 }
 
 func (d Dependency) MarshalJSON() ([]byte, error) {
