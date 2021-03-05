@@ -27,7 +27,7 @@ type jsonBOMEncoder struct {
 func (j jsonBOMEncoder) Encode(bom *BOM) error {
 	encoder := json.NewEncoder(j.writer)
 	if j.pretty {
-		encoder.SetIndent("", "    ")
+		encoder.SetIndent("", "  ")
 	}
 	return encoder.Encode(bom)
 }
@@ -42,13 +42,13 @@ type xmlBOMEncoder struct {
 }
 
 func (x xmlBOMEncoder) Encode(bom *BOM) error {
-	if _, err := fmt.Fprintf(x.writer, "<?xml version=\"1.0\"?>\n"); err != nil {
+	if _, err := fmt.Fprintf(x.writer, xml.Header); err != nil {
 		return err
 	}
 
 	encoder := xml.NewEncoder(x.writer)
 	if x.pretty {
-		encoder.Indent("", "    ")
+		encoder.Indent("", "  ")
 	}
 	return encoder.Encode(bom)
 }
