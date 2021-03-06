@@ -2,10 +2,15 @@ package cyclonedx
 
 import (
 	"bytes"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,9 +29,18 @@ func TestRoundTripJSON(t *testing.T) {
 
 	// Encode BOM again
 	buf := new(bytes.Buffer)
-	encoder := NewBOMEncoder(buf, BOMFileFormatJSON)
+
+	tempFile, err := ioutil.TempFile("", "bom.*.json")
+	require.NoError(t, err)
+	defer os.Remove(tempFile.Name())
+
+	encoder := NewBOMEncoder(io.MultiWriter(buf, tempFile), BOMFileFormatJSON)
 	encoder.SetPretty(true)
 	require.NoError(t, encoder.Encode(bom))
+	tempFile.Close() // Required for CLI to be able to access the file
+
+	// Sanity checks: BOM has to be valid
+	assertValidBOM(t, tempFile.Name())
 
 	// Compare with snapshot
 	roundTripSnapshotter.SnapshotT(t, buf.String())
@@ -44,10 +58,28 @@ func TestRoundTripXML(t *testing.T) {
 
 	// Encode BOM again
 	buf := new(bytes.Buffer)
-	encoder := NewBOMEncoder(buf, BOMFileFormatXML)
+
+	tempFile, err := ioutil.TempFile("", "bom.*.xml")
+	require.NoError(t, err)
+	defer os.Remove(tempFile.Name())
+
+	encoder := NewBOMEncoder(io.MultiWriter(buf, tempFile), BOMFileFormatXML)
 	encoder.SetPretty(true)
 	require.NoError(t, encoder.Encode(bom))
+	tempFile.Close() // Required for CLI to be able to access the file
+
+	// Sanity check: BOM has to be valid
+	assertValidBOM(t, tempFile.Name())
 
 	// Compare with snapshot
 	roundTripSnapshotter.SnapshotT(t, buf.String())
+}
+
+func assertValidBOM(t *testing.T, bomFilePath string) {
+	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--fail-on-errors")
+	valOut, err := valCmd.CombinedOutput()
+	if !assert.NoError(t, err) {
+		// Provide some context when test is failing
+		fmt.Printf("validation error: %s\n", string(valOut))
+	}
 }

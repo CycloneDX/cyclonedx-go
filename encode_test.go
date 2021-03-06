@@ -2,10 +2,8 @@ package cyclonedx
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -101,10 +99,5 @@ func writeAndValidateBOM(t *testing.T, bom *BOM, bomFileFormat BOMFileFormat) {
 	require.NoError(t, NewBOMEncoder(bomFile, bomFileFormat).Encode(bom))
 	bomFile.Close() // Required for CLI to be able to access the file
 
-	cliCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFile.Name(), "--fail-on-errors")
-	cliOutput, err := cliCmd.CombinedOutput()
-	if !assert.NoError(t, err) {
-		// Provide some context when test is failing
-		fmt.Printf("validation error: %s\n", string(cliOutput))
-	}
+	assertValidBOM(t, bomFile.Name())
 }
