@@ -18,7 +18,8 @@ GO111MODULE=on go get github.com/CycloneDX/cyclonedx-go
 
 ## Usage
 
-Checkout the [`examples`](./examples) directory for some examples of how this library may be used.
+Please refer to the module's [documentation](https://pkg.go.dev/github.com/CycloneDX/cyclonedx-go#section-documentation).
+Also, checkout the [`examples`](./examples) directory for some examples of how this library may be used.
 
 ## Compatibility
 
@@ -26,12 +27,11 @@ Checkout the [`examples`](./examples) directory for some examples of how this li
 |:---------------------:|:------------------------:|
 | 1.14 - 1.16           | 1.2                      |
 
-We're aiming to support all [officially supported](https://golang.org/doc/devel/release.html#policy) Go versions, 
-plus an additional older version.
+We're aiming to support all [officially supported](https://golang.org/doc/devel/release.html#policy) Go versions, plus
+an additional older version.
 
-This library will only support the latest version of the CycloneDX specification. 
-While it's generally possible to *read* BOMs of an older spec, *writing* will exclusively 
-produce BOMs conforming to the latest supported spec.
+This library will only support the latest version of the CycloneDX specification. While it's generally possible to *
+read* BOMs of an older spec, *writing* will exclusively produce BOMs conforming to the latest supported spec.
 
 ## License
 
@@ -40,14 +40,15 @@ See the [LICENSE](./LICENSE) file for the full license.
 
 ## Contributing
 
-Pull requests are welcome. But please read the 
+Pull requests are welcome. But please read the
 [CycloneDX contributing guidelines](https://github.com/CycloneDX/.github/blob/master/CONTRIBUTING.md) first.
 
 It is generally expected that pull requests will include relevant tests. Tests are automatically run against all
-supported Go versions (see [Compatibility](#compatibility)) for every pull request. 
+supported Go versions (see [Compatibility](#compatibility)) for every pull request.
 
 ### Running Tests
 
 Some tests make use of the [CycloneDX CLI](https://github.com/CycloneDX/cyclonedx-cli), e.g. to validate BOMs.  
 Make sure to download the CLI binary and make it available as `cyclonedx` in your `$PATH`.  
-See also *Setup CycloneDX CLI* in the [workflow](https://github.com/CycloneDX/cyclonedx-go/blob/master/.github/workflows/ci.yml#L17).
+See also *Setup CycloneDX CLI* in
+the [workflow](https://github.com/CycloneDX/cyclonedx-go/blob/master/.github/workflows/ci.yml#L17).
