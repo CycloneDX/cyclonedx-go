@@ -2,8 +2,6 @@ package cyclonedx
 
 import (
 	"bytes"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,11 +11,6 @@ import (
 func TestNewBOMEncoder(t *testing.T) {
 	assert.IsType(t, &jsonBOMEncoder{}, NewBOMEncoder(nil, BOMFileFormatJSON))
 	assert.IsType(t, &xmlBOMEncoder{}, NewBOMEncoder(nil, BOMFileFormatXML))
-}
-
-func TestJsonBOMEncoder_Encode(t *testing.T) {
-	// TODO: Build a BOM that includes all CycloneDX elements
-	writeAndValidateBOM(t, NewBOM(), BOMFileFormatJSON)
 }
 
 func TestJsonBOMEncoder_SetPretty(t *testing.T) {
@@ -51,11 +44,6 @@ func TestJsonBOMEncoder_SetPretty(t *testing.T) {
 `, buf.String())
 }
 
-func TestXmlBOMEncoder_Encode(t *testing.T) {
-	// TODO: Build a BOM that includes all CycloneDX elements
-	writeAndValidateBOM(t, NewBOM(), BOMFileFormatXML)
-}
-
 func TestXmlBOMEncoder_SetPretty(t *testing.T) {
 	buf := new(bytes.Buffer)
 	encoder := NewBOMEncoder(buf, BOMFileFormatXML)
@@ -82,22 +70,4 @@ func TestXmlBOMEncoder_SetPretty(t *testing.T) {
     </authors>
   </metadata>
 </bom>`, buf.String())
-}
-
-func writeAndValidateBOM(t *testing.T, bom *BOM, bomFileFormat BOMFileFormat) {
-	var bomFileExtension string
-	if bomFileFormat == BOMFileFormatJSON {
-		bomFileExtension = "json"
-	} else {
-		bomFileExtension = "xml"
-	}
-
-	bomFile, err := ioutil.TempFile("", "bom.*."+bomFileExtension)
-	require.NoError(t, err)
-	defer os.Remove(bomFile.Name())
-
-	require.NoError(t, NewBOMEncoder(bomFile, bomFileFormat).Encode(bom))
-	bomFile.Close() // Required for CLI to be able to access the file
-
-	assertValidBOM(t, bomFile.Name())
 }
