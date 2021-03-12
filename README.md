@@ -18,7 +18,7 @@ GO111MODULE=on go get github.com/CycloneDX/cyclonedx-go
 
 ## Usage
 
-Please refer to the module's [documentation](https://pkg.go.dev/github.com/CycloneDX/cyclonedx-go#section-documentation).
+Please refer to the module's [documentation](https://pkg.go.dev/github.com/CycloneDX/cyclonedx-go#section-documentation).  
 Also, checkout the [`examples`](./examples) directory for some examples of how this library may be used.
 
 ## Compatibility
@@ -30,8 +30,8 @@ Also, checkout the [`examples`](./examples) directory for some examples of how t
 We're aiming to support all [officially supported](https://golang.org/doc/devel/release.html#policy) Go versions, plus
 an additional older version.
 
-This library will only support the latest version of the CycloneDX specification. While it's generally possible to *
-read* BOMs of an older spec, *writing* will exclusively produce BOMs conforming to the latest supported spec.
+This library will only support the latest version of the CycloneDX specification. While it's generally possible to 
+*read* BOMs of an older spec, *writing* will exclusively produce BOMs conforming to the latest supported spec.
 
 ## License
 
