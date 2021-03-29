@@ -46,6 +46,9 @@ func main() {
 				{Ref: "pkg:golang/github.com/CycloneDX/cyclonedx-go@0.1.0"},
 			},
 		},
+		{
+			Ref: "pkg:golang/github.com/CycloneDX/cyclonedx-go@0.1.0",
+		},
 	}
 
 	encoder := cdx.NewBOMEncoder(os.Stdout, cdx.BOMFileFormatXML)
