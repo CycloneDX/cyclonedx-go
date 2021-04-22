@@ -11,6 +11,8 @@
 
 *cyclonedx-go is a Go library to consume and produce CycloneDX Software Bill of Materials (SBOM)*
 
+> If you just want to create BOMs for your Go projects, see [*cyclonedx-gomod*](https://github.com/CycloneDX/cyclonedx-gomod)
+
 ## Installation
 
 ```
