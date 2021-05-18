@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
@@ -76,7 +77,11 @@ func TestRoundTripXML(t *testing.T) {
 }
 
 func assertValidBOM(t *testing.T, bomFilePath string) {
-	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--fail-on-errors")
+	inputFormat := "xml_v1_2"
+	if strings.HasSuffix(bomFilePath, ".json") {
+		inputFormat = "json_v1_2"
+	}
+	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--input-format", inputFormat, "--fail-on-errors")
 	valOut, err := valCmd.CombinedOutput()
 	if !assert.NoError(t, err) {
 		// Provide some context when test is failing
