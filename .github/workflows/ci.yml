@@ -30,5 +30,6 @@ jobs:
         uses: CycloneDX/gh-gomod-generate-sbom@main
         with:
           json: true
+          output: bom.json
           type: library
           version: 0.8.1
