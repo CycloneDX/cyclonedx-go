@@ -26,3 +26,9 @@ jobs:
         run: make build
       - name: Test
         run: make test
+      - name: Generate SBOM
+        uses: CycloneDX/gh-gomod-generate-sbom@main
+        with:
+          json: true
+          type: library
+          version: 0.8.1
