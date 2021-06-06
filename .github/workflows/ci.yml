@@ -30,4 +30,5 @@ jobs:
         uses: CycloneDX/gh-gomod-generate-sbom@main
         with:
           type: library
+          version: 0.8.1
 
