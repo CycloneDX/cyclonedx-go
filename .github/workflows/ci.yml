@@ -27,7 +27,7 @@ jobs:
       - name: Test
         run: make test
       - name: Generate SBOM
-        uses: CycloneDX/gh-gomod-generate-sbom@v0.1.0
+        uses: CycloneDX/gh-gomod-generate-sbom@v0
         with:
           json: true
           type: library
