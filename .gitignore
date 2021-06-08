@@ -17,3 +17,7 @@
 # IntelliJ / GoLand
 .idea/
 *.iml
+
+# SBOMs generated during CI
+/bom.json
+/bom.xml
