@@ -13,8 +13,17 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      # Note: We don't need to setup Go here, because we don't distribute
-      # binaries and thus don't need to build anything
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - name: Generate SBOM
+        uses: CycloneDX/gh-gomod-generate-sbom@v0.2.0
+        with:
+          json: true
+          output: bom.json
+          type: library
+          version: v0.8.1
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
