@@ -48,7 +48,7 @@ func TestJsonBOMEncoder_SetPretty(t *testing.T) {
 
 	assert.Equal(t, `{
   "bomFormat": "CycloneDX",
-  "specVersion": "1.2",
+  "specVersion": "1.3",
   "version": 1,
   "metadata": {
     "authors": [
@@ -78,7 +78,7 @@ func TestXmlBOMEncoder_SetPretty(t *testing.T) {
 	require.NoError(t, encoder.Encode(bom))
 
 	assert.Equal(t, `<?xml version="1.0" encoding="UTF-8"?>
-<bom xmlns="http://cyclonedx.org/schema/bom/1.2" version="1">
+<bom xmlns="http://cyclonedx.org/schema/bom/1.3" version="1">
   <metadata>
     <authors>
       <author>
