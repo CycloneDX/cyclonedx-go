@@ -1,50 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bom xmlns="http://cyclonedx.org/schema/bom/1.2" serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1">
-  <metadata>
-    <timestamp>2020-04-07T07:01:00Z</timestamp>
-    <tools>
-      <tool>
-        <vendor>Awesome Vendor</vendor>
-        <name>Awesome Tool</name>
-        <version>9.1.2</version>
-        <hashes>
-          <hash alg="SHA-1">25ed8e31b995bb927966616df2a42b979a2717f0</hash>
-          <hash alg="SHA-256">a74f733635a19aefb1f73e5947cef59cd7440c6952ef0f03d09d974274cbd6df</hash>
-        </hashes>
-      </tool>
-    </tools>
-    <authors>
-      <author>
-        <name>Samantha Wright</name>
-        <email>samantha.wright@example.com</email>
-        <phone>800-555-1212</phone>
-      </author>
-    </authors>
-    <component type="application">
-      <name>Acme Application</name>
-      <version>9.1.1</version>
-      <swid tagId="swidgen-242eb18a-503e-ca37-393b-cf156ef09691_9.1.1" name="Acme Application" version="9.1.1">
-        <text content-type="text/xml" encoding="base64">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiID8+CjxTb2Z0d2FyZUlkZW50aXR5IHhtbDpsYW5nPSJFTiIgbmFtZT0iQWNtZSBBcHBsaWNhdGlvbiIgdmVyc2lvbj0iOS4xLjEiIAogdmVyc2lvblNjaGVtZT0ibXVsdGlwYXJ0bnVtZXJpYyIgCiB0YWdJZD0ic3dpZGdlbi1iNTk1MWFjOS00MmMwLWYzODItM2YxZS1iYzdhMmE0NDk3Y2JfOS4xLjEiIAogeG1sbnM9Imh0dHA6Ly9zdGFuZGFyZHMuaXNvLm9yZy9pc28vMTk3NzAvLTIvMjAxNS9zY2hlbWEueHNkIj4gCiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIiAKIHhzaTpzY2hlbWFMb2NhdGlvbj0iaHR0cDovL3N0YW5kYXJkcy5pc28ub3JnL2lzby8xOTc3MC8tMi8yMDE1LWN1cnJlbnQvc2NoZW1hLnhzZCBzY2hlbWEueHNkIiA+CiAgPE1ldGEgZ2VuZXJhdG9yPSJTV0lEIFRhZyBPbmxpbmUgR2VuZXJhdG9yIHYwLjEiIC8+IAogIDxFbnRpdHkgbmFtZT0iQWNtZSwgSW5jLiIgcmVnaWQ9ImV4YW1wbGUuY29tIiByb2xlPSJ0YWdDcmVhdG9yIiAvPiAKPC9Tb2Z0d2FyZUlkZW50aXR5Pg==</text>
-      </swid>
-    </component>
-    <manufacture>
-      <name>Acme, Inc.</name>
-      <url>https://example.com</url>
-      <url>https://example2.com</url>
-      <contact>
-        <name>Acme Professional Services</name>
-        <email>professional.services@example.com</email>
-      </contact>
-    </manufacture>
-    <supplier>
-      <name>Acme, Inc.</name>
-      <url>https://example.com</url>
-      <contact>
-        <name>Acme Distribution</name>
-        <email>distribution@example.com</email>
-      </contact>
-    </supplier>
-  </metadata>
   <components>
     <component type="application">
       <publisher>Acme Inc</publisher>
@@ -83,6 +38,18 @@
             <purl>pkg:maven/org.apache.tomcat/tomcat-catalina@9.0.14?packaging=jar</purl>
           </component>
         </ancestors>
+        <descendants>
+          <component type="library">
+            <name>foo</name>
+            <version>1.0</version>
+          </component>
+        </descendants>
+        <variants>
+          <component type="library">
+            <name>bar</name>
+            <version>1.0</version>
+          </component>
+        </variants>
         <commits>
           <commit>
             <uid>7638417db6d59f3c431d3e1f261cc637155684cd</uid>
@@ -103,105 +70,5 @@
         <notes>Commentary here</notes>
       </pedigree>
     </component>
-    <component type="library">
-      <group>org.example</group>
-      <name>mylibrary</name>
-      <version>1.0.0</version>
-      <scope>required</scope>
-      <hashes>
-        <hash alg="MD5">2342c2eaf1feb9a80195dbaddf2ebaa3</hash>
-        <hash alg="SHA-1">68b78babe00a053f9e35ec6a2d9080f5b90122b0</hash>
-        <hash alg="SHA-256">708f1f53b41f11f02d12a11b1a38d2905d47b099afc71a0f1124ef8582ec7313</hash>
-        <hash alg="SHA-512">387b7ae16b9cae45f830671541539bf544202faae5aac544a93b7b0a04f5f846fa2f4e81ef3f1677e13aed7496408a441f5657ab6d54423e56bf6f38da124aef</hash>
-      </hashes>
-      <copyright>Copyright Example Inc. All rights reserved.</copyright>
-      <cpe>cpe:/a:example:myapplication:1.0.0</cpe>
-      <purl>pkg:maven/com.example/myapplication@1.0.0?packaging=war</purl>
-      <modified>false</modified>
-      <externalReferences>
-        <reference type="documentation">
-          <url>http://example.org/docs</url>
-          <comment>All component versions are documented here</comment>
-        </reference>
-        <reference type="advisories">
-          <url>http://example.org/security</url>
-        </reference>
-      </externalReferences>
-    </component>
-    <component type="framework">
-      <group>com.example</group>
-      <name>myframework</name>
-      <version>1.0.0</version>
-      <description>Example Inc, enterprise framework</description>
-      <scope>required</scope>
-      <hashes>
-        <hash alg="MD5">cfcb0b64aacd2f81c1cd546543de965a</hash>
-        <hash alg="SHA-1">7fbeef2346c45d565c3341f037bce4e088af8a52</hash>
-        <hash alg="SHA-256">0384db3cec55d86a6898c489fdb75a8e75fe66b26639634983d2f3c3558493d1</hash>
-        <hash alg="SHA-512">854909cdb9e3ca183056837144aab6d8069b377bd66445087cc7157bf0c3f620418705dd0b83bdc2f73a508c2bdb316ca1809d75ee6972d02023a3e7dd655c79</hash>
-      </hashes>
-      <licenses>
-        <license>
-          <name>Some random license</name>
-        </license>
-      </licenses>
-      <purl>pkg:maven/com.example/myframework@1.0.0?packaging=war</purl>
-      <modified>false</modified>
-      <externalReferences>
-        <reference type="website">
-          <url>http://example.com/myframework</url>
-        </reference>
-        <reference type="advisories">
-          <url>http://example.com/security</url>
-        </reference>
-      </externalReferences>
-    </component>
   </components>
-  <services>
-    <service bom-ref="b2a46a4b-8367-4bae-9820-95557cfe03a8">
-      <provider>
-        <name>Partner Org</name>
-        <url>https://partner.org</url>
-        <contact>
-          <name>Support</name>
-          <email>support@partner</email>
-          <phone>800-555-1212</phone>
-        </contact>
-      </provider>
-      <group>org.partner</group>
-      <name>Stock ticker service</name>
-      <version>2020-Q2</version>
-      <description>Provides real-time stock information</description>
-      <endpoints>
-        <endpoint>https://partner.org/api/v1/lookup</endpoint>
-        <endpoint>https://partner.org/api/v1/stock</endpoint>
-      </endpoints>
-      <authenticated>true</authenticated>
-      <x-trust-boundary>true</x-trust-boundary>
-      <data>
-        <classification flow="inbound">PII</classification>
-        <classification flow="outbound">PIFI</classification>
-        <classification flow="bi-directional">pubic</classification>
-      </data>
-      <licenses>
-        <license>
-          <name>Partner license</name>
-        </license>
-      </licenses>
-      <externalReferences>
-        <reference type="website">
-          <url>http://partner.org</url>
-        </reference>
-        <reference type="documentation">
-          <url>http://api.partner.org/swagger</url>
-        </reference>
-      </externalReferences>
-    </service>
-  </services>
-  <dependencies>
-    <dependency ref="acme-app">
-      <dependency ref="pkg:maven/org.acme/web-framework@1.0.0"></dependency>
-      <dependency ref="pkg:maven/org.acme/persistence@3.1.0"></dependency>
-    </dependency>
-  </dependencies>
 </bom>
