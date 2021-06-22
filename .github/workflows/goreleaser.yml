@@ -3,7 +3,7 @@ name: goreleaser
 on:
   push:
     tags:
-      - '*'
+      - 'v*'
 
 jobs:
   goreleaser:
@@ -23,7 +23,7 @@ jobs:
           json: true
           output: bom.json
           type: library
-          version: v0.8.1
+          version: latest
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
