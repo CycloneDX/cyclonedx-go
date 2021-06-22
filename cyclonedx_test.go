@@ -23,11 +23,66 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBool(t *testing.T) {
 	assert.Equal(t, true, *Bool(true))
 	assert.Equal(t, false, *Bool(false))
+}
+
+func TestBOMReference_MarshalXML(t *testing.T) {
+	// Marshal empty bomRef
+	bomRef := BOMReference("")
+	xmlBytes, err := xml.Marshal(bomRef)
+	assert.NoError(t, err)
+	assert.Equal(t, "<BOMReference ref=\"\"></BOMReference>", string(xmlBytes))
+
+	// Marshal bomRef
+	bomRef = "bomRef"
+	xmlBytes, err = xml.Marshal(bomRef)
+	assert.NoError(t, err)
+	assert.Equal(t, "<BOMReference ref=\"bomRef\"></BOMReference>", string(xmlBytes))
+}
+
+func TestBOMReference_UnmarshalXML(t *testing.T) {
+	// Unmarshal empty bomRef
+	bomRef := new(BOMReference)
+	err := xml.Unmarshal([]byte("<BOMReference ref=\"\"></BOMReference>"), bomRef)
+	require.NoError(t, err)
+	require.Equal(t, "", string(*bomRef))
+
+	// Unmarshal bomRef
+	err = xml.Unmarshal([]byte("<BOMReference ref=\"bomRef\"></BOMReference>"), bomRef)
+	require.NoError(t, err)
+	require.Equal(t, "bomRef", string(*bomRef))
+}
+
+func TestCopyright_MarshalXML(t *testing.T) {
+	// Marshal empty copyright
+	copyright := Copyright{}
+	xmlBytes, err := xml.Marshal(copyright)
+	require.NoError(t, err)
+	require.Equal(t, "<Copyright></Copyright>", string(xmlBytes))
+
+	// Marshal copyright
+	copyright.Text = "copyright"
+	xmlBytes, err = xml.Marshal(copyright)
+	require.NoError(t, err)
+	require.Equal(t, "<Copyright>copyright</Copyright>", string(xmlBytes))
+}
+
+func TestCopyright_UnmarshalXML(t *testing.T) {
+	// Unmarshal empty copyright
+	copyright := new(Copyright)
+	err := xml.Unmarshal([]byte("<Copyright></Copyright>"), copyright)
+	require.NoError(t, err)
+	require.Equal(t, "", copyright.Text)
+
+	// Unmarshal copyright
+	err = xml.Unmarshal([]byte("<Copyright>copyright</Copyright>"), copyright)
+	require.NoError(t, err)
+	require.Equal(t, "copyright", copyright.Text)
 }
 
 func TestDependency_MarshalJSON(t *testing.T) {
