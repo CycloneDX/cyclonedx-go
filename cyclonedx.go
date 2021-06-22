@@ -281,8 +281,12 @@ func (l LicenseChoice) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
 		return e.EncodeElement(l.License, xml.StartElement{Name: xml.Name{Local: "license"}})
 	} else if l.Expression != "" {
 		expressionElement := xml.StartElement{Name: xml.Name{Local: "expression"}}
-		e.EncodeToken(expressionElement)
-		e.EncodeToken(xml.CharData(l.Expression))
+		if err := e.EncodeToken(expressionElement); err != nil {
+			return err
+		}
+		if err := e.EncodeToken(xml.CharData(l.Expression)); err != nil {
+			return err
+		}
 		return e.EncodeToken(xml.EndElement{Name: expressionElement.Name})
 	}
 
