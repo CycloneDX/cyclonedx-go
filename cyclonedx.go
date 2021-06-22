@@ -26,8 +26,8 @@ import (
 const (
 	BOMFormat      = "CycloneDX"
 	defaultVersion = 1
-	SpecVersion    = "1.2"
-	XMLNamespace   = "http://cyclonedx.org/schema/bom/1.2"
+	SpecVersion    = "1.3"
+	XMLNamespace   = "http://cyclonedx.org/schema/bom/1.3"
 )
 
 type AttachedText struct {
