@@ -20,7 +20,9 @@ package cyclonedx
 import (
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
+	"io"
 )
 
 const (
@@ -109,7 +111,7 @@ type Component struct {
 	Description        string                `json:"description,omitempty" xml:"description,omitempty"`
 	Scope              Scope                 `json:"scope,omitempty" xml:"scope,omitempty"`
 	Hashes             *[]Hash               `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
-	Licenses           *[]LicenseChoice      `json:"licenses,omitempty" xml:"licenses>license,omitempty"`
+	Licenses           *Licenses             `json:"licenses,omitempty" xml:"licenses,omitempty"`
 	Copyright          string                `json:"copyright,omitempty" xml:"copyright,omitempty"`
 	CPE                string                `json:"cpe,omitempty" xml:"cpe,omitempty"`
 	PackageURL         string                `json:"purl,omitempty" xml:"purl,omitempty"`
@@ -267,53 +269,75 @@ type License struct {
 	URL  string        `json:"url,omitempty" xml:"url,omitempty"`
 }
 
-type LicenseChoice struct {
-	License    *License `json:"license,omitempty" xml:"-"`
-	Expression string   `json:"expression,omitempty" xml:"-"`
+type Licenses []LicenseChoice
+
+func (l Licenses) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(l) == 0 {
+		return nil
+	}
+
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	for _, choice := range l {
+		if choice.License != nil && choice.Expression != "" {
+			return fmt.Errorf("either license or expression must be set, but not both")
+		}
+
+		if choice.License != nil {
+			if err := e.EncodeElement(choice.License, xml.StartElement{Name: xml.Name{Local: "license"}}); err != nil {
+				return err
+			}
+		} else if choice.Expression != "" {
+			if err := e.EncodeElement(choice.Expression, xml.StartElement{Name: xml.Name{Local: "expression"}}); err != nil {
+				return err
+			}
+		}
+	}
+
+	return e.EncodeToken(start.End())
 }
 
-func (l LicenseChoice) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
-	if l.License != nil && l.Expression != "" {
-		return fmt.Errorf("either license or expression must be set, but not both")
-	}
+func (l *Licenses) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
+	licenses := make([]LicenseChoice, 0)
 
-	if l.License != nil {
-		return e.EncodeElement(l.License, xml.StartElement{Name: xml.Name{Local: "license"}})
-	} else if l.Expression != "" {
-		expressionElement := xml.StartElement{Name: xml.Name{Local: "expression"}}
-		if err := e.EncodeToken(expressionElement); err != nil {
+	for {
+		token, err := d.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
 			return err
 		}
-		if err := e.EncodeToken(xml.CharData(l.Expression)); err != nil {
-			return err
+
+		switch tokenType := token.(type) {
+		case xml.StartElement:
+			if tokenType.Name.Local == "expression" {
+				var expression string
+				if err = d.DecodeElement(&expression, &tokenType); err != nil {
+					return err
+				}
+				licenses = append(licenses, LicenseChoice{Expression: expression})
+			} else if tokenType.Name.Local == "license" {
+				var license License
+				if err = d.DecodeElement(&license, &tokenType); err != nil {
+					return err
+				}
+				licenses = append(licenses, LicenseChoice{License: &license})
+			} else {
+				return fmt.Errorf("unknown element: %s", tokenType.Name.Local)
+			}
 		}
-		return e.EncodeToken(xml.EndElement{Name: expressionElement.Name})
 	}
 
-	// Neither license nor expression set - don't write anything
+	*l = licenses
 	return nil
 }
 
-func (l *LicenseChoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	if start.Name.Local == "license" {
-		license := new(License)
-		if err := d.DecodeElement(license, &start); err != nil {
-			return err
-		}
-		l.License = license
-		l.Expression = ""
-		return nil
-	} else if start.Name.Local == "expression" {
-		expression := new(string)
-		if err := d.DecodeElement(expression, &start); err != nil {
-			return err
-		}
-		l.License = nil
-		l.Expression = *expression
-		return nil
-	}
-
-	return xml.UnmarshalError(fmt.Sprintf("cannot unmarshal element %#v", start))
+type LicenseChoice struct {
+	License    *License `json:"license,omitempty" xml:"-"`
+	Expression string   `json:"expression,omitempty" xml:"-"`
 }
 
 type Metadata struct {
@@ -380,7 +404,7 @@ type Service struct {
 	Authenticated        *bool                 `json:"authenticated,omitempty" xml:"authenticated,omitempty"`
 	CrossesTrustBoundary *bool                 `json:"x-trust-boundary,omitempty" xml:"x-trust-boundary,omitempty"`
 	Data                 *[]DataClassification `json:"data,omitempty" xml:"data>classification,omitempty"`
-	Licenses             *[]LicenseChoice      `json:"licenses,omitempty" xml:"licenses>license,omitempty"`
+	Licenses             *Licenses             `json:"licenses,omitempty" xml:"licenses,omitempty"`
 	ExternalReferences   *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 	Services             *[]Service            `json:"services,omitempty" xml:"services>service,omitempty"`
 }
