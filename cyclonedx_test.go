@@ -137,99 +137,83 @@ func TestDependency_UnmarshalJSON(t *testing.T) {
 	assert.Equal(t, "transitiveDependencyRef", (*dependency.Dependencies)[0].Ref)
 }
 
-func TestLicenseChoice_MarshalJSON(t *testing.T) {
-	// Marshal license
-	choice := LicenseChoice{
-		License: &License{
-			ID:   "licenseID",
-			Name: "licenseName",
-			URL:  "licenseURL",
+func TestLicenses_MarshalXML(t *testing.T) {
+	// Marshal license and expressions
+	licenses := Licenses{
+		LicenseChoice{
+			Expression: "expressionValue1",
+		},
+		LicenseChoice{
+			License: &License{
+				ID:  "licenseID",
+				URL: "licenseURL",
+			},
+		},
+		LicenseChoice{
+			Expression: "expressionValue2",
 		},
 	}
-	jsonBytes, err := json.Marshal(choice)
+	xmlBytes, err := xml.MarshalIndent(licenses, "", "  ")
 	assert.NoError(t, err)
-	assert.Equal(t, "{\"license\":{\"id\":\"licenseID\",\"name\":\"licenseName\",\"url\":\"licenseURL\"}}", string(jsonBytes))
+	assert.Equal(t, `<Licenses>
+  <expression>expressionValue1</expression>
+  <license>
+    <id>licenseID</id>
+    <url>licenseURL</url>
+  </license>
+  <expression>expressionValue2</expression>
+</Licenses>`, string(xmlBytes))
 
-	// Marshal expression
-	choice = LicenseChoice{
-		Expression: "expressionValue",
-	}
-	jsonBytes, err = json.Marshal(choice)
-	assert.NoError(t, err)
-	assert.Equal(t, "{\"expression\":\"expressionValue\"}", string(jsonBytes))
-}
-
-func TestLicenseChoice_MarshalXML(t *testing.T) {
-	// Marshal license
-	choice := LicenseChoice{
-		License: &License{
-			ID:   "licenseID",
-			Name: "licenseName",
-			URL:  "licenseURL",
+	// Should return error when both license and expression are set on an element
+	licenses = Licenses{
+		LicenseChoice{
+			License: &License{
+				ID: "licenseID",
+			},
+			Expression: "expressionValue",
 		},
 	}
-	xmlBytes, err := xml.Marshal(choice)
-	assert.NoError(t, err)
-	assert.Equal(t, "<license><id>licenseID</id><name>licenseName</name><url>licenseURL</url></license>", string(xmlBytes))
-
-	// Marshal expression
-	choice = LicenseChoice{
-		Expression: "expressionValue",
-	}
-	xmlBytes, err = xml.Marshal(choice)
-	assert.NoError(t, err)
-	assert.Equal(t, "<expression>expressionValue</expression>", string(xmlBytes))
-
-	// Should return error when both license and expression are set
-	choice = LicenseChoice{
-		License: &License{
-			ID: "licenseID",
-		},
-		Expression: "expressionValue",
-	}
-	_, err = xml.Marshal(choice)
+	_, err = xml.Marshal(licenses)
 	assert.Error(t, err)
 
-	// Should encode nothing when neither license nor expression are set
-	choice = LicenseChoice{}
-	xmlBytes, err = xml.Marshal(choice)
+	// Should encode nothing when empty
+	licenses = Licenses{}
+	xmlBytes, err = xml.Marshal(licenses)
 	assert.NoError(t, err)
 	assert.Nil(t, xmlBytes)
 }
 
-func TestLicenseChoice_UnmarshalJSON(t *testing.T) {
-	// Unmarshal license
-	choice := new(LicenseChoice)
-	err := json.Unmarshal([]byte("{\"license\":{\"id\":\"licenseID\",\"name\":\"licenseName\",\"url\":\"licenseURL\"}}"), choice)
+func TestLicenses_UnmarshalXML(t *testing.T) {
+	// Unmarshal license and expressions
+	licenses := new(Licenses)
+	err := xml.Unmarshal([]byte(`
+<Licenses>
+  <expression>expressionValue1</expression>
+  <license>
+    <id>licenseID</id>
+    <url>licenseURL</url>
+  </license>
+  <expression>expressionValue2</expression>
+</Licenses>`), licenses)
 	assert.NoError(t, err)
-	assert.NotNil(t, choice.License)
-	assert.Equal(t, "", choice.Expression)
+	assert.Len(t, *licenses, 3)
+	assert.Nil(t, (*licenses)[0].License)
+	assert.Equal(t, "expressionValue1", (*licenses)[0].Expression)
+	assert.NotNil(t, (*licenses)[1].License)
+	assert.Equal(t, "licenseID", (*licenses)[1].License.ID)
+	assert.Equal(t, "licenseURL", (*licenses)[1].License.URL)
+	assert.Empty(t, (*licenses)[1].Expression)
+	assert.Nil(t, (*licenses)[2].License)
+	assert.Equal(t, "expressionValue2", (*licenses)[2].Expression)
 
-	// Unmarshal expression
-	choice = new(LicenseChoice)
-	err = json.Unmarshal([]byte("{\"expression\":\"expressionValue\"}"), choice)
+	// Unmarshal empty licenses
+	licenses = new(Licenses)
+	err = xml.Unmarshal([]byte("<Licenses></Licenses>"), licenses)
 	assert.NoError(t, err)
-	assert.Nil(t, choice.License)
-	assert.Equal(t, "expressionValue", choice.Expression)
-}
+	assert.Empty(t, *licenses)
 
-func TestLicenseChoice_UnmarshalXML(t *testing.T) {
-	// Unmarshal license
-	choice := new(LicenseChoice)
-	err := xml.Unmarshal([]byte("<license><id>licenseID</id><name>licenseName</name><url>licenseURL</url></license>"), choice)
-	assert.NoError(t, err)
-	assert.NotNil(t, choice.License)
-	assert.Equal(t, "", choice.Expression)
-
-	// Unmarshal expression
-	choice = new(LicenseChoice)
-	err = xml.Unmarshal([]byte("<expression>expressionValue</expression>"), choice)
-	assert.NoError(t, err)
-	assert.Nil(t, choice.License)
-	assert.Equal(t, "expressionValue", choice.Expression)
-
-	// Should return error when input is neither license nor expression
-	choice = new(LicenseChoice)
-	err = xml.Unmarshal([]byte("<somethingElse>expressionValue</somethingElse>"), choice)
+	// Should return error when an element is neither license nor expression
+	licenses = new(Licenses)
+	err = xml.Unmarshal([]byte("<Licenses><somethingElse>expressionValue</somethingElse></Licenses>"), licenses)
 	assert.Error(t, err)
 }
