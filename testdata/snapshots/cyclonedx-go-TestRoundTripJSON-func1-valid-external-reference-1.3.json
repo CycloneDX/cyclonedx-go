@@ -19,6 +19,12 @@
         {
           "url": "https://example.org/support/sbom/portal-server/1.0.0",
           "comment": "An external SBOM that describes what this component includes",
+          "hashes": [
+            {
+              "alg": "SHA-256",
+              "content": "708f1f53b41f11f02d12a11b1a38d2905d47b099afc71a0f1124ef8582ec7313"
+            }
+          ],
           "type": "bom"
         },
         {

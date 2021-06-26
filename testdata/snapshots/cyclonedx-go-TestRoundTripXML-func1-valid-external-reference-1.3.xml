@@ -13,6 +13,9 @@
         <reference type="bom">
           <url>https://example.org/support/sbom/portal-server/1.0.0</url>
           <comment>An external SBOM that describes what this component includes</comment>
+          <hashes>
+            <hash alg="SHA-256">f498a8ff2dd007e29c2074f5e4b01a9a01775c3ff3aeaf6906ea503bc5791b7b</hash>
+          </hashes>
         </reference>
         <reference type="documentation">
           <url>https://example.org/support/documentation/portal-server/1.0.0</url>

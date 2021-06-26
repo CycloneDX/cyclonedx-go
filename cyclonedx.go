@@ -258,6 +258,7 @@ type Evidence struct {
 type ExternalReference struct {
 	URL     string                `json:"url" xml:"url"`
 	Comment string                `json:"comment,omitempty" xml:"comment,omitempty"`
+	Hashes  *[]Hash               `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
 	Type    ExternalReferenceType `json:"type" xml:"type,attr"`
 }
 
