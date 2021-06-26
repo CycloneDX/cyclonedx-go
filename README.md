@@ -28,7 +28,7 @@ Also, checkout the [`examples`](./examples) directory for some examples of how t
 
 | cyclonedx-go versions | Supported Go versions | Supported CycloneDX spec |
 |:---------------------:|:---------------------:|:------------------------:|
-|    <= v0.2.1          |         1.14+         |            1.2           |
+|    <= v0.3.0          |         1.14+         |            1.2           |
 |      v0.4.0+          |         1.14+         |            1.3           |
 
 We're aiming to support all [officially supported](https://golang.org/doc/devel/release.html#policy) Go versions, plus
