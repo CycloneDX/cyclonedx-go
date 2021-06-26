@@ -28,8 +28,8 @@ import (
 const (
 	BOMFormat      = "CycloneDX"
 	defaultVersion = 1
-	SpecVersion    = "1.2"
-	XMLNamespace   = "http://cyclonedx.org/schema/bom/1.2"
+	SpecVersion    = "1.3"
+	XMLNamespace   = "http://cyclonedx.org/schema/bom/1.3"
 )
 
 type AttachedText struct {
@@ -54,6 +54,8 @@ type BOM struct {
 	Services           *[]Service           `json:"services,omitempty" xml:"services>service,omitempty"`
 	ExternalReferences *[]ExternalReference `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 	Dependencies       *[]Dependency        `json:"dependencies,omitempty" xml:"dependencies>dependency,omitempty"`
+	Compositions       *[]Composition       `json:"compositions,omitempty" xml:"compositions>composition,omitempty"`
+	Properties         *[]Property          `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
 func NewBOM() *BOM {
@@ -75,6 +77,26 @@ const (
 // Bool is a convenience function to transform a value of the primitive type bool to a pointer of bool
 func Bool(value bool) *bool {
 	return &value
+}
+
+type BOMReference string
+
+// bomReferenceXML is temporarily used for marshalling and unmarshalling BOMReference instances to and from XML
+type bomReferenceXML struct {
+	Ref string `json:"-" xml:"ref,attr"`
+}
+
+func (b BOMReference) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return e.EncodeElement(bomReferenceXML{Ref: string(b)}, start)
+}
+
+func (b *BOMReference) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	bXML := bomReferenceXML{}
+	if err := d.DecodeElement(&bXML, &start); err != nil {
+		return err
+	}
+	*b = BOMReference(bXML.Ref)
+	return nil
 }
 
 type ComponentType string
@@ -119,7 +141,43 @@ type Component struct {
 	Modified           *bool                 `json:"modified,omitempty" xml:"modified,omitempty"`
 	Pedigree           *Pedigree             `json:"pedigree,omitempty" xml:"pedigree,omitempty"`
 	ExternalReferences *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+	Properties         *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Components         *[]Component          `json:"components,omitempty" xml:"components>component,omitempty"`
+	Evidence           *Evidence             `json:"evidence,omitempty" xml:"evidence,omitempty"`
+}
+
+type Composition struct {
+	Aggregate    CompositionAggregate `json:"aggregate" xml:"aggregate"`
+	Assemblies   *[]BOMReference      `json:"assemblies,omitempty" xml:"assemblies>assembly,omitempty"`
+	Dependencies *[]BOMReference      `json:"dependencies,omitempty" xml:"dependencies>dependency,omitempty"`
+}
+
+type CompositionAggregate string
+
+const (
+	CompositionAggregateComplete                 CompositionAggregate = "complete"
+	CompositionAggregateIncomplete               CompositionAggregate = "incomplete"
+	CompositionAggregateIncompleteFirstPartyOnly CompositionAggregate = "incomplete_first_party_only"
+	CompositionAggregateIncompleteThirdPartyOnly CompositionAggregate = "incomplete_third_party_only"
+	CompositionAggregateUnknown                  CompositionAggregate = "unknown"
+	CompositionAggregateNotSpecified             CompositionAggregate = "not_specified"
+)
+
+type Copyright struct {
+	Text string `json:"text" xml:"-"`
+}
+
+func (c Copyright) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return e.EncodeElement(c.Text, start)
+}
+
+func (c *Copyright) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var text string
+	if err := d.DecodeElement(&text, &start); err != nil {
+		return err
+	}
+	(*c).Text = text
+	return nil
 }
 
 type DataClassification struct {
@@ -192,9 +250,15 @@ type Diff struct {
 	URL  string        `json:"url,omitempty" xml:"url,omitempty"`
 }
 
+type Evidence struct {
+	Licenses  *Licenses    `json:"licenses,omitempty" xml:"licenses,omitempty"`
+	Copyright *[]Copyright `json:"copyright,omitempty" xml:"copyright>text,omitempty"`
+}
+
 type ExternalReference struct {
 	URL     string                `json:"url" xml:"url"`
 	Comment string                `json:"comment,omitempty" xml:"comment,omitempty"`
+	Hashes  *[]Hash               `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
 	Type    ExternalReferenceType `json:"type" xml:"type,attr"`
 }
 
@@ -347,6 +411,8 @@ type Metadata struct {
 	Component   *Component               `json:"component,omitempty" xml:"component,omitempty"`
 	Manufacture *OrganizationalEntity    `json:"manufacture,omitempty" xml:"manufacture,omitempty"`
 	Supplier    *OrganizationalEntity    `json:"supplier,omitempty" xml:"supplier,omitempty"`
+	Licenses    *Licenses                `json:"licenses,omitempty" xml:"licenses,omitempty"`
+	Properties  *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
 type OrganizationalContact struct {
@@ -385,6 +451,11 @@ type Pedigree struct {
 	Notes       string       `json:"notes,omitempty" xml:"notes,omitempty"`
 }
 
+type Property struct {
+	Name  string `json:"name" xml:"name,attr"`
+	Value string `json:"value" xml:",innerxml"`
+}
+
 type Scope string
 
 const (
@@ -406,6 +477,7 @@ type Service struct {
 	Data                 *[]DataClassification `json:"data,omitempty" xml:"data>classification,omitempty"`
 	Licenses             *Licenses             `json:"licenses,omitempty" xml:"licenses,omitempty"`
 	ExternalReferences   *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+	Properties           *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Services             *[]Service            `json:"services,omitempty" xml:"services>service,omitempty"`
 }
 
