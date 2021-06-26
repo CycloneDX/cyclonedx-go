@@ -29,21 +29,27 @@ func main() {
 	bom.Metadata = &cdx.Metadata{
 		Timestamp: time.Now().Format(time.RFC3339),
 		Component: &cdx.Component{
-			BOMRef:  "pkg:golang/acme-inc/acme-app@1.0.0",
+			BOMRef:  "pkg:golang/acme-inc/acme-app@v1.0.0",
 			Type:    cdx.ComponentTypeApplication,
 			Name:    "ACME Application",
-			Version: "1.0.0",
+			Version: "v1.0.0",
+		},
+		Properties: &[]cdx.Property{
+			{
+				Name:  "internal-bom-identifier",
+				Value: "123456789",
+			},
 		},
 	}
 	bom.Components = &[]cdx.Component{
 		{
-			BOMRef:      "pkg:golang/github.com/CycloneDX/cyclonedx-go@0.1.0",
+			BOMRef:      "pkg:golang/github.com/CycloneDX/cyclonedx-go@v0.3.0",
 			Type:        cdx.ComponentTypeLibrary,
 			Author:      "CycloneDX",
 			Name:        "cyclonedx-go",
-			Version:     "0.1.0",
+			Version:     "v0.3.0",
 			Description: "Go library to consume and produce CycloneDX Software Bill of Materials (SBOM)",
-			PackageURL:  "pkg:golang/github.com/CycloneDX/cyclonedx-go@0.1.0",
+			PackageURL:  "pkg:golang/github.com/CycloneDX/cyclonedx-go@v0.3.0",
 			ExternalReferences: &[]cdx.ExternalReference{
 				{
 					Type: cdx.ERTypeIssueTracker,
@@ -58,13 +64,24 @@ func main() {
 	}
 	bom.Dependencies = &[]cdx.Dependency{
 		{
-			Ref: "pkg:golang/acme-inc/acme-app@1.0.0",
+			Ref: "pkg:golang/acme-inc/acme-app@v1.0.0",
 			Dependencies: &[]cdx.Dependency{
-				{Ref: "pkg:golang/github.com/CycloneDX/cyclonedx-go@0.1.0"},
+				{Ref: "pkg:golang/github.com/CycloneDX/cyclonedx-go@v0.3.0"},
 			},
 		},
 		{
-			Ref: "pkg:golang/github.com/CycloneDX/cyclonedx-go@0.1.0",
+			Ref: "pkg:golang/github.com/CycloneDX/cyclonedx-go@v0.3.0",
+		},
+	}
+	bom.Compositions = &[]cdx.Composition{
+		{
+			Aggregate: cdx.CompositionAggregateComplete,
+			Assemblies: &[]cdx.BOMReference{
+				"pkg:golang/github.com/CycloneDX/cyclonedx-go@v0.3.0",
+			},
+			Dependencies: &[]cdx.BOMReference{
+				"pkg:golang/acme-inc/acme-app@v1.0.0",
+			},
 		},
 	}
 
