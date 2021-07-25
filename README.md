@@ -37,7 +37,9 @@ an additional older version.
 This library will only support the latest version of the CycloneDX specification. While it's generally possible to 
 *read* BOMs of an older spec, *writing* will exclusively produce BOMs conforming to the latest supported spec.
 
-## License
+## Copyright & License
+
+CycloneDX Go is Copyright (c) OWASP Foundation. All Rights Reserved.
 
 Permission to modify and redistribute is granted under the terms of the Apache 2.0 license.  
 See the [LICENSE](./LICENSE) file for the full license.
