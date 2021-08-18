@@ -29,6 +29,7 @@ jobs:
           - "^1.14"
           - "^1.15"
           - "^1.16"
+          - "^1.17"
     steps:
       - name: Setup Go
         uses: actions/setup-go@v2
