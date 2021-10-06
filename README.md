@@ -22,7 +22,7 @@ GO111MODULE=on go get github.com/CycloneDX/cyclonedx-go
 ## Usage
 
 Please refer to the module's [documentation](https://pkg.go.dev/github.com/CycloneDX/cyclonedx-go#section-documentation).  
-Also, checkout the [`examples`](./examples) directory for some examples of how this library may be used.
+Also, checkout the [`examples`](./example_test.go) to get an idea of how this library may be used.
 
 ## Compatibility
 
