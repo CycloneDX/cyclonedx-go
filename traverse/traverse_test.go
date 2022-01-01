@@ -20,36 +20,36 @@ package traverse
 import (
 	"testing"
 
-	"github.com/CycloneDX/cyclonedx-go"
+	cdx "github.com/CycloneDX/cyclonedx-go"
 	"github.com/stretchr/testify/require"
 )
 
 func TestTraverse(t *testing.T) {
-	bom := &cyclonedx.BOM{
-		Metadata: &cyclonedx.Metadata{
-			Component: &cyclonedx.Component{
+	bom := &cdx.BOM{
+		Metadata: &cdx.Metadata{
+			Component: &cdx.Component{
 				Name: "main",
-				Components: &[]cyclonedx.Component{
+				Components: &[]cdx.Component{
 					{
 						Name: "main2",
 					},
 				},
 			},
 		},
-		Components: &[]cyclonedx.Component{
+		Components: &[]cdx.Component{
 			{
 				Name: "c1",
-				Components: &[]cyclonedx.Component{
+				Components: &[]cdx.Component{
 					{
 						Name: "c1.1",
 					},
 				},
 			},
 		},
-		Dependencies: &[]cyclonedx.Dependency{
+		Dependencies: &[]cdx.Dependency{
 			{
 				Ref: "d1",
-				Dependencies: &[]cyclonedx.Dependency{
+				Dependencies: &[]cdx.Dependency{
 					{
 						Ref: "d1.1",
 					},
@@ -64,9 +64,9 @@ func TestTraverse(t *testing.T) {
 
 		err = Traverse(bom, Options{Wants: []Want{WantComponent, WantDependency}}, func(e interface{}) error {
 			switch elem := e.(type) {
-			case *cyclonedx.Component:
+			case *cdx.Component:
 				elem.BOMRef = "x"
-			case *cyclonedx.Dependency:
+			case *cdx.Dependency:
 				elem.Ref = "y"
 			default:
 				require.Fail(t, "traversal over unwanted element of type %T", elem)
@@ -91,9 +91,9 @@ func TestTraverse(t *testing.T) {
 
 		err = Traverse(bom, Options{Wants: []Want{WantComponent, WantDependency}, Recursive: true}, func(e interface{}) error {
 			switch elem := e.(type) {
-			case *cyclonedx.Component:
+			case *cdx.Component:
 				elem.BOMRef = "x"
-			case *cyclonedx.Dependency:
+			case *cdx.Dependency:
 				elem.Ref = "y"
 			default:
 				require.Fail(t, "traversal over unwanted element of type %T", elem)
@@ -118,11 +118,11 @@ func TestTraverse(t *testing.T) {
 
 		err = Traverse(bom, Options{Wants: []Want{WantAll}}, func(e interface{}) error {
 			switch e.(type) {
-			case *cyclonedx.Metadata:
+			case *cdx.Metadata:
 				break
-			case *cyclonedx.Component:
+			case *cdx.Component:
 				break
-			case *cyclonedx.Dependency:
+			case *cdx.Dependency:
 				break
 			default:
 				require.Failf(t, "traversal over unwanted element", "element type is %T", e)
