@@ -113,7 +113,7 @@ func assertValidBOM(t *testing.T, bomFilePath string) {
 	if strings.HasSuffix(bomFilePath, ".json") {
 		inputFormat = "json"
 	}
-	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--input-format", inputFormat, "--input-version", "v1_3", "--fail-on-errors")
+	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--input-format", inputFormat, "--input-version", "v1_4", "--fail-on-errors")
 	valOut, err := valCmd.CombinedOutput()
 	if !assert.NoError(t, err) {
 		// Provide some context when test is failing

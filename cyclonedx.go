@@ -28,8 +28,8 @@ import (
 const (
 	BOMFormat      = "CycloneDX"
 	defaultVersion = 1
-	SpecVersion    = "1.3"
-	XMLNamespace   = "http://cyclonedx.org/schema/bom/1.3"
+	SpecVersion    = "1.4"
+	XMLNamespace   = "http://cyclonedx.org/schema/bom/1.4"
 )
 
 type AttachedText struct {
@@ -56,6 +56,7 @@ type BOM struct {
 	Dependencies       *[]Dependency        `json:"dependencies,omitempty" xml:"dependencies>dependency,omitempty"`
 	Compositions       *[]Composition       `json:"compositions,omitempty" xml:"compositions>composition,omitempty"`
 	Properties         *[]Property          `json:"properties,omitempty" xml:"properties>property,omitempty"`
+	Vulnerabilities    *[]Vulnerability     `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
 }
 
 func NewBOM() *BOM {
@@ -129,7 +130,7 @@ type Component struct {
 	Publisher          string                `json:"publisher,omitempty" xml:"publisher,omitempty"`
 	Group              string                `json:"group,omitempty" xml:"group,omitempty"`
 	Name               string                `json:"name" xml:"name"`
-	Version            string                `json:"version" xml:"version"`
+	Version            string                `json:"version,omitempty" xml:"version,omitempty"`
 	Description        string                `json:"description,omitempty" xml:"description,omitempty"`
 	Scope              Scope                 `json:"scope,omitempty" xml:"scope,omitempty"`
 	Hashes             *[]Hash               `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
@@ -144,6 +145,7 @@ type Component struct {
 	Properties         *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Components         *[]Component          `json:"components,omitempty" xml:"components>component,omitempty"`
 	Evidence           *Evidence             `json:"evidence,omitempty" xml:"evidence,omitempty"`
+	ReleaseNotes       *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
 }
 
 type Composition struct {
@@ -276,6 +278,7 @@ const (
 	ERTypeMailingList   ExternalReferenceType = "mailing-list"
 	ERTypeOther         ExternalReferenceType = "other"
 	ERTypeIssueTracker  ExternalReferenceType = "issue-tracker"
+	ERTypeReleaseNotes  ExternalReferenceType = "release-notes"
 	ERTypeSocial        ExternalReferenceType = "social"
 	ERTypeSupport       ExternalReferenceType = "support"
 	ERTypeVCS           ExternalReferenceType = "vcs"
@@ -311,7 +314,7 @@ type IdentifiableAction struct {
 
 type Issue struct {
 	ID          string    `json:"id" xml:"id"`
-	Name        string    `json:"name" xml:"name"`
+	Name        string    `json:"name,omitempty" xml:"name,omitempty"`
 	Description string    `json:"description" xml:"description"`
 	Source      *Source   `json:"source,omitempty" xml:"source,omitempty"`
 	References  *[]string `json:"references,omitempty" xml:"references>url,omitempty"`
@@ -479,6 +482,7 @@ type Service struct {
 	ExternalReferences   *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 	Properties           *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Services             *[]Service            `json:"services,omitempty" xml:"services>service,omitempty"`
+	ReleaseNotes         *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
 }
 
 type Source struct {
@@ -497,8 +501,9 @@ type SWID struct {
 }
 
 type Tool struct {
-	Vendor  string  `json:"vendor,omitempty" xml:"vendor,omitempty"`
-	Name    string  `json:"name" xml:"name"`
-	Version string  `json:"version,omitempty" xml:"version,omitempty"`
-	Hashes  *[]Hash `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
+	Vendor             string               `json:"vendor,omitempty" xml:"vendor,omitempty"`
+	Name               string               `json:"name" xml:"name"`
+	Version            string               `json:"version,omitempty" xml:"version,omitempty"`
+	Hashes             *[]Hash              `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
+	ExternalReferences *[]ExternalReference `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 }
