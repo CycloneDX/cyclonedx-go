@@ -32,6 +32,22 @@ const (
 	XMLNamespace   = "http://cyclonedx.org/schema/bom/1.4"
 )
 
+type Advisory struct {
+	Title string `json:"title,omitempty" xml:"title,omitempty"`
+	URL   string `json:"url" xml:"url"`
+}
+
+type AffectedVersions struct {
+	Version string              `json:"version,omitempty" xml:"version,omitempty"`
+	Range   string              `json:"range,omitempty" xml:"range,omitempty"`
+	Status  VulnerabilityStatus `json:"status" xml:"status"`
+}
+
+type Affects struct {
+	Ref   string              `json:"ref" xml:"ref"`
+	Range *[]AffectedVersions `json:"range,omitempty" xml:"versions>version,omitempty"`
+}
+
 type AttachedText struct {
 	Content     string `json:"content" xml:",innerxml"`
 	ContentType string `json:"contentType,omitempty" xml:"content-type,attr,omitempty"`
@@ -182,6 +198,11 @@ func (c *Copyright) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return nil
 }
 
+type Credits struct {
+	Organizations *[]OrganizationalEntity  `json:"organizations,omitempty" xml:"organizations>organization,omitempty"`
+	Individuals   *[]OrganizationalContact `json:"individuals,omitempty" xml:"individuals>individual,omitempty"`
+}
+
 type DataClassification struct {
 	Flow           DataFlow `json:"flow" xml:"flow,attr"`
 	Classification string   `json:"classification" xml:",innerxml"`
@@ -312,6 +333,41 @@ type IdentifiableAction struct {
 	EMail     string `json:"email,omitempty" xml:"email,omitempty"`
 }
 
+type ImpactAnalysisJustification string
+
+const (
+	IAJCodeNotPresent               ImpactAnalysisJustification = "code_not_present"
+	IAJCodeNotReachable             ImpactAnalysisJustification = "code_not_reachable"
+	IAJRequiresConfiguration        ImpactAnalysisJustification = "requires_configuration"
+	IAJRequiresDependency           ImpactAnalysisJustification = "requires_dependency"
+	IAJRequiresEnvironment          ImpactAnalysisJustification = "requires_environment"
+	IAJProtectedByCompiler          ImpactAnalysisJustification = "protected_by_compiler"
+	IAJProtectedAtRuntime           ImpactAnalysisJustification = "protected_at_runtime"
+	IAJProtectedAtPerimeter         ImpactAnalysisJustification = "protected_at_perimeter"
+	IAJProtectedByMitigatingControl ImpactAnalysisJustification = "protected_by_mitigating_control"
+)
+
+type ImpactAnalysisResponse string
+
+const (
+	IARCanNotFix           ImpactAnalysisResponse = "can_not_fix"
+	IARWillNotFix          ImpactAnalysisResponse = "will_not_fix"
+	IARUpdate              ImpactAnalysisResponse = "update"
+	IARRollback            ImpactAnalysisResponse = "rollback"
+	IARWorkaroundAvailable ImpactAnalysisResponse = "workaround_available"
+)
+
+type ImpactAnalysisState string
+
+const (
+	IASResolved             ImpactAnalysisState = "resolved"
+	IASResolvedWithPedigree ImpactAnalysisState = "resolved_with_pedigree"
+	IASExploitable          ImpactAnalysisState = "exploitable"
+	IASInTriage             ImpactAnalysisState = "in_triage"
+	IASFalsePositive        ImpactAnalysisState = "false_positive"
+	IASNotAffected          ImpactAnalysisState = "not_affected"
+)
+
 type Issue struct {
 	ID          string    `json:"id" xml:"id"`
 	Name        string    `json:"name,omitempty" xml:"name,omitempty"`
@@ -418,6 +474,11 @@ type Metadata struct {
 	Properties  *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
+type Note struct {
+	Locale string       `json:"locale,omitempty" xml:"locale,omitempty"`
+	Text   AttachedText `json:"text" xml:"text"`
+}
+
 type OrganizationalContact struct {
 	Name  string `json:"name,omitempty" xml:"name,omitempty"`
 	EMail string `json:"email,omitempty" xml:"email,omitempty"`
@@ -459,12 +520,36 @@ type Property struct {
 	Value string `json:"value" xml:",innerxml"`
 }
 
+type ReleaseNotes struct {
+	Type          string      `json:"type" xml:"type"`
+	Title         string      `json:"title,omitempty" xml:"title,omitempty"`
+	FeaturedImage string      `json:"featuredImage,omitempty" xml:"featuredImage,omitempty"`
+	SocialImage   string      `json:"socialImage,omitempty" xml:"socialImage,omitempty"`
+	Description   string      `json:"description,omitempty" xml:"description,omitempty"`
+	Timestamp     string      `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
+	Aliases       *[]string   `json:"aliases,omitempty" xml:"aliases>alias,omitempty"`
+	Tags          *[]string   `json:"tags,omitempty" xml:"tags>tag,omitempty"`
+	Resolves      *[]Issue    `json:"resolves,omitempty" xml:"resolves>issue,omitempty"`
+	Notes         *[]Note     `json:"notes,omitempty" xml:"notes>note,omitempty"`
+	Properties    *[]Property `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
 type Scope string
 
 const (
 	ScopeExcluded Scope = "excluded"
 	ScopeOptional Scope = "optional"
 	ScopeRequired Scope = "required"
+)
+
+type ScoringMethod string
+
+const (
+	ScoringMethodOther   ScoringMethod = "other"
+	ScoringMethodCVSSv2  ScoringMethod = "CVSSv2"
+	ScoringMethodCVSSv3  ScoringMethod = "CVSSv3"
+	ScoringMethodCVSSv31 ScoringMethod = "CVSSv31"
+	ScoringMethodOWASP   ScoringMethod = "OWASP"
 )
 
 type Service struct {
@@ -484,6 +569,18 @@ type Service struct {
 	Services             *[]Service            `json:"services,omitempty" xml:"services>service,omitempty"`
 	ReleaseNotes         *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
 }
+
+type Severity string
+
+const (
+	SeverityUnknown  Severity = "unknown"
+	SeverityNone     Severity = "none"
+	SeverityInfo     Severity = "info"
+	SeverityLow      Severity = "low"
+	SeverityMedium   Severity = "medium"
+	SeverityHigh     Severity = "high"
+	SeverityCritical Severity = "critical"
+)
 
 type Source struct {
 	Name string `json:"name,omitempty" xml:"name,omitempty"`
@@ -507,3 +604,52 @@ type Tool struct {
 	Hashes             *[]Hash              `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
 	ExternalReferences *[]ExternalReference `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 }
+
+type Vulnerability struct {
+	BOMRef         string                    `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	ID             string                    `json:"id" xml:"id"`
+	Source         *Source                   `json:"source,omitempty" xml:"source,omitempty"`
+	References     *[]VulnerabilityReference `json:"references,omitempty" xml:"references>reference,omitempty"`
+	Ratings        *[]VulnerabilityRating    `json:"ratings,omitempty" xml:"ratings>rating,omitempty"`
+	CWEs           *[]int                    `json:"cwes,omitempty" xml:"cwes>cwe,omitempty"`
+	Description    string                    `json:"description,omitempty" xml:"description,omitempty"`
+	Detail         string                    `json:"detail,omitempty" xml:"detail,omitempty"`
+	Recommendation string                    `json:"recommendation,omitempty" xml:"recommendation,omitempty"`
+	Advisories     *[]Advisory               `json:"advisories,omitempty" xml:"advisories>advisory,omitempty"`
+	Created        string                    `json:"created,omitempty" xml:"created,omitempty"`
+	Published      string                    `json:"published,omitempty" xml:"published,omitempty"`
+	Updated        string                    `json:"updated,omitempty" xml:"updated,omitempty"`
+	Credits        *Credits                  `json:"credits,omitempty" xml:"credits,omitempty"`
+	Tools          *[]Tool                   `json:"tools,omitempty" xml:"tools>tool,omitempty"`
+	Analysis       *VulnerabilityAnalysis    `json:"analysis,omitempty" xml:"analysis,omitempty"`
+	Affects        *[]Affects                `json:"affects,omitempty" xml:"affects>target,omitempty"`
+}
+
+type VulnerabilityAnalysis struct {
+	State         ImpactAnalysisState         `json:"state,omitempty" xml:"state,omitempty"`
+	Justification ImpactAnalysisJustification `json:"justification,omitempty" xml:"justification,omitempty"`
+	Response      *[]ImpactAnalysisResponse   `json:"response,omitempty" xml:"responses>response,omitempty"`
+	Detail        string                      `json:"detail,omitempty" xml:"detail,omitempty"`
+}
+
+type VulnerabilityRating struct {
+	Source        *Source       `json:"source,omitempty" xml:"source,omitempty"`
+	Score         float64       `json:"score" xml:"score"`
+	Severity      Severity      `json:"severity,omitempty" xml:"severity,omitempty"`
+	Method        ScoringMethod `json:"method,omitempty" xml:"method,omitempty"`
+	Vector        string        `json:"vector,omitempty" xml:"vector,omitempty"`
+	Justification string        `json:"justification,omitempty" xml:"justification,omitempty"`
+}
+
+type VulnerabilityReference struct {
+	ID     string  `json:"id,omitempty" xml:"id,omitempty"`
+	Source *Source `json:"source,omitempty" xml:"source,omitempty"`
+}
+
+type VulnerabilityStatus string
+
+const (
+	VulnerabilityStatusUnknown     VulnerabilityStatus = "unknown"
+	VulnerabilityStatusAffected    VulnerabilityStatus = "affected"
+	VulnerabilityStatusNotAffected VulnerabilityStatus = "unaffected"
+)
