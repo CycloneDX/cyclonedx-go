@@ -11,7 +11,7 @@ type ReleaseNotes struct {
 	FeaturedImage string      `json:"featuredImage,omitempty" xml:"featuredImage,omitempty"`
 	SocialImage   string      `json:"socialImage,omitempty" xml:"socialImage,omitempty"`
 	Description   string      `json:"description,omitempty" xml:"description,omitempty"`
-	Timestamp     *Time       `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
+	Timestamp     string      `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
 	Aliases       *[]string   `json:"aliases,omitempty" xml:"aliases>alias,omitempty"`
 	Tags          *[]string   `json:"tags,omitempty" xml:"tags>tag,omitempty"`
 	Resolves      *[]Issue    `json:"resolves,omitempty" xml:"resolves>issue,omitempty"`
