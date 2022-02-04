@@ -45,7 +45,7 @@ type AffectedVersions struct {
 
 type Affects struct {
 	Ref   string              `json:"ref" xml:"ref"`
-	Range *[]AffectedVersions `json:"range,omitempty" xml:"versions>version,omitempty"`
+	Range *[]AffectedVersions `json:"versions,omitempty" xml:"versions>version,omitempty"`
 }
 
 type AttachedText struct {
