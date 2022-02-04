@@ -1,6 +1,6 @@
 {
   "bomFormat": "CycloneDX",
-  "specVersion": "1.3",
+  "specVersion": "1.4",
   "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
   "version": 1,
   "components": [
@@ -31,7 +31,6 @@
             "resolves": [
               {
                 "id": "JIRA-17240",
-                "name": "",
                 "description": "Great new feature that does something",
                 "source": {
                   "name": "Acme Org",
@@ -68,7 +67,6 @@
               },
               {
                 "id": "JIRA-874319",
-                "name": "",
                 "description": "Enable to do something",
                 "source": {
                   "name": "Example Org",
