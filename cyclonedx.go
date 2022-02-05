@@ -55,11 +55,9 @@ type AttachedText struct {
 }
 
 type BOM struct {
-	// XML specific fields
 	XMLName xml.Name `json:"-" xml:"bom"`
 	XMLNS   string   `json:"-" xml:"xmlns,attr"`
 
-	// JSON specific fields
 	BOMFormat   string `json:"bomFormat" xml:"-"`
 	SpecVersion string `json:"specVersion" xml:"-"`
 
@@ -73,6 +71,7 @@ type BOM struct {
 	Compositions       *[]Composition       `json:"compositions,omitempty" xml:"compositions>composition,omitempty"`
 	Properties         *[]Property          `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Vulnerabilities    *[]Vulnerability     `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
+	Signature          *Signature           `json:"signature,omitempty" xml:"-"`
 }
 
 func NewBOM() *BOM {
@@ -162,12 +161,14 @@ type Component struct {
 	Components         *[]Component          `json:"components,omitempty" xml:"components>component,omitempty"`
 	Evidence           *Evidence             `json:"evidence,omitempty" xml:"evidence,omitempty"`
 	ReleaseNotes       *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
+	Signature          *Signature            `json:"signature,omitempty" xml:"-"`
 }
 
 type Composition struct {
 	Aggregate    CompositionAggregate `json:"aggregate" xml:"aggregate"`
 	Assemblies   *[]BOMReference      `json:"assemblies,omitempty" xml:"assemblies>assembly,omitempty"`
 	Dependencies *[]BOMReference      `json:"dependencies,omitempty" xml:"dependencies>dependency,omitempty"`
+	Signature    *Signature           `json:"signature,omitempty" xml:"-"`
 }
 
 type CompositionAggregate string
@@ -568,6 +569,7 @@ type Service struct {
 	Properties           *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Services             *[]Service            `json:"services,omitempty" xml:"services>service,omitempty"`
 	ReleaseNotes         *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
+	Signature            *Signature            `json:"signature,omitempty" xml:"-"`
 }
 
 type Severity string
@@ -581,6 +583,46 @@ const (
 	SeverityHigh     Severity = "high"
 	SeverityCritical Severity = "critical"
 )
+
+type Signature struct {
+	Chain           []Signature         `json:"chain,omitempty" xml:"-"`
+	Signers         []Signature         `json:"signers,omitempty" xml:"-"`
+	Algorithm       SignatureAlgorithm  `json:"algorithm" xml:"-"`
+	KeyID           string              `json:"keyId,omitempty" xml:"-"`
+	PublicKey       *SignaturePublicKey `json:"publicKey,omitempty" xml:"-"`
+	CertificatePath []string            `json:"certificatePath,omitempty" xml:"-"`
+	Extensions      []string            `json:"extensions,omitempty" xml:"-"`
+	Excludes        []string            `json:"excludes,omitempty" xml:"-"`
+	Value           string              `json:"value" xml:"-"`
+}
+
+type SignatureAlgorithm string
+
+const (
+	SignatureAlgoRS256   SignatureAlgorithm = "RS256"
+	SignatureAlgoRS384   SignatureAlgorithm = "RS384"
+	SignatureAlgoRS512   SignatureAlgorithm = "RS512"
+	SignatureAlgoPS256   SignatureAlgorithm = "PS256"
+	SignatureAlgoPS384   SignatureAlgorithm = "PS384"
+	SignatureAlgoPS512   SignatureAlgorithm = "PS512"
+	SignatureAlgoES256   SignatureAlgorithm = "ES256"
+	SignatureAlgoES384   SignatureAlgorithm = "ES384"
+	SignatureAlgoES512   SignatureAlgorithm = "ES512"
+	SignatureAlgoEd25519 SignatureAlgorithm = "Ed25519"
+	SignatureAlgoEd448   SignatureAlgorithm = "Ed448"
+	SignatureAlgoHS256   SignatureAlgorithm = "HS256"
+	SignatureAlgoHS384   SignatureAlgorithm = "HS384"
+	SignatureAlgoHS512   SignatureAlgorithm = "HS512"
+)
+
+type SignaturePublicKey struct {
+	KeyType   string `json:"kty" xml:"-"`
+	CurveName string `json:"krv" xml:"-"`
+	CurveX    string `json:"x" xml:"-"`
+	CurveY    string `json:"y" xml:"-"`
+	Modulus   string `json:"n" xml:"-"`
+	Exponent  string `json:"e" xml:"-"`
+}
 
 type Source struct {
 	Name string `json:"name,omitempty" xml:"name,omitempty"`
