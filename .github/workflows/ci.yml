@@ -9,7 +9,18 @@ on:
       - master
 
 jobs:
-  golangci:
+  licensecheck:
+    name: License Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Check license headers
+        uses: apache/skywalking-eyes@v0.2.0
+        with:
+          config: .licenserc.yml
+
+  lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
@@ -45,8 +56,3 @@ jobs:
         uses: actions/checkout@v2
       - name: Test
         run: make test
-      - name: Generate SBOM
-        uses: CycloneDX/gh-gomod-generate-sbom@v1
-        with:
-          version: v1
-          args: mod -licenses -json -type library -verbose
