@@ -16,7 +16,7 @@
 ## Installation
 
 ```
-GO111MODULE=on go get github.com/CycloneDX/cyclonedx-go
+go get github.com/CycloneDX/cyclonedx-go
 ```
 
 ## Usage
@@ -28,9 +28,9 @@ Also, checkout the [`examples`](./example_test.go) to get an idea of how this li
 
 | cyclonedx-go versions | Supported Go versions | Supported CycloneDX spec |
 |:---------------------:|:---------------------:|:------------------------:|
-|    < v0.4.0           |         1.14+         |            1.2           |
-|   == v0.4.0           |         1.14+         |            1.3           |
-|   >= v0.5.0           |         1.15+         |            1.3           |
+|    < v0.4.0           |         1.14+         |           1.2            |
+|   == v0.4.0           |         1.14+         |           1.3            |
+|   >= v0.5.0           |         1.15+         |           1.4            |
 
 We're aiming to support all [officially supported](https://golang.org/doc/devel/release.html#policy) Go versions, plus
 an additional older version.
