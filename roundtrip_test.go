@@ -109,11 +109,11 @@ func TestRoundTripXML(t *testing.T) {
 }
 
 func assertValidBOM(t *testing.T, bomFilePath string) {
-	inputFormat := "xml_v1_3"
+	inputFormat := "xml"
 	if strings.HasSuffix(bomFilePath, ".json") {
-		inputFormat = "json_v1_3"
+		inputFormat = "json"
 	}
-	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--input-format", inputFormat, "--fail-on-errors")
+	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--input-format", inputFormat, "--input-version", "v1_4", "--fail-on-errors")
 	valOut, err := valCmd.CombinedOutput()
 	if !assert.NoError(t, err) {
 		// Provide some context when test is failing

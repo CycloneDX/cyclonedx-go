@@ -2,9 +2,10 @@ package cyclonedx_test
 
 import (
 	"fmt"
-	cdx "github.com/CycloneDX/cyclonedx-go"
 	"net/http"
 	"os"
+
+	cdx "github.com/CycloneDX/cyclonedx-go"
 )
 
 // This example demonstrates how to create and encode a BOM in CycloneDX format.
@@ -70,7 +71,7 @@ func Example_encode() {
 
 	// Output:
 	// <?xml version="1.0" encoding="UTF-8"?>
-	// <bom xmlns="http://cyclonedx.org/schema/bom/1.3" version="1">
+	// <bom xmlns="http://cyclonedx.org/schema/bom/1.4" version="1">
 	//   <metadata>
 	//     <component bom-ref="pkg:golang/acme-inc/acme-app@v1.0.0" type="application">
 	//       <name>ACME Application</name>
