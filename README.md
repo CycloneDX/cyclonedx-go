@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/CycloneDX/cyclonedx-go/actions/workflows/ci.yml/badge.svg)](https://github.com/CycloneDX/cyclonedx-go/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/CycloneDX/cyclonedx-go)](https://goreportcard.com/report/github.com/CycloneDX/cyclonedx-go)
 [![Go Reference](https://pkg.go.dev/badge/github.com/nscuro/cyclonedx-go.svg)](https://pkg.go.dev/github.com/CycloneDX/cyclonedx-go)
-[![License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](LICENSE)  
 [![Website](https://img.shields.io/badge/https://-cyclonedx.org-blue.svg)](https://cyclonedx.org/)
 [![Slack Invite](https://img.shields.io/badge/Slack-Join-blue?logo=slack&labelColor=393939)](https://cyclonedx.org/slack/invite)
 [![Group Discussion](https://img.shields.io/badge/discussion-groups.io-blue.svg)](https://groups.io/g/CycloneDX)
