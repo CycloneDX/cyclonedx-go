@@ -23,6 +23,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+
+	"github.com/google/uuid"
+	"github.com/gowebpki/jcs"
 )
 
 const (
@@ -162,6 +165,37 @@ type Component struct {
 	Components         *[]Component          `json:"components,omitempty" xml:"components>component,omitempty"`
 	Evidence           *Evidence             `json:"evidence,omitempty" xml:"evidence,omitempty"`
 	ReleaseNotes       *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
+}
+
+func (c Component) bomReference() string {
+	return c.BOMRef
+}
+
+func (c *Component) setBOMReference(ref string) {
+	c.BOMRef = ref
+}
+
+// TODO: Can we solve this more elegantly?
+type componentRefSeed Component
+
+func (c componentRefSeed) MarshalJSON() ([]byte, error) {
+	c.BOMRef = ""
+
+	componentJSON, err := json.Marshal(Component(c))
+	if err != nil {
+		return nil, err
+	}
+
+	return jcs.Transform(componentJSON)
+}
+
+func (c Component) generateBOMReference() (string, error) {
+	componentJSON, err := json.Marshal(componentRefSeed(c))
+	if err != nil {
+		return "", err
+	}
+
+	return uuid.NewSHA1(uuid.MustParse("369fac08-d4a0-452e-b4b1-de87a0f376c6"), componentJSON).String(), nil
 }
 
 type Composition struct {
@@ -520,6 +554,17 @@ type Property struct {
 	Value string `json:"value" xml:",innerxml"`
 }
 
+// referrer is an internal utility interface that is used
+// to address bom elements that have a BOM reference.
+type referrer interface {
+	bomReference() string
+	setBOMReference(ref string)
+
+	// generateBOMReference returns a new value intended to be used as BOM reference.
+	// Given the same state of the referrer, generateBOMReference must return the same result.
+	generateBOMReference() (string, error)
+}
+
 type ReleaseNotes struct {
 	Type          string      `json:"type" xml:"type"`
 	Title         string      `json:"title,omitempty" xml:"title,omitempty"`
@@ -568,6 +613,18 @@ type Service struct {
 	Properties           *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Services             *[]Service            `json:"services,omitempty" xml:"services>service,omitempty"`
 	ReleaseNotes         *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
+}
+
+func (s Service) bomReference() string {
+	return s.BOMRef
+}
+
+func (s *Service) setBOMReference(ref string) {
+	s.BOMRef = ref
+}
+
+func (s Service) generateBOMReference() (string, error) {
+	return "", nil
 }
 
 type Severity string
@@ -623,6 +680,18 @@ type Vulnerability struct {
 	Tools          *[]Tool                   `json:"tools,omitempty" xml:"tools>tool,omitempty"`
 	Analysis       *VulnerabilityAnalysis    `json:"analysis,omitempty" xml:"analysis,omitempty"`
 	Affects        *[]Affects                `json:"affects,omitempty" xml:"affects>target,omitempty"`
+}
+
+func (v Vulnerability) bomReference() string {
+	return v.BOMRef
+}
+
+func (v *Vulnerability) setBOMReference(ref string) {
+	v.BOMRef = ref
+}
+
+func (v Vulnerability) generateBOMReference() (string, error) {
+	return "", nil
 }
 
 type VulnerabilityAnalysis struct {

@@ -20,6 +20,8 @@ package cyclonedx
 import (
 	"encoding/json"
 	"encoding/xml"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -216,4 +218,23 @@ func TestLicenses_UnmarshalXML(t *testing.T) {
 	licenses = new(Licenses)
 	err = xml.Unmarshal([]byte("<Licenses><somethingElse>expressionValue</somethingElse></Licenses>"), licenses)
 	assert.Error(t, err)
+}
+
+func readTestBOM(t *testing.T, filePath string) *BOM {
+	format := BOMFileFormatJSON
+	if filepath.Ext(filePath) == ".xml" {
+		format = BOMFileFormatXML
+	}
+
+	file, err := os.Open(filePath)
+	require.NoError(t, err)
+	defer func() {
+		_ = file.Close()
+	}()
+
+	var bom BOM
+	err = NewBOMDecoder(file, format).Decode(&bom)
+	require.NoError(t, err)
+
+	return &bom
 }

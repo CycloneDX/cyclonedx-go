@@ -1,0 +1,67 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "components": [
+    {
+      "bom-ref": "urn:cdx:b3b9a427-329d-4478-8787-a368c05e1b8b/1#acme-app-a%401.0.0",
+      "type": "application",
+      "name": "acme-app-a",
+      "version": "1.0.0"
+    },
+    {
+      "bom-ref": "urn:cdx:b3b9a427-329d-4478-8787-a368c05e1b8b/1#pkg%3Amaven%2Fcom.acme%2Facme-lib-a%401.2.3",
+      "type": "library",
+      "group": "com.acme",
+      "name": "acme-lib-a",
+      "version": "1.2.3",
+      "components": [
+        {
+          "bom-ref": "urn:cdx:b3b9a427-329d-4478-8787-a368c05e1b8b/1#ee6758ea-6932-5a2d-86af-2bebaa3fa001",
+          "type": "file",
+          "name": "blob-a.tar.gz"
+        }
+      ]
+    },
+    {
+      "bom-ref": "urn:cdx:dfd8724c-d1ea-4717-b240-d95af1545240/2#acme-app-b%402.0.0",
+      "type": "application",
+      "name": "acme-app-b",
+      "version": "2.0.0"
+    },
+    {
+      "bom-ref": "urn:cdx:dfd8724c-d1ea-4717-b240-d95af1545240/2#pkg%3Amaven%2Fcom.acme%2Facme-lib-b%402.1.0",
+      "type": "library",
+      "group": "com.acme",
+      "name": "acme-lib-b",
+      "version": "2.1.0",
+      "components": [
+        {
+          "bom-ref": "urn:cdx:dfd8724c-d1ea-4717-b240-d95af1545240/2#927391ab-6b52-54b9-a2c8-290c7100fe56",
+          "type": "file",
+          "name": "blob-b.tar.gz"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "urn:cdx:b3b9a427-329d-4478-8787-a368c05e1b8b/1#acme-app-a%401.0.0",
+      "dependsOn": [
+        "urn:cdx:b3b9a427-329d-4478-8787-a368c05e1b8b/1#pkg%3Amaven%2Fcom.acme%2Facme-lib-a%401.2.3"
+      ]
+    },
+    {
+      "ref": "urn:cdx:b3b9a427-329d-4478-8787-a368c05e1b8b/1#pkg%3Amaven%2Fcom.acme%2Facme-lib-a%401.2.3"
+    },
+    {
+      "ref": "urn:cdx:dfd8724c-d1ea-4717-b240-d95af1545240/2#acme-app-b%402.0.0",
+      "dependsOn": [
+        "urn:cdx:dfd8724c-d1ea-4717-b240-d95af1545240/2#pkg%3Amaven%2Fcom.acme%2Facme-lib-b%402.1.0"
+      ]
+    },
+    {
+      "ref": "urn:cdx:dfd8724c-d1ea-4717-b240-d95af1545240/2#pkg%3Amaven%2Fcom.acme%2Facme-lib-b%402.1.0"
+    }
+  ]
+}
