@@ -41,7 +41,7 @@ type BOMLink struct {
 }
 
 // NewBOMLink TODO
-func NewBOMLink(bom *BOM, elem referrer) (*BOMLink, error) {
+func NewBOMLink(bom *BOM, ref bomReferrer) (*BOMLink, error) {
 	if bom == nil {
 		return nil, fmt.Errorf("bom is nil")
 	}
@@ -57,7 +57,7 @@ func NewBOMLink(bom *BOM, elem referrer) (*BOMLink, error) {
 		return nil, fmt.Errorf("invalid serial number: %w", err)
 	}
 
-	if elem == nil {
+	if ref == nil {
 		return &BOMLink{
 			SerialNumber: serial,
 			Version:      bom.Version,
@@ -67,7 +67,7 @@ func NewBOMLink(bom *BOM, elem referrer) (*BOMLink, error) {
 	return &BOMLink{
 		SerialNumber: serial,
 		Version:      bom.Version,
-		Reference:    elem.bomReference(),
+		Reference:    ref.bomReference(),
 	}, nil
 }
 

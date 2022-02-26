@@ -1,0 +1,34 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "serialNumber": "urn:uuid:b3b9a427-329d-4478-8787-a368c05e1b8b",
+  "metadata": {
+    "component": {
+      "bom-ref": "acme-app-a@1.0.0",
+      "type": "application",
+      "name": "acme-app-a",
+      "version": "1.0.0"
+    },
+    "properties": [
+      {
+        "name": "internal:some-id",
+        "value": "bom-a"
+      },
+      {
+        "name": "internal:some-id",
+        "value": "common-value"
+      }
+    ]
+  },
+  "properties": [
+    {
+      "name": "internal:some-id",
+      "value": "bom-a"
+    },
+    {
+      "name": "internal:some-id",
+      "value": "common-value"
+    }
+  ]
+}

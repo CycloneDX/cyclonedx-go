@@ -17,10 +17,37 @@
 
 package cyclonedx
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestIsBOMLink(t *testing.T) {
-	// TODO
+	t.Run("Valid", func(t *testing.T) {
+		for _, link := range []string{
+			"urn:cdx:ca0265ad-5bb3-46f2-8523-af52a7efc40b/1",
+			"urn:cdx:ca0265ad-5bb3-46f2-8523-af52a7efc40b/111",
+			"urn:cdx:ca0265ad-5bb3-46f2-8523-af52a7efc40b/1#ref",
+			"urn:cdx:ca0265ad-5bb3-46f2-8523-af52a7efc40b/1#r%2Fe%2Ff",
+		} {
+			assert.True(t, IsBOMLink(link))
+		}
+	})
+
+	t.Run("Invalid", func(t *testing.T) {
+		for _, invalidLink := range []string{
+			"urn",
+			"urn:cdx",
+			"urn:cdx:foo-bar",
+			"urn:cdx:ca0265ad-5bb3-46f2-8523-af52a7efc40b",
+			"urn:cdx:ca0265ad-5bb3-46f2-8523-af52a7efc40b#ref",
+			"urn:cdx:ca0265ad-5bb3-46f2-8523-af52a7efc40b/#ref",
+			"urn:cdx:ca0265ad-5bb3-46f2-8523-af52a7efc40b/1#",
+		} {
+			assert.False(t, IsBOMLink(invalidLink), invalidLink)
+		}
+	})
 }
 
 func TestNewBOMLink(t *testing.T) {

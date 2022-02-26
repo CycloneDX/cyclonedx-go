@@ -119,6 +119,17 @@ func (b *BOMReference) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	return nil
 }
 
+// bomReferrer is an internal utility interface that is used
+// to address bom elements that have a BOM reference.
+type bomReferrer interface {
+	bomReference() string
+	setBOMReference(ref string)
+
+	// generateBOMReference returns a new value intended to be used as BOM reference.
+	// Given the same state of the bomReferrer, generateBOMReference must return the same result.
+	generateBOMReference() (string, error)
+}
+
 type ComponentType string
 
 const (
@@ -167,10 +178,12 @@ type Component struct {
 	ReleaseNotes       *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
 }
 
+// bomReference implements the bomReferrer interface.
 func (c Component) bomReference() string {
 	return c.BOMRef
 }
 
+// setBOMReference implements the bomReferrer interface.
 func (c *Component) setBOMReference(ref string) {
 	c.BOMRef = ref
 }
@@ -189,6 +202,7 @@ func (c componentRefSeed) MarshalJSON() ([]byte, error) {
 	return jcs.Transform(componentJSON)
 }
 
+// generateBOMReference implements the bomReferrer interface.
 func (c Component) generateBOMReference() (string, error) {
 	componentJSON, err := json.Marshal(componentRefSeed(c))
 	if err != nil {
@@ -554,17 +568,6 @@ type Property struct {
 	Value string `json:"value" xml:",innerxml"`
 }
 
-// referrer is an internal utility interface that is used
-// to address bom elements that have a BOM reference.
-type referrer interface {
-	bomReference() string
-	setBOMReference(ref string)
-
-	// generateBOMReference returns a new value intended to be used as BOM reference.
-	// Given the same state of the referrer, generateBOMReference must return the same result.
-	generateBOMReference() (string, error)
-}
-
 type ReleaseNotes struct {
 	Type          string      `json:"type" xml:"type"`
 	Title         string      `json:"title,omitempty" xml:"title,omitempty"`
@@ -615,14 +618,17 @@ type Service struct {
 	ReleaseNotes         *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
 }
 
+// bomReference implements the bomReferrer interface.
 func (s Service) bomReference() string {
 	return s.BOMRef
 }
 
+// setBOMReference implements the bomReferrer interface.
 func (s *Service) setBOMReference(ref string) {
 	s.BOMRef = ref
 }
 
+// generateBOMReference implements the bomReferrer interface.
 func (s Service) generateBOMReference() (string, error) {
 	return "", nil
 }
@@ -682,14 +688,17 @@ type Vulnerability struct {
 	Affects        *[]Affects                `json:"affects,omitempty" xml:"affects>target,omitempty"`
 }
 
+// bomReference implements the bomReferrer interface.
 func (v Vulnerability) bomReference() string {
 	return v.BOMRef
 }
 
+// setBOMReference implements the bomReferrer interface.
 func (v *Vulnerability) setBOMReference(ref string) {
 	v.BOMRef = ref
 }
 
+// generateBOMReference implements the bomReferrer interface.
 func (v Vulnerability) generateBOMReference() (string, error) {
 	return "", nil
 }
