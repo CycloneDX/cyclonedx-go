@@ -634,7 +634,7 @@ type VulnerabilityAnalysis struct {
 
 type VulnerabilityRating struct {
 	Source        *Source       `json:"source,omitempty" xml:"source,omitempty"`
-	Score         float64       `json:"score" xml:"score"`
+	Score         *float64      `json:"score,omitempty" xml:"score,omitempty"`
 	Severity      Severity      `json:"severity,omitempty" xml:"severity,omitempty"`
 	Method        ScoringMethod `json:"method,omitempty" xml:"method,omitempty"`
 	Vector        string        `json:"vector,omitempty" xml:"vector,omitempty"`
