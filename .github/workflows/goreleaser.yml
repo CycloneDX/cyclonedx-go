@@ -23,11 +23,10 @@ jobs:
       with:
         go-version: "1.17"
         check-latest: true
-    - name: Generate SBOM
+    - name: Install cyclonedx-gomod
       uses: CycloneDX/gh-gomod-generate-sbom@v1
       with:
         version: v1
-        args: mod -licenses -json -output bom.json -type library -verbose
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v2
       with:
