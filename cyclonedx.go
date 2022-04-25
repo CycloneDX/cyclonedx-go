@@ -330,7 +330,7 @@ const (
 type IdentifiableAction struct {
 	Timestamp string `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
 	Name      string `json:"name,omitempty" xml:"name,omitempty"`
-	EMail     string `json:"email,omitempty" xml:"email,omitempty"`
+	Email     string `json:"email,omitempty" xml:"email,omitempty"`
 }
 
 type ImpactAnalysisJustification string
@@ -481,7 +481,7 @@ type Note struct {
 
 type OrganizationalContact struct {
 	Name  string `json:"name,omitempty" xml:"name,omitempty"`
-	EMail string `json:"email,omitempty" xml:"email,omitempty"`
+	Email string `json:"email,omitempty" xml:"email,omitempty"`
 	Phone string `json:"phone,omitempty" xml:"phone,omitempty"`
 }
 
