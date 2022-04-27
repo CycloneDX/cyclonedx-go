@@ -49,7 +49,7 @@ type Affects struct {
 }
 
 type AttachedText struct {
-	Content     string `json:"content" xml:",innerxml"`
+	Content     string `json:"content" xml:",chardata"`
 	ContentType string `json:"contentType,omitempty" xml:"content-type,attr,omitempty"`
 	Encoding    string `json:"encoding,omitempty" xml:"encoding,attr,omitempty"`
 }
@@ -205,7 +205,7 @@ type Credits struct {
 
 type DataClassification struct {
 	Flow           DataFlow `json:"flow" xml:"flow,attr"`
-	Classification string   `json:"classification" xml:",innerxml"`
+	Classification string   `json:"classification" xml:",chardata"`
 }
 
 type DataFlow string
@@ -308,7 +308,7 @@ const (
 
 type Hash struct {
 	Algorithm HashAlgorithm `json:"alg" xml:"alg,attr"`
-	Value     string        `json:"content" xml:",innerxml"`
+	Value     string        `json:"content" xml:",chardata"`
 }
 
 type HashAlgorithm string
@@ -517,7 +517,7 @@ type Pedigree struct {
 
 type Property struct {
 	Name  string `json:"name" xml:"name,attr"`
-	Value string `json:"value" xml:",innerxml"`
+	Value string `json:"value" xml:",chardata"`
 }
 
 type ReleaseNotes struct {
