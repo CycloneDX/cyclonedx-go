@@ -73,6 +73,16 @@ func TestXmlBOMEncoder_SetPretty(t *testing.T) {
 				Name: "authorName",
 			},
 		},
+		Properties: &[]Property{
+			{
+				Name:  "XML",
+				Value: "<xml>in here</xml>",
+			},
+			{
+				Name:  "Specials",
+				Value: "Special chars: < & > \"",
+			},
+		},
 	}
 
 	require.NoError(t, encoder.Encode(bom))
@@ -85,6 +95,10 @@ func TestXmlBOMEncoder_SetPretty(t *testing.T) {
         <name>authorName</name>
       </author>
     </authors>
+    <properties>
+      <property name="XML">&lt;xml&gt;in here&lt;/xml&gt;</property>
+      <property name="Specials">Special chars: &lt; &amp; &gt; &#34;</property>
+    </properties>
   </metadata>
 </bom>`, buf.String())
 }
