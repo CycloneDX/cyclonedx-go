@@ -1,0 +1,40 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "serialNumber": "urn:uuid:b3b9a427-329d-4478-8787-a368c05e1b8b",
+  "metadata": {
+    "component": {
+      "bom-ref": "acme-app-a@1.0.0",
+      "type": "application",
+      "name": "acme-app-a",
+      "version": "1.0.0"
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:maven/com.acme/acme-lib-a@1.2.3",
+      "type": "library",
+      "group": "com.acme",
+      "name": "acme-lib-a",
+      "version": "1.2.3",
+      "components": [
+        {
+          "type": "file",
+          "name": "blob-a.tar.gz"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "acme-app-a@1.0.0",
+      "dependsOn": [
+        "pkg:maven/com.acme/acme-lib-a@1.2.3"
+      ]
+    },
+    {
+      "ref": "pkg:maven/com.acme/acme-lib-a@1.2.3"
+    }
+  ]
+}

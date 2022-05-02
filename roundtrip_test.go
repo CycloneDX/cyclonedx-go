@@ -45,13 +45,7 @@ func TestRoundTripJSON(t *testing.T) {
 	for _, bomFilePath := range bomFilePaths {
 		t.Run(filepath.Base(bomFilePath), func(t *testing.T) {
 			// Read original BOM JSON
-			bomFile, err := os.Open(bomFilePath)
-			require.NoError(t, err)
-
-			// Decode BOM
-			bom := new(BOM)
-			require.NoError(t, NewBOMDecoder(bomFile, BOMFileFormatJSON).Decode(bom))
-			bomFile.Close()
+			bom := readTestBOM(t, bomFilePath)
 
 			// Encode BOM again
 			buf := new(bytes.Buffer)
@@ -61,11 +55,11 @@ func TestRoundTripJSON(t *testing.T) {
 			encoder := NewBOMEncoder(io.MultiWriter(buf, tempFile), BOMFileFormatJSON)
 			encoder.SetPretty(true)
 			require.NoError(t, encoder.Encode(bom))
-			tempFile.Close() // Required for CLI to be able to access the file
+			_ = tempFile.Close() // Required for CLI to be able to access the file
 
 			// Sanity checks: BOM has to be valid
 			assertValidBOM(t, tempFile.Name())
-			os.Remove(tempFile.Name())
+			_ = os.Remove(tempFile.Name())
 
 			// Compare with snapshot
 			assert.NoError(t, roundTripSnapshotter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))
@@ -80,13 +74,7 @@ func TestRoundTripXML(t *testing.T) {
 	for _, bomFilePath := range bomFilePaths {
 		t.Run(filepath.Base(bomFilePath), func(t *testing.T) {
 			// Read original BOM XML
-			bomFile, err := os.Open(bomFilePath)
-			require.NoError(t, err)
-
-			// Decode BOM
-			bom := new(BOM)
-			require.NoError(t, NewBOMDecoder(bomFile, BOMFileFormatXML).Decode(bom))
-			bomFile.Close()
+			bom := readTestBOM(t, bomFilePath)
 
 			// Encode BOM again
 			buf := new(bytes.Buffer)
@@ -96,11 +84,11 @@ func TestRoundTripXML(t *testing.T) {
 			encoder := NewBOMEncoder(io.MultiWriter(buf, tempFile), BOMFileFormatXML)
 			encoder.SetPretty(true)
 			require.NoError(t, encoder.Encode(bom))
-			tempFile.Close() // Required for CLI to be able to access the file
+			_ = tempFile.Close() // Required for CLI to be able to access the file
 
 			// Sanity check: BOM has to be valid
 			assertValidBOM(t, tempFile.Name())
-			os.Remove(tempFile.Name())
+			_ = os.Remove(tempFile.Name())
 
 			// Compare with snapshot
 			assert.NoError(t, roundTripSnapshotter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))

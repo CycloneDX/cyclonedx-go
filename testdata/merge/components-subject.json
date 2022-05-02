@@ -1,0 +1,13 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "bom-ref": "acme-product@1.0.0",
+      "type": "application",
+      "name": "acme-product",
+      "version": "1.0.0"
+    }
+  }
+}

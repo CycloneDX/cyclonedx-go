@@ -1,0 +1,31 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "components": [
+    {
+      "bom-ref": "urn:cdx:b3b9a427-329d-4478-8787-a368c05e1b8b/1#acme-app-a%401.0.0",
+      "type": "application",
+      "name": "acme-app-a",
+      "version": "1.0.0",
+      "externalReferences": [
+        {
+          "type": "bom",
+          "url": "urn:cdx:b3b9a427-329d-4478-8787-a368c05e1b8b/1"
+        }
+      ]
+    },
+    {
+      "bom-ref": "urn:cdx:dfd8724c-d1ea-4717-b240-d95af1545240/2#acme-app-b%402.0.0",
+      "type": "application",
+      "name": "acme-app-b",
+      "version": "2.0.0",
+      "externalReferences": [
+        {
+          "type": "bom",
+          "url": "urn:cdx:dfd8724c-d1ea-4717-b240-d95af1545240/2"
+        }
+      ]
+    }
+  ]
+}
