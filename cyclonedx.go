@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
 )
 
 const (
@@ -581,6 +582,8 @@ const (
 	SeverityHigh     Severity = "high"
 	SeverityCritical Severity = "critical"
 )
+
+var serialNumberRegex = regexp.MustCompile(`^urn:uuid:[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$`)
 
 type Source struct {
 	Name string `json:"name,omitempty" xml:"name,omitempty"`
