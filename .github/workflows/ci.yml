@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3.0.0
+      uses: actions/checkout@v3.0.2
     - name: Check license headers
       uses: apache/skywalking-eyes@v0.2.0
       with:
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3.0.0
+      uses: actions/checkout@v3.0.2
     - name: Setup Go
       uses: actions/setup-go@v3.0.0
       with:
@@ -64,6 +64,6 @@ jobs:
         echo "691cf7ed82ecce1f85e6d21bccd1ed2d7968e40eb6be7504b392c8b3a0943891 $HOME/.local/bin/cyclonedx" | sha256sum -c
         chmod +x "$HOME/.local/bin/cyclonedx"
     - name: Checkout Repository
-      uses: actions/checkout@v3.0.0
+      uses: actions/checkout@v3.0.2
     - name: Test
       run: make test
