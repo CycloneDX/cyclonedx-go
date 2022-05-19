@@ -220,7 +220,10 @@ func TestLicenses_UnmarshalXML(t *testing.T) {
 
 func TestVulnerability_Properties(t *testing.T) {
 	// GIVEN
-	var vuln Vulnerability
+	properties := []Property{}
+	vuln := Vulnerability{
+		Properties: &properties,
+	}
 
 	// EXPECT
 	assert.Equal(t, 0, len(*vuln.Properties))
