@@ -626,6 +626,7 @@ type Vulnerability struct {
 	Tools          *[]Tool                   `json:"tools,omitempty" xml:"tools>tool,omitempty"`
 	Analysis       *VulnerabilityAnalysis    `json:"analysis,omitempty" xml:"analysis,omitempty"`
 	Affects        *[]Affects                `json:"affects,omitempty" xml:"affects>target,omitempty"`
+	Properties     *[]Property               `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
 type VulnerabilityAnalysis struct {
