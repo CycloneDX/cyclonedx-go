@@ -218,7 +218,7 @@ func TestLicenses_UnmarshalXML(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestVulnerability(t *testing.T) {
+func TestVulnerability_Properties(t *testing.T) {
 	// GIVEN
 	var vuln Vulnerability
 
