@@ -217,3 +217,14 @@ func TestLicenses_UnmarshalXML(t *testing.T) {
 	err = xml.Unmarshal([]byte("<Licenses><somethingElse>expressionValue</somethingElse></Licenses>"), licenses)
 	assert.Error(t, err)
 }
+
+func TestVulnerability_Properties(t *testing.T) {
+	// GIVEN
+	properties := []Property{}
+	vuln := Vulnerability{
+		Properties: &properties,
+	}
+
+	// EXPECT
+	assert.Equal(t, 0, len(*vuln.Properties))
+}
