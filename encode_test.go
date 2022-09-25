@@ -19,6 +19,11 @@ package cyclonedx
 
 import (
 	"bytes"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -101,4 +106,84 @@ func TestXmlBOMEncoder_SetPretty(t *testing.T) {
     </properties>
   </metadata>
 </bom>`, buf.String())
+}
+
+func TestJsonBOMEncoder_EncodeVersion(t *testing.T) {
+	t.Run(SpecVersion1_0.String(), func(t *testing.T) {
+		err := NewBOMEncoder(ioutil.Discard, BOMFileFormatJSON).EncodeVersion(NewBOM(), SpecVersion1_0)
+		require.Error(t, err)
+		require.ErrorContains(t, err, "not supported")
+	})
+
+	t.Run(SpecVersion1_1.String(), func(t *testing.T) {
+		err := NewBOMEncoder(ioutil.Discard, BOMFileFormatJSON).EncodeVersion(NewBOM(), SpecVersion1_1)
+		require.Error(t, err)
+		require.ErrorContains(t, err, "not supported")
+	})
+
+	for _, version := range []SpecVersion{SpecVersion1_2, SpecVersion1_3, SpecVersion1_4} {
+		t.Run(version.String(), func(t *testing.T) {
+			// Read original BOM JSON
+			inputFile, err := os.Open("./testdata/valid-bom.json")
+			require.NoError(t, err)
+
+			// Decode BOM
+			var bom BOM
+			require.NoError(t, NewBOMDecoder(inputFile, BOMFileFormatJSON).Decode(&bom))
+			inputFile.Close()
+
+			// Prepare encoding destinations
+			buf := bytes.Buffer{}
+			outputFilePath := filepath.Join(t.TempDir(), "bom.json")
+			outputFile, err := os.Create(outputFilePath)
+			require.NoError(t, err)
+
+			// Encode BOM again, for a specific version
+			err = NewBOMEncoder(io.MultiWriter(&buf, outputFile), BOMFileFormatJSON).
+				SetPretty(true).
+				EncodeVersion(&bom, version)
+			require.NoError(t, err)
+			outputFile.Close() // Required for CLI to be able to access the file
+
+			// Sanity checks: BOM has to be valid
+			assertValidBOM(t, outputFilePath, version)
+
+			// Compare with snapshot
+			require.NoError(t, snapShooter.SnapshotMulti(fmt.Sprintf("%s.bom.json", version), buf.String()))
+		})
+	}
+}
+
+func TestXmlBOMEncoder_EncodeVersion(t *testing.T) {
+	for _, version := range []SpecVersion{SpecVersion1_0, SpecVersion1_1, SpecVersion1_2, SpecVersion1_3, SpecVersion1_4} {
+		t.Run(version.String(), func(t *testing.T) {
+			// Read original BOM JSON
+			inputFile, err := os.Open("./testdata/valid-bom.xml")
+			require.NoError(t, err)
+
+			// Decode BOM
+			var bom BOM
+			require.NoError(t, NewBOMDecoder(inputFile, BOMFileFormatXML).Decode(&bom))
+			inputFile.Close()
+
+			// Prepare encoding destinations
+			buf := bytes.Buffer{}
+			outputFilePath := filepath.Join(t.TempDir(), "bom.xml")
+			outputFile, err := os.Create(outputFilePath)
+			require.NoError(t, err)
+
+			// Encode BOM again
+			err = NewBOMEncoder(io.MultiWriter(&buf, outputFile), BOMFileFormatXML).
+				SetPretty(true).
+				EncodeVersion(&bom, version)
+			require.NoError(t, err)
+			outputFile.Close() // Required for CLI to be able to access the file
+
+			// Sanity checks: BOM has to be valid
+			require.NoError(t, snapShooter.SnapshotMulti(fmt.Sprintf("%s.bom.xml", version), buf.String()))
+
+			// Compare with snapshot
+			assertValidBOM(t, outputFilePath, version)
+		})
+	}
 }

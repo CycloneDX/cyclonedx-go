@@ -28,15 +28,18 @@ Also, checkout the [`examples`](./example_test.go) to get an idea of how this li
 
 | cyclonedx-go versions | Supported Go versions | Supported CycloneDX spec |
 |:---------------------:|:---------------------:|:------------------------:|
-|    < v0.4.0           |         1.14+         |           1.2            |
-|   == v0.4.0           |         1.14+         |           1.3            |
-|   >= v0.5.0           |         1.15+         |           1.4            |
+|       < v0.4.0        |         1.14+         |           1.2            |
+|       == v0.4.0       |         1.14+         |           1.3            |
+|       >= v0.5.0       |         1.15+         |           1.4            |
+|       >= v0.7.0       |         1.15+         |         1.0-1.4          |
 
 We're aiming to support all [officially supported](https://golang.org/doc/devel/release.html#policy) Go versions, plus
 an additional older version.
 
-This library will only support the latest version of the CycloneDX specification. While it's generally possible to 
-*read* BOMs of an older spec, *writing* will exclusively produce BOMs conforming to the latest supported spec.
+Prior to v0.7.0, this library only supported the latest version of the CycloneDX specification. While it is generally 
+possible to *read* BOMs of an older spec, *writing* would exclusively produce BOMs conforming to the latest supported spec.
+
+Starting with v0.7.0, writing BOMs conforming to all previous version of the spec is also possible.
 
 ## Copyright & License
 

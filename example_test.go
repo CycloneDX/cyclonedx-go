@@ -80,9 +80,10 @@ func Example_encode() {
 	bom.Dependencies = &dependencies
 
 	// Encode the BOM
-	encoder := cdx.NewBOMEncoder(os.Stdout, cdx.BOMFileFormatXML)
-	encoder.SetPretty(true)
-	if err := encoder.Encode(bom); err != nil {
+	err := cdx.NewBOMEncoder(os.Stdout, cdx.BOMFileFormatXML).
+		SetPretty(true).
+		Encode(bom)
+	if err != nil {
 		panic(err)
 	}
 

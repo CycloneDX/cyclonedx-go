@@ -20,11 +20,18 @@ package cyclonedx
 import (
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
+	"os/exec"
+	"strings"
 	"testing"
 
+	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+var snapShooter = cupaloy.NewDefaultConfig().
+	WithOptions(cupaloy.SnapshotSubdirectory("./testdata/snapshots"))
 
 func TestBool(t *testing.T) {
 	assert.Equal(t, true, *Bool(true))
@@ -227,4 +234,18 @@ func TestVulnerability_Properties(t *testing.T) {
 
 	// EXPECT
 	assert.Equal(t, 0, len(*vuln.Properties))
+}
+
+func assertValidBOM(t *testing.T, bomFilePath string, version SpecVersion) {
+	inputFormat := "xml"
+	if strings.HasSuffix(bomFilePath, ".json") {
+		inputFormat = "json"
+	}
+	inputVersion := fmt.Sprintf("v%s", strings.ReplaceAll(version.String(), ".", "_"))
+	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--input-format", inputFormat, "--input-version", inputVersion, "--fail-on-errors")
+	valOut, err := valCmd.CombinedOutput()
+	if !assert.NoError(t, err) {
+		// Provide some context when test is failing
+		fmt.Printf("validation error: %s\n", string(valOut))
+	}
 }

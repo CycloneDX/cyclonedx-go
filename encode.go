@@ -25,8 +25,16 @@ import (
 )
 
 type BOMEncoder interface {
-	Encode(*BOM) error
-	SetPretty(bool)
+	// Encode encodes a given BOM.
+	Encode(bom *BOM) error
+
+	// EncodeVersion encodes a given BOM in a specific version of the specification.
+	// Choosing a lower spec version than what the BOM was constructed for will result
+	// in loss of information. The original BOM struct is guaranteed to not be modified.
+	EncodeVersion(bom *BOM, version SpecVersion) error
+
+	// SetPretty toggles prettified output.
+	SetPretty(pretty bool) BOMEncoder
 }
 
 func NewBOMEncoder(writer io.Writer, format BOMFileFormat) BOMEncoder {
@@ -41,16 +49,34 @@ type jsonBOMEncoder struct {
 	pretty bool
 }
 
+// Encode implements the BOMEncoder interface.
 func (j jsonBOMEncoder) Encode(bom *BOM) error {
+	if bom.SpecVersion < SpecVersion1_2 {
+		return fmt.Errorf("json format is not supported for specification versions lower than 1.2")
+	}
+
 	encoder := json.NewEncoder(j.writer)
 	if j.pretty {
 		encoder.SetIndent("", "  ")
 	}
+
 	return encoder.Encode(bom)
 }
 
-func (j *jsonBOMEncoder) SetPretty(pretty bool) {
+// EncodeVersion implements the BOMEncoder interface.
+func (j jsonBOMEncoder) EncodeVersion(bom *BOM, version SpecVersion) (err error) {
+	bom, err = bom.copyAndDowngrade(version)
+	if err != nil {
+		return
+	}
+
+	return j.Encode(bom)
+}
+
+// SetPretty implements the BOMEncoder interface.
+func (j *jsonBOMEncoder) SetPretty(pretty bool) BOMEncoder {
 	j.pretty = pretty
+	return j
 }
 
 type xmlBOMEncoder struct {
@@ -58,6 +84,7 @@ type xmlBOMEncoder struct {
 	pretty bool
 }
 
+// Encode implements the BOMEncoder interface.
 func (x xmlBOMEncoder) Encode(bom *BOM) error {
 	if _, err := fmt.Fprintf(x.writer, xml.Header); err != nil {
 		return err
@@ -67,9 +94,22 @@ func (x xmlBOMEncoder) Encode(bom *BOM) error {
 	if x.pretty {
 		encoder.Indent("", "  ")
 	}
+
 	return encoder.Encode(bom)
 }
 
-func (x *xmlBOMEncoder) SetPretty(pretty bool) {
+// EncodeVersion implements the BOMEncoder interface.
+func (x xmlBOMEncoder) EncodeVersion(bom *BOM, version SpecVersion) (err error) {
+	bom, err = bom.copyAndDowngrade(version)
+	if err != nil {
+		return
+	}
+
+	return x.Encode(bom)
+}
+
+// SetPretty implements the BOMEncoder interface.
+func (x *xmlBOMEncoder) SetPretty(pretty bool) BOMEncoder {
 	x.pretty = pretty
+	return x
 }

@@ -19,24 +19,14 @@ package cyclonedx
 
 import (
 	"bytes"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 	"testing"
 
-	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-var roundTripSnapshotter = cupaloy.NewDefaultConfig().
-	WithOptions(cupaloy.SnapshotSubdirectory("./testdata/snapshots"))
-
-var subTestNameSlashReplacer = strings.NewReplacer("/", "_")
 
 func TestRoundTripJSON(t *testing.T) {
 	bomFilePaths, err := filepath.Glob("./testdata/*.json")
@@ -45,30 +35,32 @@ func TestRoundTripJSON(t *testing.T) {
 	for _, bomFilePath := range bomFilePaths {
 		t.Run(filepath.Base(bomFilePath), func(t *testing.T) {
 			// Read original BOM JSON
-			bomFile, err := os.Open(bomFilePath)
+			inputFile, err := os.Open(bomFilePath)
 			require.NoError(t, err)
 
 			// Decode BOM
-			bom := new(BOM)
-			require.NoError(t, NewBOMDecoder(bomFile, BOMFileFormatJSON).Decode(bom))
-			bomFile.Close()
+			var bom BOM
+			require.NoError(t, NewBOMDecoder(inputFile, BOMFileFormatJSON).Decode(&bom))
+			inputFile.Close()
 
-			// Encode BOM again
-			buf := new(bytes.Buffer)
-			tempFile, err := ioutil.TempFile("", "*_"+subTestNameSlashReplacer.Replace(t.Name()))
+			// Prepare encoding destinations
+			buf := bytes.Buffer{}
+			outputFilePath := filepath.Join(t.TempDir(), "bom.json")
+			outputFile, err := os.Create(outputFilePath)
 			require.NoError(t, err)
 
-			encoder := NewBOMEncoder(io.MultiWriter(buf, tempFile), BOMFileFormatJSON)
-			encoder.SetPretty(true)
-			require.NoError(t, encoder.Encode(bom))
-			tempFile.Close() // Required for CLI to be able to access the file
+			// Encode BOM again
+			err = NewBOMEncoder(io.MultiWriter(&buf, outputFile), BOMFileFormatJSON).
+				SetPretty(true).
+				Encode(&bom)
+			require.NoError(t, err)
+			outputFile.Close() // Required for CLI to be able to access the file
 
 			// Sanity checks: BOM has to be valid
-			assertValidBOM(t, tempFile.Name())
-			os.Remove(tempFile.Name())
+			assertValidBOM(t, outputFilePath, SpecVersion1_4)
 
 			// Compare with snapshot
-			assert.NoError(t, roundTripSnapshotter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))
+			assert.NoError(t, snapShooter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))
 		})
 	}
 }
@@ -80,43 +72,32 @@ func TestRoundTripXML(t *testing.T) {
 	for _, bomFilePath := range bomFilePaths {
 		t.Run(filepath.Base(bomFilePath), func(t *testing.T) {
 			// Read original BOM XML
-			bomFile, err := os.Open(bomFilePath)
+			inputFile, err := os.Open(bomFilePath)
 			require.NoError(t, err)
 
 			// Decode BOM
-			bom := new(BOM)
-			require.NoError(t, NewBOMDecoder(bomFile, BOMFileFormatXML).Decode(bom))
-			bomFile.Close()
+			var bom BOM
+			require.NoError(t, NewBOMDecoder(inputFile, BOMFileFormatXML).Decode(&bom))
+			inputFile.Close()
 
-			// Encode BOM again
-			buf := new(bytes.Buffer)
-			tempFile, err := ioutil.TempFile("", "*_"+subTestNameSlashReplacer.Replace(t.Name()))
+			// Prepare encoding destinations
+			buf := bytes.Buffer{}
+			outputFilePath := filepath.Join(t.TempDir(), "bom.xml")
+			outputFile, err := os.Create(outputFilePath)
 			require.NoError(t, err)
 
-			encoder := NewBOMEncoder(io.MultiWriter(buf, tempFile), BOMFileFormatXML)
-			encoder.SetPretty(true)
-			require.NoError(t, encoder.Encode(bom))
-			tempFile.Close() // Required for CLI to be able to access the file
+			// Encode BOM again
+			err = NewBOMEncoder(io.MultiWriter(&buf, outputFile), BOMFileFormatXML).
+				SetPretty(true).
+				Encode(&bom)
+			require.NoError(t, err)
+			outputFile.Close() // Required for CLI to be able to access the file
 
 			// Sanity check: BOM has to be valid
-			assertValidBOM(t, tempFile.Name())
-			os.Remove(tempFile.Name())
+			assertValidBOM(t, outputFilePath, SpecVersion1_4)
 
 			// Compare with snapshot
-			assert.NoError(t, roundTripSnapshotter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))
+			assert.NoError(t, snapShooter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))
 		})
-	}
-}
-
-func assertValidBOM(t *testing.T, bomFilePath string) {
-	inputFormat := "xml"
-	if strings.HasSuffix(bomFilePath, ".json") {
-		inputFormat = "json"
-	}
-	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--input-format", inputFormat, "--input-version", "v1_4", "--fail-on-errors")
-	valOut, err := valCmd.CombinedOutput()
-	if !assert.NoError(t, err) {
-		// Provide some context when test is failing
-		fmt.Printf("validation error: %s\n", string(valOut))
 	}
 }

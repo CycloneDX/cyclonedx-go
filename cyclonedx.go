@@ -26,11 +26,10 @@ import (
 	"regexp"
 )
 
+//go:generate stringer -linecomment -output cyclonedx_string.go -type SpecVersion
+
 const (
-	BOMFormat      = "CycloneDX"
-	defaultVersion = 1
-	SpecVersion    = "1.4"
-	XMLNamespace   = "http://cyclonedx.org/schema/bom/1.4"
+	BOMFormat = "CycloneDX"
 )
 
 type Advisory struct {
@@ -61,8 +60,8 @@ type BOM struct {
 	XMLNS   string   `json:"-" xml:"xmlns,attr"`
 
 	// JSON specific fields
-	BOMFormat   string `json:"bomFormat" xml:"-"`
-	SpecVersion string `json:"specVersion" xml:"-"`
+	BOMFormat   string      `json:"bomFormat" xml:"-"`
+	SpecVersion SpecVersion `json:"specVersion" xml:"-"`
 
 	SerialNumber       string               `json:"serialNumber,omitempty" xml:"serialNumber,attr,omitempty"`
 	Version            int                  `json:"version" xml:"version,attr"`
@@ -78,10 +77,10 @@ type BOM struct {
 
 func NewBOM() *BOM {
 	return &BOM{
-		XMLNS:       XMLNamespace,
+		XMLNS:       xmlNamespaces[SpecVersion1_4],
 		BOMFormat:   BOMFormat,
-		SpecVersion: SpecVersion,
-		Version:     defaultVersion,
+		SpecVersion: SpecVersion1_4,
+		Version:     1,
 	}
 }
 
@@ -590,6 +589,70 @@ type Source struct {
 	URL  string `json:"url,omitempty" xml:"url,omitempty"`
 }
 
+type SpecVersion int
+
+const (
+	SpecVersion1_0 SpecVersion = iota + 1 // 1.0
+	SpecVersion1_1                        // 1.1
+	SpecVersion1_2                        // 1.2
+	SpecVersion1_3                        // 1.3
+	SpecVersion1_4                        // 1.4
+)
+
+func (sv SpecVersion) MarshalJSON() ([]byte, error) {
+	return json.Marshal(sv.String())
+}
+
+func (sv *SpecVersion) UnmarshalJSON(bytes []byte) error {
+	var v string
+	err := json.Unmarshal(bytes, &v)
+	if err != nil {
+		return err
+	}
+
+	switch v {
+	case SpecVersion1_0.String():
+		*sv = SpecVersion1_0
+	case SpecVersion1_1.String():
+		*sv = SpecVersion1_1
+	case SpecVersion1_2.String():
+		*sv = SpecVersion1_2
+	case SpecVersion1_3.String():
+		*sv = SpecVersion1_3
+	case SpecVersion1_4.String():
+		*sv = SpecVersion1_4
+	}
+
+	return nil
+}
+
+func (sv SpecVersion) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return e.EncodeElement(sv.String(), start)
+}
+
+func (sv *SpecVersion) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var v string
+	err := d.DecodeElement(&v, &start)
+	if err != nil {
+		return err
+	}
+
+	switch v {
+	case SpecVersion1_0.String():
+		*sv = SpecVersion1_0
+	case SpecVersion1_1.String():
+		*sv = SpecVersion1_1
+	case SpecVersion1_2.String():
+		*sv = SpecVersion1_2
+	case SpecVersion1_3.String():
+		*sv = SpecVersion1_3
+	case SpecVersion1_4.String():
+		*sv = SpecVersion1_4
+	}
+
+	return nil
+}
+
 type SWID struct {
 	Text       *AttachedText `json:"text,omitempty" xml:"text,omitempty"`
 	URL        string        `json:"url,omitempty" xml:"url,attr,omitempty"`
@@ -657,3 +720,11 @@ const (
 	VulnerabilityStatusAffected    VulnerabilityStatus = "affected"
 	VulnerabilityStatusNotAffected VulnerabilityStatus = "unaffected"
 )
+
+var xmlNamespaces = map[SpecVersion]string{
+	SpecVersion1_0: "http://cyclonedx.org/schema/bom/1.0",
+	SpecVersion1_1: "http://cyclonedx.org/schema/bom/1.1",
+	SpecVersion1_2: "http://cyclonedx.org/schema/bom/1.2",
+	SpecVersion1_3: "http://cyclonedx.org/schema/bom/1.3",
+	SpecVersion1_4: "http://cyclonedx.org/schema/bom/1.4",
+}
