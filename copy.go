@@ -18,36 +18,26 @@
 package cyclonedx
 
 import (
-	"encoding/json"
-	"encoding/xml"
-	"io"
+	"bytes"
+	"encoding/gob"
+	"fmt"
 )
 
-type BOMDecoder interface {
-	Decode(bom *BOM) error
-}
-
-func NewBOMDecoder(reader io.Reader, format BOMFileFormat) BOMDecoder {
-	if format == BOMFileFormatJSON {
-		return &jsonBOMDecoder{reader: reader}
+// copy creates a deep copy of the BOM in a given destination.
+// Copying is currently done be encoding and decoding the BOM struct using the gop.
+// In the future we may choose to switch to a more efficient strategy,
+// and consider to export this API.
+func (b BOM) copy(dst *BOM) error {
+	buf := bytes.Buffer{}
+	err := gob.NewEncoder(&buf).Encode(b)
+	if err != nil {
+		return fmt.Errorf("failed to encode bom: %w", err)
 	}
-	return &xmlBOMDecoder{reader: reader}
-}
 
-type jsonBOMDecoder struct {
-	reader io.Reader
-}
+	err = gob.NewDecoder(&buf).Decode(dst)
+	if err != nil {
+		return fmt.Errorf("failed to decode bom: %w", err)
+	}
 
-// Decode implements the BOMDecoder interface.
-func (j jsonBOMDecoder) Decode(bom *BOM) error {
-	return json.NewDecoder(j.reader).Decode(bom)
-}
-
-type xmlBOMDecoder struct {
-	reader io.Reader
-}
-
-// Decode implements the BOMDecoder interface.
-func (x xmlBOMDecoder) Decode(bom *BOM) error {
-	return xml.NewDecoder(x.reader).Decode(bom)
+	return nil
 }
