@@ -14,5 +14,9 @@ generate:
 	go generate
 .PHONY: generate
 
+lint:
+	golangci-lint run
+.PHONY: lint
+
 all: clean build test
 .PHONY: all

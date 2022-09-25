@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -110,13 +109,13 @@ func TestXmlBOMEncoder_SetPretty(t *testing.T) {
 
 func TestJsonBOMEncoder_EncodeVersion(t *testing.T) {
 	t.Run(SpecVersion1_0.String(), func(t *testing.T) {
-		err := NewBOMEncoder(ioutil.Discard, BOMFileFormatJSON).EncodeVersion(NewBOM(), SpecVersion1_0)
+		err := NewBOMEncoder(io.Discard, BOMFileFormatJSON).EncodeVersion(NewBOM(), SpecVersion1_0)
 		require.Error(t, err)
 		require.ErrorContains(t, err, "not supported")
 	})
 
 	t.Run(SpecVersion1_1.String(), func(t *testing.T) {
-		err := NewBOMEncoder(ioutil.Discard, BOMFileFormatJSON).EncodeVersion(NewBOM(), SpecVersion1_1)
+		err := NewBOMEncoder(io.Discard, BOMFileFormatJSON).EncodeVersion(NewBOM(), SpecVersion1_1)
 		require.Error(t, err)
 		require.ErrorContains(t, err, "not supported")
 	})
