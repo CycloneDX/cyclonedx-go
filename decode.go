@@ -49,5 +49,17 @@ type xmlBOMDecoder struct {
 
 // Decode implements the BOMDecoder interface.
 func (x xmlBOMDecoder) Decode(bom *BOM) error {
-	return xml.NewDecoder(x.reader).Decode(bom)
+	err := xml.NewDecoder(x.reader).Decode(bom)
+	if err != nil {
+		return err
+	}
+
+	for specVersion, xmlNs := range xmlNamespaces {
+		if xmlNs == bom.XMLNS {
+			bom.SpecVersion = specVersion
+			break
+		}
+	}
+
+	return nil
 }
