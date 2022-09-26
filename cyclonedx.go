@@ -239,6 +239,7 @@ const (
 	HashAlgoSHA384      HashAlgorithm = "SHA-384"
 	HashAlgoSHA512      HashAlgorithm = "SHA-512"
 	HashAlgoSHA3_256    HashAlgorithm = "SHA3-256"
+	HashAlgoSHA3_384    HashAlgorithm = "SHA3-384"
 	HashAlgoSHA3_512    HashAlgorithm = "SHA3-512"
 	HashAlgoBlake2b_256 HashAlgorithm = "BLAKE2b-256"
 	HashAlgoBlake2b_384 HashAlgorithm = "BLAKE2b-384"

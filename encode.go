@@ -64,8 +64,8 @@ func (j jsonBOMEncoder) Encode(bom *BOM) error {
 }
 
 // EncodeVersion implements the BOMEncoder interface.
-func (j jsonBOMEncoder) EncodeVersion(bom *BOM, version SpecVersion) (err error) {
-	bom, err = bom.copyAndDowngrade(version)
+func (j jsonBOMEncoder) EncodeVersion(bom *BOM, specVersion SpecVersion) (err error) {
+	bom, err = bom.copyAndConvert(specVersion)
 	if err != nil {
 		return
 	}
@@ -99,8 +99,8 @@ func (x xmlBOMEncoder) Encode(bom *BOM) error {
 }
 
 // EncodeVersion implements the BOMEncoder interface.
-func (x xmlBOMEncoder) EncodeVersion(bom *BOM, version SpecVersion) (err error) {
-	bom, err = bom.copyAndDowngrade(version)
+func (x xmlBOMEncoder) EncodeVersion(bom *BOM, specVersion SpecVersion) (err error) {
+	bom, err = bom.copyAndConvert(specVersion)
 	if err != nil {
 		return
 	}
