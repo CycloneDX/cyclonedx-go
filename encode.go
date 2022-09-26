@@ -52,7 +52,7 @@ type jsonBOMEncoder struct {
 // Encode implements the BOMEncoder interface.
 func (j jsonBOMEncoder) Encode(bom *BOM) error {
 	if bom.SpecVersion < SpecVersion1_2 {
-		return fmt.Errorf("json format is not supported for specification versions lower than 1.2")
+		return fmt.Errorf("json format is not supported for specification versions lower than %s", SpecVersion1_2)
 	}
 
 	encoder := json.NewEncoder(j.writer)

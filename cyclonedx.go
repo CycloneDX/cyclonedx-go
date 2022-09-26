@@ -19,10 +19,11 @@ package cyclonedx
 
 import (
 	"encoding/xml"
+	"fmt"
 	"regexp"
 )
 
-//go:generate stringer -linecomment -output cyclonedx_string.go -type SpecVersion
+//go:generate stringer -linecomment -output cyclonedx_string.go -type MediaType,SpecVersion
 
 const (
 	BOMFormat = "CycloneDX"
@@ -317,6 +318,24 @@ type Licenses []LicenseChoice
 type LicenseChoice struct {
 	License    *License `json:"license,omitempty" xml:"-"`
 	Expression string   `json:"expression,omitempty" xml:"-"`
+}
+
+// MediaType defines the official media types for CycloneDX BOMs.
+// See https://cyclonedx.org/specification/overview/#registered-media-types
+type MediaType int
+
+const (
+	MediaTypeJSON     MediaType = iota + 1 // application/vnd.cyclonedx+json
+	MediaTypeXML                           // application/vnd.cyclonedx+xml
+	MediaTypeProtobuf                      // application/x.vnd.cyclonedx+protobuf
+)
+
+func (mt MediaType) WithVersion(specVersion SpecVersion) (string, error) {
+	if mt == MediaTypeJSON && specVersion < SpecVersion1_2 {
+		return "", fmt.Errorf("json format is not supported for specification versions lower than %s", SpecVersion1_2)
+	}
+
+	return fmt.Sprintf("%s; version=%s", mt, specVersion), nil
 }
 
 type Metadata struct {
