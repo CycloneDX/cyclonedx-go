@@ -64,8 +64,8 @@ func Example_encode() {
 	dependencies := []cdx.Dependency{
 		{
 			Ref: "pkg:golang/acme-inc/acme-app@v1.0.0",
-			Dependencies: &[]cdx.Dependency{
-				{Ref: "pkg:golang/github.com/CycloneDX/cyclonedx-go@v0.3.0"},
+			Dependencies: &[]string{
+				"pkg:golang/github.com/CycloneDX/cyclonedx-go@v0.3.0",
 			},
 		},
 		{

@@ -19,52 +19,6 @@ package cyclonedx
 
 import "encoding/json"
 
-// dependencyJSON is temporarily used for marshalling and unmarshalling Dependency instances to and from JSON
-type dependencyJSON struct {
-	Ref       string   `json:"ref"`
-	DependsOn []string `json:"dependsOn,omitempty"`
-}
-
-func (d Dependency) MarshalJSON() ([]byte, error) {
-	if d.Dependencies == nil || len(*d.Dependencies) == 0 {
-		return json.Marshal(&dependencyJSON{
-			Ref: d.Ref,
-		})
-	}
-
-	dependencyRefs := make([]string, len(*d.Dependencies))
-	for i, dependency := range *d.Dependencies {
-		dependencyRefs[i] = dependency.Ref
-	}
-
-	return json.Marshal(&dependencyJSON{
-		Ref:       d.Ref,
-		DependsOn: dependencyRefs,
-	})
-}
-
-func (d *Dependency) UnmarshalJSON(bytes []byte) error {
-	dependency := new(dependencyJSON)
-	if err := json.Unmarshal(bytes, dependency); err != nil {
-		return err
-	}
-	d.Ref = dependency.Ref
-
-	if len(dependency.DependsOn) == 0 {
-		return nil
-	}
-
-	dependencies := make([]Dependency, len(dependency.DependsOn))
-	for i, dep := range dependency.DependsOn {
-		dependencies[i] = Dependency{
-			Ref: dep,
-		}
-	}
-	d.Dependencies = &dependencies
-
-	return nil
-}
-
 func (sv SpecVersion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(sv.String())
 }

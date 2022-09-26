@@ -184,8 +184,8 @@ const (
 )
 
 type Dependency struct {
-	Ref          string        `xml:"ref,attr"`
-	Dependencies *[]Dependency `xml:"dependency,omitempty"`
+	Ref          string    `json:"ref"`
+	Dependencies *[]string `json:"dependsOn,omitempty"`
 }
 
 type Diff struct {
