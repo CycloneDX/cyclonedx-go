@@ -25,7 +25,8 @@
   ],
   "dependencies": [
     {
-      "ref": "library-a"
+      "ref": "library-a",
+      "dependsOn": []
     },
     {
       "ref": "library-b",

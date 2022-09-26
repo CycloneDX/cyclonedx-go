@@ -24,7 +24,8 @@ import (
 	"io"
 )
 
-// bomReferenceXML is temporarily used for marshalling and unmarshalling BOMReference instances to and from XML
+// bomReferenceXML is temporarily used for marshalling and unmarshalling
+// BOMReference instances to and from XML.
 type bomReferenceXML struct {
 	Ref string `json:"-" xml:"ref,attr"`
 }
@@ -52,6 +53,47 @@ func (c *Copyright) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 	(*c).Text = text
+	return nil
+}
+
+// dependencyXML is temporarily used for marshalling and unmarshalling
+// Dependency instances to and from XML.
+type dependencyXML struct {
+	Ref          string           `xml:"ref,attr"`
+	Dependencies *[]dependencyXML `xml:"dependency,omitempty"`
+}
+
+func (d Dependency) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	xmlDep := dependencyXML{Ref: d.Ref}
+
+	if d.Dependencies != nil && len(*d.Dependencies) > 0 {
+		xmlDeps := make([]dependencyXML, len(*d.Dependencies))
+		for i := range *d.Dependencies {
+			xmlDeps[i] = dependencyXML{Ref: (*d.Dependencies)[i]}
+		}
+		xmlDep.Dependencies = &xmlDeps
+	}
+
+	return e.EncodeElement(xmlDep, start)
+}
+
+func (d *Dependency) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
+	xmlDep := dependencyXML{}
+	err := dec.DecodeElement(&xmlDep, &start)
+	if err != nil {
+		return err
+	}
+
+	dep := Dependency{Ref: xmlDep.Ref}
+	if xmlDep.Dependencies != nil && len(*xmlDep.Dependencies) > 0 {
+		deps := make([]string, len(*xmlDep.Dependencies))
+		for i := range *xmlDep.Dependencies {
+			deps[i] = (*xmlDep.Dependencies)[i].Ref
+		}
+		dep.Dependencies = &deps
+	}
+
+	*d = dep
 	return nil
 }
 

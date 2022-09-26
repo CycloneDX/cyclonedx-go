@@ -79,6 +79,64 @@ func TestCopyright_UnmarshalXML(t *testing.T) {
 	require.Equal(t, "copyright", copyright.Text)
 }
 
+func TestDependency_MarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		dependency := Dependency{}
+		xmlBytes, err := xml.Marshal(dependency)
+		require.NoError(t, err)
+		require.Equal(t, `<Dependency ref=""></Dependency>`, string(xmlBytes))
+	})
+
+	t.Run("EmptyDependencies", func(t *testing.T) {
+		dependency := Dependency{
+			Ref:          "dependencyRef",
+			Dependencies: &[]string{},
+		}
+		xmlBytes, err := xml.Marshal(dependency)
+		require.NoError(t, err)
+		require.Equal(t, `<Dependency ref="dependencyRef"></Dependency>`, string(xmlBytes))
+	})
+
+	t.Run("WithDependencies", func(t *testing.T) {
+		dependency := Dependency{
+			Ref: "dependencyRef",
+			Dependencies: &[]string{
+				"transitiveDependencyRef",
+			},
+		}
+		xmlBytes, err := xml.Marshal(dependency)
+		require.NoError(t, err)
+		require.Equal(t, `<Dependency ref="dependencyRef"><dependency ref="transitiveDependencyRef"></dependency></Dependency>`, string(xmlBytes))
+	})
+}
+
+func TestDependency_UnmarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		dependency := Dependency{}
+		err := xml.Unmarshal([]byte(`<Dependency></Dependency>`), &dependency)
+		require.NoError(t, err)
+		require.Equal(t, "", dependency.Ref)
+		require.Nil(t, dependency.Dependencies)
+	})
+
+	t.Run("EmptyDependencies", func(t *testing.T) {
+		dependency := Dependency{}
+		err := xml.Unmarshal([]byte(`<Dependency ref="dependencyRef"></Dependency>`), &dependency)
+		require.NoError(t, err)
+		require.Equal(t, "dependencyRef", dependency.Ref)
+		require.Nil(t, dependency.Dependencies)
+	})
+
+	t.Run("WithDependencies", func(t *testing.T) {
+		dependency := Dependency{}
+		err := xml.Unmarshal([]byte(`<Dependency ref="dependencyRef"><dependency ref="transitiveDependencyRef"></dependency></Dependency>`), &dependency)
+		require.NoError(t, err)
+		require.Equal(t, "dependencyRef", dependency.Ref)
+		require.Equal(t, 1, len(*dependency.Dependencies))
+		require.Equal(t, "transitiveDependencyRef", (*dependency.Dependencies)[0])
+	})
+}
+
 func TestLicenses_MarshalXML(t *testing.T) {
 	// Marshal license and expressions
 	licenses := Licenses{
