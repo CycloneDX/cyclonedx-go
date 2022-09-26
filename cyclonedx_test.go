@@ -25,6 +25,7 @@ import (
 
 	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var snapShooter = cupaloy.NewDefaultConfig().
@@ -33,6 +34,19 @@ var snapShooter = cupaloy.NewDefaultConfig().
 func TestBool(t *testing.T) {
 	assert.Equal(t, true, *Bool(true))
 	assert.Equal(t, false, *Bool(false))
+}
+
+func TestMediaType_WithVersion(t *testing.T) {
+	t.Run("ShouldReturnVersionedMediaType", func(t *testing.T) {
+		res, err := MediaTypeJSON.WithVersion(SpecVersion1_2)
+		require.NoError(t, err)
+		require.Equal(t, "application/vnd.cyclonedx+json; version=1.2", res)
+	})
+
+	t.Run("ShouldReturnErrorForSpecLowerThan1.2AndJSON", func(t *testing.T) {
+		_, err := MediaTypeJSON.WithVersion(SpecVersion1_1)
+		require.Error(t, err)
+	})
 }
 
 func TestVulnerability_Properties(t *testing.T) {
