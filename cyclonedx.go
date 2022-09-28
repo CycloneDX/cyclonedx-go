@@ -19,6 +19,7 @@ package cyclonedx
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"regexp"
 )
@@ -28,6 +29,8 @@ import (
 const (
 	BOMFormat = "CycloneDX"
 )
+
+var ErrInvalidSpecVersion = errors.New("invalid specification version")
 
 type Advisory struct {
 	Title string `json:"title,omitempty" xml:"title,omitempty"`
