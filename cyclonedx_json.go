@@ -17,7 +17,9 @@
 
 package cyclonedx
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 func (sv SpecVersion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(sv.String())
@@ -41,6 +43,8 @@ func (sv *SpecVersion) UnmarshalJSON(bytes []byte) error {
 		*sv = SpecVersion1_3
 	case SpecVersion1_4.String():
 		*sv = SpecVersion1_4
+	default:
+		return ErrInvalidSpecVersion
 	}
 
 	return nil

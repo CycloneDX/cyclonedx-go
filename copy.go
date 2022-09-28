@@ -24,7 +24,7 @@ import (
 )
 
 // copy creates a deep copy of the BOM in a given destination.
-// Copying is currently done be encoding and decoding the BOM struct using the gop.
+// Copying is currently done by encoding and decoding the BOM struct using gob.
 // In the future we may choose to switch to a more efficient strategy,
 // and consider to export this API.
 func (b BOM) copy(dst *BOM) error {
