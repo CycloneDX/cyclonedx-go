@@ -60,8 +60,8 @@ jobs:
       run: |
         mkdir -p "$HOME/.local/bin"
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-        wget -O "$HOME/.local/bin/cyclonedx" https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.24.0/cyclonedx-linux-x64
-        echo "691cf7ed82ecce1f85e6d21bccd1ed2d7968e40eb6be7504b392c8b3a0943891 $HOME/.local/bin/cyclonedx" | sha256sum -c
+        wget -O "$HOME/.local/bin/cyclonedx" https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.24.1/cyclonedx-linux-x64
+        echo "ad736b1443aa6527fc8bffdca1f632414908d21a631f33c60f439f6942a47d3c $HOME/.local/bin/cyclonedx" | sha256sum -c
         chmod +x "$HOME/.local/bin/cyclonedx"
     - name: Checkout Repository
       uses: actions/checkout@v3.1.0
