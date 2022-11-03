@@ -1,10 +1,22 @@
 version: 2
 updates:
+  - package-ecosystem: "docker"
+    directory: "/"
+    reviewers:
+    - "CycloneDX/go-maintainers"
+    schedule:
+      # We only have one Dockerfile for the Gitpod workspace
+      # right now, and it's not critical to be super up-to-date.
+      interval: "monthly"
   - package-ecosystem: "gomod"
     directory: "/"
+    reviewers:
+    - "CycloneDX/go-maintainers"
     schedule:
       interval: "daily"
   - package-ecosystem: "github-actions"
     directory: "/"
+    reviewers:
+    - "CycloneDX/go-maintainers"
     schedule:
       interval: "daily"
