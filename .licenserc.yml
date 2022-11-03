@@ -9,7 +9,7 @@ header:
     - "**/testdata/**"
     - ".github/**"
     - ".gitignore"
-    - ".gitpod.*"
+    - ".gitpod.yml"
     - ".golangci.yml"
     - ".goreleaser.yml"
     - ".licenserc.yml"
