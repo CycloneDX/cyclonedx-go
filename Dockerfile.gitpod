@@ -1,0 +1,10 @@
+FROM gitpod/workspace-go:latest@sha256:2be827f022fddfb5c244b3c6705f971ba3de07490d64789cd6b2aa420176f4b1
+
+USER root
+
+RUN \
+    wget -O "/usr/local/bin/cyclonedx" https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.24.2/cyclonedx-linux-x64 && \
+    echo "ef0d3b31d176e02bc594f83e19cfcea053c6bc5b197351f71696e189390f851d /usr/local/bin/cyclonedx" | sha256sum -c && \
+    chmod +x "/usr/local/bin/cyclonedx"
+
+USER gitpod
