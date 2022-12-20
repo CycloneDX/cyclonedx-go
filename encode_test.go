@@ -65,6 +65,70 @@ func TestJsonBOMEncoder_SetPretty(t *testing.T) {
 `, buf.String())
 }
 
+func TestJsonBOMEncoder_SetEscapeHTML_true(t *testing.T) {
+	buf := new(bytes.Buffer)
+	encoder := NewBOMEncoder(buf, BOMFileFormatJSON)
+	encoder.SetPretty(true)
+	encoder.SetEscapeHTML(true)
+
+	bom := NewBOM()
+	bom.Metadata = &Metadata{
+		Authors: &[]OrganizationalContact{
+			{
+				Name: "some&<\"Name",
+			},
+		},
+	}
+
+	require.NoError(t, encoder.Encode(bom))
+
+	assert.Equal(t, `{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "metadata": {
+    "authors": [
+      {
+        "name": "some\u0026\u003c\"Name"
+      }
+    ]
+  }
+}
+`, buf.String())
+}
+
+func TestJsonBOMEncoder_SetEscapeHTML_false(t *testing.T) {
+	buf := new(bytes.Buffer)
+	encoder := NewBOMEncoder(buf, BOMFileFormatJSON)
+	encoder.SetPretty(true)
+	encoder.SetEscapeHTML(false)
+
+	bom := NewBOM()
+	bom.Metadata = &Metadata{
+		Authors: &[]OrganizationalContact{
+			{
+				Name: "some+<&\"Name",
+			},
+		},
+	}
+
+	require.NoError(t, encoder.Encode(bom))
+
+	assert.Equal(t, `{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "metadata": {
+    "authors": [
+      {
+        "name": "some+<&\"Name"
+      }
+    ]
+  }
+}
+`, buf.String())
+}
+
 func TestXmlBOMEncoder_SetPretty(t *testing.T) {
 	buf := new(bytes.Buffer)
 	encoder := NewBOMEncoder(buf, BOMFileFormatXML)
