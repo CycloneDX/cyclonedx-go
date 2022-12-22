@@ -35,18 +35,22 @@ type BOMEncoder interface {
 
 	// SetPretty toggles prettified output.
 	SetPretty(pretty bool) BOMEncoder
+
+	// SetEscapeHTML toggles escaped HTML output.
+	SetEscapeHTML(escapeHTML bool) BOMEncoder
 }
 
 func NewBOMEncoder(writer io.Writer, format BOMFileFormat) BOMEncoder {
 	if format == BOMFileFormatJSON {
-		return &jsonBOMEncoder{writer: writer}
+		return &jsonBOMEncoder{writer: writer, escapeHTML: true}
 	}
 	return &xmlBOMEncoder{writer: writer}
 }
 
 type jsonBOMEncoder struct {
-	writer io.Writer
-	pretty bool
+	writer     io.Writer
+	pretty     bool
+	escapeHTML bool
 }
 
 // Encode implements the BOMEncoder interface.
@@ -56,6 +60,7 @@ func (j jsonBOMEncoder) Encode(bom *BOM) error {
 	}
 
 	encoder := json.NewEncoder(j.writer)
+	encoder.SetEscapeHTML(j.escapeHTML)
 	if j.pretty {
 		encoder.SetIndent("", "  ")
 	}
@@ -76,6 +81,12 @@ func (j jsonBOMEncoder) EncodeVersion(bom *BOM, specVersion SpecVersion) (err er
 // SetPretty implements the BOMEncoder interface.
 func (j *jsonBOMEncoder) SetPretty(pretty bool) BOMEncoder {
 	j.pretty = pretty
+	return j
+}
+
+// SetEscapeHTML implements the BOMEncoder interface.
+func (j *jsonBOMEncoder) SetEscapeHTML(escapeHTML bool) BOMEncoder {
+	j.escapeHTML = escapeHTML
 	return j
 }
 
@@ -112,4 +123,10 @@ func (x xmlBOMEncoder) EncodeVersion(bom *BOM, specVersion SpecVersion) (err err
 func (x *xmlBOMEncoder) SetPretty(pretty bool) BOMEncoder {
 	x.pretty = pretty
 	return x
+}
+
+// SetEscapeHTML implements the BOMEncoder interface.
+func (j *xmlBOMEncoder) SetEscapeHTML(escapeHTML bool) BOMEncoder {
+	// NOOP -- XML always needs to escape HTML
+	return j
 }
