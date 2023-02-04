@@ -621,6 +621,8 @@ type VulnerabilityAnalysis struct {
 	Justification ImpactAnalysisJustification `json:"justification,omitempty" xml:"justification,omitempty"`
 	Response      *[]ImpactAnalysisResponse   `json:"response,omitempty" xml:"responses>response,omitempty"`
 	Detail        string                      `json:"detail,omitempty" xml:"detail,omitempty"`
+	FirstIssued   string                      `json:"firstIssued,omitempty" xml:"firstIssued,omitempty"`
+	LastUpdated   string                      `json:"lastUpdated,omitempty" xml:"lastUpdated,omitempty"`
 }
 
 type VulnerabilityRating struct {
