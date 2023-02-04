@@ -82,6 +82,14 @@ func (b *BOM) convert(specVersion SpecVersion) {
 		}
 	}
 
+	if b.Vulnerabilities != nil {
+		for i := range *b.Vulnerabilities {
+			if specVersion < SpecVersion1_5 {
+				(*b.Vulnerabilities)[i].Rejected = ""
+			}
+		}
+	}
+
 	b.SpecVersion = specVersion
 	b.XMLNS = xmlNamespaces[specVersion]
 	b.JSONSchema = jsonSchemas[specVersion]

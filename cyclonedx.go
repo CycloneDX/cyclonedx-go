@@ -608,6 +608,7 @@ type Vulnerability struct {
 	Created        string                    `json:"created,omitempty" xml:"created,omitempty"`
 	Published      string                    `json:"published,omitempty" xml:"published,omitempty"`
 	Updated        string                    `json:"updated,omitempty" xml:"updated,omitempty"`
+	Rejected       string                    `json:"rejected,omitempty" xml:"rejected,omitempty"`
 	Credits        *Credits                  `json:"credits,omitempty" xml:"credits,omitempty"`
 	Tools          *[]Tool                   `json:"tools,omitempty" xml:"tools>tool,omitempty"`
 	Analysis       *VulnerabilityAnalysis    `json:"analysis,omitempty" xml:"analysis,omitempty"`
