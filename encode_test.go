@@ -51,6 +51,7 @@ func TestJsonBOMEncoder_SetPretty(t *testing.T) {
 	require.NoError(t, encoder.Encode(bom))
 
 	assert.Equal(t, `{
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
   "version": 1,
@@ -83,6 +84,7 @@ func TestJsonBOMEncoder_SetEscapeHTML_true(t *testing.T) {
 	require.NoError(t, encoder.Encode(bom))
 
 	assert.Equal(t, `{
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
   "version": 1,
@@ -115,6 +117,7 @@ func TestJsonBOMEncoder_SetEscapeHTML_false(t *testing.T) {
 	require.NoError(t, encoder.Encode(bom))
 
 	assert.Equal(t, `{
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
   "version": 1,

@@ -60,6 +60,7 @@ type BOM struct {
 	XMLNS   string   `json:"-" xml:"xmlns,attr"`
 
 	// JSON specific fields
+	JSONSchema  string      `json:"$schema,omitempty" xml:"-"`
 	BOMFormat   string      `json:"bomFormat" xml:"-"`
 	SpecVersion SpecVersion `json:"specVersion" xml:"-"`
 
@@ -77,6 +78,7 @@ type BOM struct {
 
 func NewBOM() *BOM {
 	return &BOM{
+		JSONSchema:  jsonSchemas[SpecVersion1_4],
 		XMLNS:       xmlNamespaces[SpecVersion1_4],
 		BOMFormat:   BOMFormat,
 		SpecVersion: SpecVersion1_4,

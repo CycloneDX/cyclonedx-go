@@ -78,6 +78,7 @@ func (b *BOM) convert(specVersion SpecVersion) {
 
 	b.SpecVersion = specVersion
 	b.XMLNS = xmlNamespaces[specVersion]
+	b.JSONSchema = jsonSchemas[specVersion]
 }
 
 // componentConverter modifies a Component such that it adheres to a given SpecVersion.
