@@ -49,3 +49,11 @@ func (sv *SpecVersion) UnmarshalJSON(bytes []byte) error {
 
 	return nil
 }
+
+var jsonSchemas = map[SpecVersion]string{
+	SpecVersion1_0: "",
+	SpecVersion1_1: "",
+	SpecVersion1_2: "http://cyclonedx.org/schema/bom-1.2.schema.json",
+	SpecVersion1_3: "http://cyclonedx.org/schema/bom-1.3.schema.json",
+	SpecVersion1_4: "http://cyclonedx.org/schema/bom-1.4.schema.json",
+}
