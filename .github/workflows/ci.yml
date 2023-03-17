@@ -31,7 +31,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f # tag=v3.4.0
     - name: Setup Go
-      uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568 # tag=v3.5.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # tag=v4.0.0
       with:
         go-version: "1.19"
         check-latest: true
@@ -52,7 +52,7 @@ jobs:
         - "1.19"
     steps:
     - name: Setup Go
-      uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568 # tag=v3.5.0
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # tag=v4.0.0
       with:
         go-version: ${{ matrix.go }}
         check-latest: true
