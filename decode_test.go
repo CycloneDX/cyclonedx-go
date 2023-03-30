@@ -30,6 +30,18 @@ func TestNewBOMDecoder(t *testing.T) {
 	assert.IsType(t, &xmlBOMDecoder{}, NewBOMDecoder(nil, BOMFileFormatXML))
 }
 
+func TestXmlBOMDecoder_Decode_InvalidXML(t *testing.T) {
+	var bom BOM
+	err := NewBOMDecoder(strings.NewReader("invalid"), BOMFileFormatXML).Decode(&bom)
+	require.Error(t, err)
+}
+
+func TestJsonBOMDecoder_Decode_InvalidJson(t *testing.T) {
+	var bom BOM
+	err := NewBOMDecoder(strings.NewReader("{}invalid"), BOMFileFormatJSON).Decode(&bom)
+	require.Error(t, err)
+}
+
 func TestXmlBOMDecoder_Decode(t *testing.T) {
 	t.Run("ShouldSetSpecVersion", func(t *testing.T) {
 		testCases := []struct {
