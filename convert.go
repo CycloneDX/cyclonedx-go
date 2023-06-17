@@ -90,6 +90,10 @@ func (b *BOM) convert(specVersion SpecVersion) {
 		}
 	}
 
+	if b.ExternalReferences != nil {
+		convertExternalReferences(b.ExternalReferences, specVersion)
+	}
+
 	b.SpecVersion = specVersion
 	b.XMLNS = xmlNamespaces[specVersion]
 	b.JSONSchema = jsonSchemas[specVersion]
