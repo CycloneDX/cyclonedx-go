@@ -169,20 +169,26 @@ type Component struct {
 }
 
 type Composition struct {
-	Aggregate    CompositionAggregate `json:"aggregate" xml:"aggregate"`
-	Assemblies   *[]BOMReference      `json:"assemblies,omitempty" xml:"assemblies>assembly,omitempty"`
-	Dependencies *[]BOMReference      `json:"dependencies,omitempty" xml:"dependencies>dependency,omitempty"`
+	BOMRef          string               `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Aggregate       CompositionAggregate `json:"aggregate" xml:"aggregate"`
+	Assemblies      *[]BOMReference      `json:"assemblies,omitempty" xml:"assemblies>assembly,omitempty"`
+	Dependencies    *[]BOMReference      `json:"dependencies,omitempty" xml:"dependencies>dependency,omitempty"`
+	Vulnerabilities *[]BOMReference      `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
 }
 
 type CompositionAggregate string
 
 const (
-	CompositionAggregateComplete                 CompositionAggregate = "complete"
-	CompositionAggregateIncomplete               CompositionAggregate = "incomplete"
-	CompositionAggregateIncompleteFirstPartyOnly CompositionAggregate = "incomplete_first_party_only"
-	CompositionAggregateIncompleteThirdPartyOnly CompositionAggregate = "incomplete_third_party_only"
-	CompositionAggregateUnknown                  CompositionAggregate = "unknown"
-	CompositionAggregateNotSpecified             CompositionAggregate = "not_specified"
+	CompositionAggregateComplete                            CompositionAggregate = "complete"
+	CompositionAggregateIncomplete                          CompositionAggregate = "incomplete"
+	CompositionAggregateIncompleteFirstPartyOnly            CompositionAggregate = "incomplete_first_party_only"
+	CompositionAggregateIncompleteFirstPartyOpenSourceOnly  CompositionAggregate = "incomplete_first_party_opensource_only"
+	CompositionAggregateIncompleteFirstPartyProprietaryOnly CompositionAggregate = "incomplete_first_party_proprietary_only"
+	CompositionAggregateIncompleteThirdPartyOnly            CompositionAggregate = "incomplete_third_party_only"
+	CompositionAggregateIncompleteThirdPartyOpenSourceOnly  CompositionAggregate = "incomplete_third_party_opensource_only"
+	CompositionAggregateIncompleteThirdPartyProprietaryOnly CompositionAggregate = "incomplete_third_party_proprietary_only"
+	CompositionAggregateNotSpecified                        CompositionAggregate = "not_specified"
+	CompositionAggregateUnknown                             CompositionAggregate = "unknown"
 )
 
 type Copyright struct {
