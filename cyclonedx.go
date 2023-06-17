@@ -525,6 +525,7 @@ const (
 	ScoringMethodCVSSv2  ScoringMethod = "CVSSv2"
 	ScoringMethodCVSSv3  ScoringMethod = "CVSSv3"
 	ScoringMethodCVSSv31 ScoringMethod = "CVSSv31"
+	ScoringMethodCVSSv4  ScoringMethod = "CVSSv4"
 	ScoringMethodOWASP   ScoringMethod = "OWASP"
 )
 

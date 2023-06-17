@@ -83,11 +83,7 @@ func (b *BOM) convert(specVersion SpecVersion) {
 	}
 
 	if b.Vulnerabilities != nil {
-		for i := range *b.Vulnerabilities {
-			if specVersion < SpecVersion1_5 {
-				(*b.Vulnerabilities)[i].Rejected = ""
-			}
-		}
+		convertVulnerabilities(b.Vulnerabilities, specVersion)
 	}
 
 	if b.ExternalReferences != nil {
@@ -230,6 +226,29 @@ func convertLicenses(licenses *Licenses, specVersion SpecVersion) {
 	}
 }
 
+func convertVulnerabilities(vulns *[]Vulnerability, specVersion SpecVersion) {
+	if vulns == nil {
+		return
+	}
+
+	for i := range *vulns {
+		vuln := &(*vulns)[i]
+
+		if specVersion < SpecVersion1_5 {
+			vuln.Rejected = ""
+		}
+
+		if vuln.Ratings != nil {
+			for j := range *vuln.Ratings {
+				rating := &(*vuln.Ratings)[j]
+				if !specVersion.supportsScoringMethod(rating.Method) {
+					rating.Method = ScoringMethodOther
+				}
+			}
+		}
+	}
+}
+
 // serviceConverter modifies a Service such that it adheres to a given SpecVersion.
 func serviceConverter(specVersion SpecVersion) func(*Service) {
 	return func(s *Service) {
@@ -360,6 +379,17 @@ func (sv SpecVersion) supportsScope(scope Scope) bool {
 		return sv >= SpecVersion1_0
 	case ScopeExcluded:
 		return sv >= SpecVersion1_2
+	}
+
+	return false
+}
+
+func (sv SpecVersion) supportsScoringMethod(method ScoringMethod) bool {
+	switch method {
+	case ScoringMethodCVSSv2, ScoringMethodCVSSv3, ScoringMethodCVSSv31, ScoringMethodOWASP, ScoringMethodOther:
+		return sv >= SpecVersion1_4
+	case ScoringMethodCVSSv4:
+		return sv >= SpecVersion1_5
 	}
 
 	return false
