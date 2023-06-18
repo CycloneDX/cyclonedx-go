@@ -256,7 +256,9 @@ func convertVulnerabilities(vulns *[]Vulnerability, specVersion SpecVersion) {
 		vuln := &(*vulns)[i]
 
 		if specVersion < SpecVersion1_5 {
+			vuln.ProofOfConcept = nil
 			vuln.Rejected = ""
+			vuln.Workaround = ""
 		}
 
 		if vuln.Ratings != nil {

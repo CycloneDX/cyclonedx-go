@@ -497,6 +497,12 @@ type Pedigree struct {
 	Notes       string       `json:"notes,omitempty" xml:"notes,omitempty"`
 }
 
+type ProofOfConcept struct {
+	ReproductionSteps  string          `json:"reproductionSteps,omitempty" xml:"reproductionSteps,omitempty"`
+	Environment        string          `json:"environment,omitempty" xml:"environment,omitempty"`
+	SupportingMaterial *[]AttachedText `json:"supportingMaterial,omitempty" xml:"supportingMaterial>attachment,omitempty"`
+}
+
 type Property struct {
 	Name  string `json:"name" xml:"name,attr"`
 	Value string `json:"value" xml:",chardata"`
@@ -611,6 +617,8 @@ type Vulnerability struct {
 	Description    string                    `json:"description,omitempty" xml:"description,omitempty"`
 	Detail         string                    `json:"detail,omitempty" xml:"detail,omitempty"`
 	Recommendation string                    `json:"recommendation,omitempty" xml:"recommendation,omitempty"`
+	Workaround     string                    `json:"workaround,omitempty" xml:"workaround,omitempty"`
+	ProofOfConcept *ProofOfConcept           `json:"proofOfConcept,omitempty" xml:"proofOfConcept,omitempty"`
 	Advisories     *[]Advisory               `json:"advisories,omitempty" xml:"advisories>advisory,omitempty"`
 	Created        string                    `json:"created,omitempty" xml:"created,omitempty"`
 	Published      string                    `json:"published,omitempty" xml:"published,omitempty"`
