@@ -16,12 +16,3 @@
 # Copyright (c) OWASP Foundation. All Rights Reserved.
 
 FROM gitpod/workspace-go:latest@sha256:d7a41f5f2a24f093cee1791f154e173a51359db19204a67c64ace06be65c0a2f
-
-USER root
-
-RUN \
-    wget -O "/usr/local/bin/cyclonedx" https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.24.2/cyclonedx-linux-x64 && \
-    echo "ef0d3b31d176e02bc594f83e19cfcea053c6bc5b197351f71696e189390f851d /usr/local/bin/cyclonedx" | sha256sum -c && \
-    chmod +x "/usr/local/bin/cyclonedx"
-
-USER gitpod

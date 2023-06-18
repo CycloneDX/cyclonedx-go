@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -198,21 +197,17 @@ func TestJsonBOMEncoder_EncodeVersion(t *testing.T) {
 			require.NoError(t, NewBOMDecoder(inputFile, BOMFileFormatJSON).Decode(&bom))
 			inputFile.Close()
 
-			// Prepare encoding destinations
+			// Prepare encoding destination
 			buf := bytes.Buffer{}
-			outputFilePath := filepath.Join(t.TempDir(), "bom.json")
-			outputFile, err := os.Create(outputFilePath)
-			require.NoError(t, err)
 
 			// Encode BOM again, for a specific version
-			err = NewBOMEncoder(io.MultiWriter(&buf, outputFile), BOMFileFormatJSON).
+			err = NewBOMEncoder(&buf, BOMFileFormatJSON).
 				SetPretty(true).
 				EncodeVersion(&bom, version)
 			require.NoError(t, err)
-			outputFile.Close() // Required for CLI to be able to access the file
 
 			// Sanity checks: BOM has to be valid
-			assertValidBOM(t, outputFilePath, version)
+			assertValidBOM(t, buf.Bytes(), BOMFileFormatJSON, version)
 
 			// Compare with snapshot
 			require.NoError(t, snapShooter.SnapshotMulti(fmt.Sprintf("%s.bom.json", version), buf.String()))
@@ -232,24 +227,20 @@ func TestXmlBOMEncoder_EncodeVersion(t *testing.T) {
 			require.NoError(t, NewBOMDecoder(inputFile, BOMFileFormatXML).Decode(&bom))
 			inputFile.Close()
 
-			// Prepare encoding destinations
+			// Prepare encoding destination
 			buf := bytes.Buffer{}
-			outputFilePath := filepath.Join(t.TempDir(), "bom.xml")
-			outputFile, err := os.Create(outputFilePath)
-			require.NoError(t, err)
 
 			// Encode BOM again
-			err = NewBOMEncoder(io.MultiWriter(&buf, outputFile), BOMFileFormatXML).
+			err = NewBOMEncoder(&buf, BOMFileFormatXML).
 				SetPretty(true).
 				EncodeVersion(&bom, version)
 			require.NoError(t, err)
-			outputFile.Close() // Required for CLI to be able to access the file
 
 			// Sanity checks: BOM has to be valid
 			require.NoError(t, snapShooter.SnapshotMulti(fmt.Sprintf("%s.bom.xml", version), buf.String()))
 
 			// Compare with snapshot
-			assertValidBOM(t, outputFilePath, version)
+			assertValidBOM(t, buf.Bytes(), BOMFileFormatXML, version)
 		})
 	}
 }

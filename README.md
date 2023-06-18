@@ -57,9 +57,3 @@ Pull requests are welcome. But please read the
 
 It is generally expected that pull requests will include relevant tests. Tests are automatically run against all
 supported Go versions (see [Compatibility](#compatibility)) for every pull request.
-
-### Running Tests
-
-Some tests make use of the [CycloneDX CLI](https://github.com/CycloneDX/cyclonedx-cli), e.g. to validate BOMs.  
-Make sure to download the CLI binary and make it available as `cyclonedx` in your `$PATH`.  
-This is done automatically for [Gitpod](https://gitpod.io/#https://github.com/CycloneDX/cyclonedx-go).

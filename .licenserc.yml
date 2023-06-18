@@ -18,3 +18,4 @@ header:
     - "Makefile"
     - "NOTICE"
     - "cyclonedx_string.go"
+    - "schema/**"

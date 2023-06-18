@@ -19,7 +19,6 @@ package cyclonedx
 
 import (
 	"bytes"
-	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -43,21 +42,17 @@ func TestRoundTripJSON(t *testing.T) {
 			require.NoError(t, NewBOMDecoder(inputFile, BOMFileFormatJSON).Decode(&bom))
 			inputFile.Close()
 
-			// Prepare encoding destinations
+			// Prepare encoding destination
 			buf := bytes.Buffer{}
-			outputFilePath := filepath.Join(t.TempDir(), "bom.json")
-			outputFile, err := os.Create(outputFilePath)
-			require.NoError(t, err)
 
 			// Encode BOM again
-			err = NewBOMEncoder(io.MultiWriter(&buf, outputFile), BOMFileFormatJSON).
+			err = NewBOMEncoder(&buf, BOMFileFormatJSON).
 				SetPretty(true).
 				Encode(&bom)
 			require.NoError(t, err)
-			outputFile.Close() // Required for CLI to be able to access the file
 
 			// Sanity checks: BOM has to be valid
-			assertValidBOM(t, outputFilePath, SpecVersion1_4)
+			assertValidBOM(t, buf.Bytes(), BOMFileFormatJSON, SpecVersion1_4)
 
 			// Compare with snapshot
 			assert.NoError(t, snapShooter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))
@@ -80,21 +75,17 @@ func TestRoundTripXML(t *testing.T) {
 			require.NoError(t, NewBOMDecoder(inputFile, BOMFileFormatXML).Decode(&bom))
 			inputFile.Close()
 
-			// Prepare encoding destinations
+			// Prepare encoding destination
 			buf := bytes.Buffer{}
-			outputFilePath := filepath.Join(t.TempDir(), "bom.xml")
-			outputFile, err := os.Create(outputFilePath)
-			require.NoError(t, err)
 
 			// Encode BOM again
-			err = NewBOMEncoder(io.MultiWriter(&buf, outputFile), BOMFileFormatXML).
+			err = NewBOMEncoder(&buf, BOMFileFormatXML).
 				SetPretty(true).
 				Encode(&bom)
 			require.NoError(t, err)
-			outputFile.Close() // Required for CLI to be able to access the file
 
 			// Sanity check: BOM has to be valid
-			assertValidBOM(t, outputFilePath, SpecVersion1_4)
+			assertValidBOM(t, buf.Bytes(), BOMFileFormatXML, SpecVersion1_4)
 
 			// Compare with snapshot
 			assert.NoError(t, snapShooter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))

@@ -18,9 +18,6 @@
 package cyclonedx
 
 import (
-	"fmt"
-	"os/exec"
-	"strings"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
@@ -60,16 +57,13 @@ func TestVulnerability_Properties(t *testing.T) {
 	assert.Equal(t, 0, len(*vuln.Properties))
 }
 
-func assertValidBOM(t *testing.T, bomFilePath string, version SpecVersion) {
-	inputFormat := "xml"
-	if strings.HasSuffix(bomFilePath, ".json") {
-		inputFormat = "json"
+func assertValidBOM(t *testing.T, bomBytes []byte, format BOMFileFormat, version SpecVersion) {
+	var v validator
+	if format == BOMFileFormatJSON {
+		v = newJSONValidator()
+	} else {
+		v = newXMLValidator()
 	}
-	inputVersion := fmt.Sprintf("v%s", strings.ReplaceAll(version.String(), ".", "_"))
-	valCmd := exec.Command("cyclonedx", "validate", "--input-file", bomFilePath, "--input-format", inputFormat, "--input-version", inputVersion, "--fail-on-errors")
-	valOut, err := valCmd.CombinedOutput()
-	if !assert.NoError(t, err) {
-		// Provide some context when test is failing
-		fmt.Printf("validation error: %s\n", string(valOut))
-	}
+	err := v.Validate(bomBytes, version)
+	require.NoError(t, err)
 }
