@@ -421,7 +421,7 @@ func (sv SpecVersion) supportsScoringMethod(method ScoringMethod) bool {
 	switch method {
 	case ScoringMethodCVSSv2, ScoringMethodCVSSv3, ScoringMethodCVSSv31, ScoringMethodOWASP, ScoringMethodOther:
 		return sv >= SpecVersion1_4
-	case ScoringMethodCVSSv4:
+	case ScoringMethodCVSSv4, ScoringMethodSSVC:
 		return sv >= SpecVersion1_5
 	}
 

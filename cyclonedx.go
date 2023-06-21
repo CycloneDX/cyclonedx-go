@@ -539,6 +539,7 @@ const (
 	ScoringMethodCVSSv31 ScoringMethod = "CVSSv31"
 	ScoringMethodCVSSv4  ScoringMethod = "CVSSv4"
 	ScoringMethodOWASP   ScoringMethod = "OWASP"
+	ScoringMethodSSVC    ScoringMethod = "SSVC"
 )
 
 type Service struct {
