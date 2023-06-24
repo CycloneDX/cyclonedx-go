@@ -78,10 +78,10 @@ type BOM struct {
 
 func NewBOM() *BOM {
 	return &BOM{
-		JSONSchema:  jsonSchemas[SpecVersion1_4],
-		XMLNS:       xmlNamespaces[SpecVersion1_4],
+		JSONSchema:  jsonSchemas[SpecVersion1_5],
+		XMLNS:       xmlNamespaces[SpecVersion1_5],
 		BOMFormat:   BOMFormat,
-		SpecVersion: SpecVersion1_4,
+		SpecVersion: SpecVersion1_5,
 		Version:     1,
 	}
 }
@@ -477,6 +477,7 @@ const (
 	SpecVersion1_2                        // 1.2
 	SpecVersion1_3                        // 1.3
 	SpecVersion1_4                        // 1.4
+	SpecVersion1_5                        // 1.5
 )
 
 type SWID struct {
