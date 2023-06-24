@@ -26,6 +26,7 @@ var jsonSchemaFiles = map[SpecVersion]string{
 	SpecVersion1_2: "file://./schema/bom-1.2.schema.json",
 	SpecVersion1_3: "file://./schema/bom-1.3.schema.json",
 	SpecVersion1_4: "file://./schema/bom-1.4.schema.json",
+	SpecVersion1_5: "file://./schema/bom-1.5.schema.json",
 }
 
 type jsonValidator struct {

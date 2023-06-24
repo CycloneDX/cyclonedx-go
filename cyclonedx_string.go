@@ -33,11 +33,12 @@ func _() {
 	_ = x[SpecVersion1_2-3]
 	_ = x[SpecVersion1_3-4]
 	_ = x[SpecVersion1_4-5]
+	_ = x[SpecVersion1_5-6]
 }
 
-const _SpecVersion_name = "1.01.11.21.31.4"
+const _SpecVersion_name = "1.01.11.21.31.41.5"
 
-var _SpecVersion_index = [...]uint8{0, 3, 6, 9, 12, 15}
+var _SpecVersion_index = [...]uint8{0, 3, 6, 9, 12, 15, 18}
 
 func (i SpecVersion) String() string {
 	i -= 1
