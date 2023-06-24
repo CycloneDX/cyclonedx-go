@@ -103,14 +103,18 @@ type BOMReference string
 type ComponentType string
 
 const (
-	ComponentTypeApplication ComponentType = "application"
-	ComponentTypeContainer   ComponentType = "container"
-	ComponentTypeDevice      ComponentType = "device"
-	ComponentTypeFile        ComponentType = "file"
-	ComponentTypeFirmware    ComponentType = "firmware"
-	ComponentTypeFramework   ComponentType = "framework"
-	ComponentTypeLibrary     ComponentType = "library"
-	ComponentTypeOS          ComponentType = "operating-system"
+	ComponentTypeApplication          ComponentType = "application"
+	ComponentTypeContainer            ComponentType = "container"
+	ComponentTypeData                 ComponentType = "data"
+	ComponentTypeDevice               ComponentType = "device"
+	ComponentTypeDeviceDriver         ComponentType = "device-driver"
+	ComponentTypeFile                 ComponentType = "file"
+	ComponentTypeFirmware             ComponentType = "firmware"
+	ComponentTypeFramework            ComponentType = "framework"
+	ComponentTypeLibrary              ComponentType = "library"
+	ComponentTypeMachineLearningModel ComponentType = "machine-learning-model"
+	ComponentTypeOS                   ComponentType = "operating-system"
+	ComponentTypePlatform             ComponentType = "platform"
 )
 
 type Commit struct {
