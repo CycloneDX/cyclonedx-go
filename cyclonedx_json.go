@@ -43,6 +43,8 @@ func (sv *SpecVersion) UnmarshalJSON(bytes []byte) error {
 		*sv = SpecVersion1_3
 	case SpecVersion1_4.String():
 		*sv = SpecVersion1_4
+	case SpecVersion1_5.String():
+		*sv = SpecVersion1_5
 	default:
 		return ErrInvalidSpecVersion
 	}
