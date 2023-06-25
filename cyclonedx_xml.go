@@ -183,6 +183,8 @@ func (sv *SpecVersion) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		*sv = SpecVersion1_3
 	case SpecVersion1_4.String():
 		*sv = SpecVersion1_4
+	case SpecVersion1_5.String():
+		*sv = SpecVersion1_5
 	default:
 		return ErrInvalidSpecVersion
 	}
