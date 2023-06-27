@@ -52,7 +52,7 @@ func TestRoundTripJSON(t *testing.T) {
 			require.NoError(t, err)
 
 			// Sanity checks: BOM has to be valid
-			assertValidBOM(t, buf.Bytes(), BOMFileFormatJSON, SpecVersion1_4)
+			assertValidBOM(t, buf.Bytes(), BOMFileFormatJSON, SpecVersion1_5)
 
 			// Compare with snapshot
 			assert.NoError(t, snapShooter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))
@@ -85,7 +85,7 @@ func TestRoundTripXML(t *testing.T) {
 			require.NoError(t, err)
 
 			// Sanity check: BOM has to be valid
-			assertValidBOM(t, buf.Bytes(), BOMFileFormatXML, SpecVersion1_4)
+			assertValidBOM(t, buf.Bytes(), BOMFileFormatXML, SpecVersion1_5)
 
 			// Compare with snapshot
 			assert.NoError(t, snapShooter.SnapshotMulti(filepath.Base(bomFilePath), buf.String()))
