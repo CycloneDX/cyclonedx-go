@@ -48,6 +48,21 @@ type Affects struct {
 	Range *[]AffectedVersions `json:"versions,omitempty" xml:"versions>version,omitempty"`
 }
 
+type Annotation struct {
+	BOMRef    string          `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Subjects  *[]BOMReference `json:"subjects,omitempty" xml:"subjects>subject,omitempty"`
+	Annotator *Annotator      `json:"annotator,omitempty" xml:"annotator,omitempty"`
+	Timestamp string          `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
+	Text      string          `json:"text,omitempty" xml:"text,omitempty"`
+}
+
+type Annotator struct {
+	Organization *OrganizationalEntity  `json:"organization,omitempty" xml:"organization,omitempty"`
+	Individual   *OrganizationalContact `json:"individual,omitempty" xml:"individual,omitempty"`
+	Component    *Component             `json:"component,omitempty" xml:"component,omitempty"`
+	Service      *Service               `json:"service,omitempty" xml:"service,omitempty"`
+}
+
 type AttachedText struct {
 	Content     string `json:"content" xml:",chardata"`
 	ContentType string `json:"contentType,omitempty" xml:"content-type,attr,omitempty"`
@@ -74,6 +89,7 @@ type BOM struct {
 	Compositions       *[]Composition       `json:"compositions,omitempty" xml:"compositions>composition,omitempty"`
 	Properties         *[]Property          `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Vulnerabilities    *[]Vulnerability     `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
+	Annotations        *[]Annotation        `json:"annotations,omitempty" xml:"annotations>annotation,omitempty"`
 }
 
 func NewBOM() *BOM {
