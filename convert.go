@@ -48,6 +48,9 @@ func (b *BOM) convert(specVersion SpecVersion) {
 	if specVersion < SpecVersion1_4 {
 		b.Vulnerabilities = nil
 	}
+	if specVersion < SpecVersion1_5 {
+		b.Annotations = nil
+	}
 
 	if b.Metadata != nil {
 		if specVersion < SpecVersion1_3 {
