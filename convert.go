@@ -196,6 +196,17 @@ func convertLicenses(licenses *Licenses, specVersion SpecVersion) {
 			*licenses = converted
 		}
 	}
+
+	if specVersion < SpecVersion1_5 {
+		for i := range *licenses {
+			choice := &(*licenses)[i]
+			if choice.License != nil {
+				choice.License.BOMRef = ""
+				choice.License.Licensing = nil
+				choice.License.Properties = nil
+			}
+		}
+	}
 }
 
 // serviceConverter modifies a Service such that it adheres to a given SpecVersion.
