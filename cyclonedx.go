@@ -332,10 +332,13 @@ const (
 )
 
 type License struct {
-	ID   string        `json:"id,omitempty" xml:"id,omitempty"`
-	Name string        `json:"name,omitempty" xml:"name,omitempty"`
-	Text *AttachedText `json:"text,omitempty" xml:"text,omitempty"`
-	URL  string        `json:"url,omitempty" xml:"url,omitempty"`
+	BOMRef     string        `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	ID         string        `json:"id,omitempty" xml:"id,omitempty"`
+	Name       string        `json:"name,omitempty" xml:"name,omitempty"`
+	Text       *AttachedText `json:"text,omitempty" xml:"text,omitempty"`
+	URL        string        `json:"url,omitempty" xml:"url,omitempty"`
+	Licensing  *Licensing    `json:"licensing,omitempty" xml:"licensing,omitempty"`
+	Properties *[]Property   `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
 type Licenses []LicenseChoice
@@ -343,6 +346,38 @@ type Licenses []LicenseChoice
 type LicenseChoice struct {
 	License    *License `json:"license,omitempty" xml:"-"`
 	Expression string   `json:"expression,omitempty" xml:"-"`
+}
+
+type LicenseType string
+
+const (
+	LicenseTypeAcademic        LicenseType = "academic"
+	LicenseTypeAppliance       LicenseType = "appliance"
+	LicenseTypeClientAccess    LicenseType = "client-access"
+	LicenseTypeConcurrentUser  LicenseType = "concurrent-user"
+	LicenseTypeCorePoints      LicenseType = "core-points"
+	LicenseTypeCustomMetric    LicenseType = "custom-metric"
+	LicenseTypeDevice          LicenseType = "device"
+	LicenseTypeEvaluation      LicenseType = "evaluation"
+	LicenseTypeNamedUser       LicenseType = "named-user"
+	LicenseTypeNodeLocked      LicenseType = "node-locked"
+	LicenseTypeOEM             LicenseType = "oem"
+	LicenseTypeOther           LicenseType = "other"
+	LicenseTypePerpetual       LicenseType = "perpetual"
+	LicenseTypeProcessorPoints LicenseType = "processor-points"
+	LicenseTypeSubscription    LicenseType = "subscription"
+	LicenseTypeUser            LicenseType = "user"
+)
+
+type Licensing struct {
+	AltIDs        *[]string                      `json:"altIds,omitempty" xml:"altIds>altId,omitempty"`
+	Licensor      *OrganizationalEntityOrContact `json:"licensor,omitempty" xml:"licensor,omitempty"`
+	Licensee      *OrganizationalEntityOrContact `json:"licensee,omitempty" xml:"licensee,omitempty"`
+	Purchaser     *OrganizationalEntityOrContact `json:"purchaser,omitempty" xml:"purchaser,omitempty"`
+	PurchaseOrder string                         `json:"purchaseOrder,omitempty" xml:"purchaseOrder,omitempty"`
+	LicenseTypes  *[]LicenseType                 `json:"licenseTypes,omitempty" xml:"licenseTypes>licenseType,omitempty"`
+	LastRenewal   string                         `json:"lastRenewal,omitempty" xml:"lastRenewal,omitempty"`
+	Expiration    string                         `json:"expiration,omitempty" xml:"expiration,omitempty"`
 }
 
 // MediaType defines the official media types for CycloneDX BOMs.
@@ -389,6 +424,11 @@ type OrganizationalEntity struct {
 	Name    string                   `json:"name" xml:"name"`
 	URL     *[]string                `json:"url,omitempty" xml:"url,omitempty"`
 	Contact *[]OrganizationalContact `json:"contact,omitempty" xml:"contact,omitempty"`
+}
+
+type OrganizationalEntityOrContact struct {
+	Organization *OrganizationalEntity  `json:"organization,omitempty" xml:"organization,omitempty"`
+	Individual   *OrganizationalContact `json:"individual,omitempty" xml:"individual,omitempty"`
 }
 
 type Patch struct {
