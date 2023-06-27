@@ -57,6 +57,9 @@ func (b *BOM) convert(specVersion SpecVersion) {
 			b.Metadata.Licenses = nil
 			b.Metadata.Properties = nil
 		}
+		if specVersion < SpecVersion1_5 {
+			b.Metadata.Lifecycles = nil
+		}
 
 		recurseComponent(b.Metadata.Component, componentConverter(specVersion))
 		convertLicenses(b.Metadata.Licenses, specVersion)

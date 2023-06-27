@@ -380,6 +380,24 @@ type Licensing struct {
 	Expiration    string                         `json:"expiration,omitempty" xml:"expiration,omitempty"`
 }
 
+type Lifecycle struct {
+	Name        string         `json:"name,omitempty" xml:"name,omitempty"`
+	Phase       LifecyclePhase `json:"phase,omitempty" xml:"phase,omitempty"`
+	Description string         `json:"description,omitempty" xml:"description,omitempty"`
+}
+
+type LifecyclePhase string
+
+const (
+	LifecyclePhaseBuild        LifecyclePhase = "build"
+	LifecyclePhaseDecommission LifecyclePhase = "decommission"
+	LifecyclePhaseDesign       LifecyclePhase = "design"
+	LifecyclePhaseDiscovery    LifecyclePhase = "discovery"
+	LifecyclePhaseOperations   LifecyclePhase = "operations"
+	LifecyclePhasePostBuild    LifecyclePhase = "post-build"
+	LifecyclePhasePreBuild     LifecyclePhase = "pre-build"
+)
+
 // MediaType defines the official media types for CycloneDX BOMs.
 // See https://cyclonedx.org/specification/overview/#registered-media-types
 type MediaType int
@@ -400,6 +418,7 @@ func (mt MediaType) WithVersion(specVersion SpecVersion) (string, error) {
 
 type Metadata struct {
 	Timestamp   string                   `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
+	Lifecycles  *[]Lifecycle             `json:"lifecycles,omitempty" xml:"lifecycles>lifecycle,omitempty"`
 	Tools       *[]Tool                  `json:"tools,omitempty" xml:"tools>tool,omitempty"`
 	Authors     *[]OrganizationalContact `json:"authors,omitempty" xml:"authors>author,omitempty"`
 	Component   *Component               `json:"component,omitempty" xml:"component,omitempty"`
