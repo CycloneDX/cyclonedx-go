@@ -137,6 +137,11 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 			}
 		}
 
+		if specVersion < SpecVersion1_5 {
+			c.ModelCard = nil
+			c.Data = nil
+		}
+
 		if !specVersion.supportsComponentType(c.Type) {
 			c.Type = ComponentTypeApplication
 		}
@@ -382,6 +387,7 @@ func (sv SpecVersion) supportsExternalReferenceType(ert ExternalReferenceType) b
 		ERTypeDynamicAnalysisReport,
 		ERTypeExploitabilityStatement,
 		ERTypeMaturityReport,
+		ERTypeModelCard,
 		ERTypePentestReport,
 		ERTypeQualityMetrics,
 		ERTypeRiskAssessment,

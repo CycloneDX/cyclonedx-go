@@ -21,6 +21,45 @@ import (
 	"encoding/json"
 )
 
+type mlDatasetChoiceRefJSON struct {
+	Ref string `json:"ref" xml:"-"`
+}
+
+func (dc MLDatasetChoice) MarshalJSON() ([]byte, error) {
+	if dc.Ref != "" {
+		return json.Marshal(mlDatasetChoiceRefJSON{Ref: dc.Ref})
+	} else if dc.ComponentData != nil {
+		return json.Marshal(dc.ComponentData)
+	}
+
+	return []byte("{}"), nil
+}
+
+func (dc *MLDatasetChoice) UnmarshalJSON(bytes []byte) error {
+	var refObj mlDatasetChoiceRefJSON
+	err := json.Unmarshal(bytes, &refObj)
+	if err != nil {
+		return err
+	}
+
+	if refObj.Ref != "" {
+		dc.Ref = refObj.Ref
+		return nil
+	}
+
+	var componentData ComponentData
+	err = json.Unmarshal(bytes, &componentData)
+	if err != nil {
+		return err
+	}
+
+	if componentData != (ComponentData{}) {
+		dc.ComponentData = &componentData
+	}
+
+	return nil
+}
+
 func (sv SpecVersion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(sv.String())
 }

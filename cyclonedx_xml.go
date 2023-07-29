@@ -161,6 +161,44 @@ func (l *Licenses) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 	return nil
 }
 
+type mlDatasetChoiceRefXML struct {
+	Ref string `json:"-" xml:"ref"`
+}
+
+type mlDatasetChoiceXML struct {
+	Ref string `json:"-" xml:"ref"`
+	ComponentData
+}
+
+func (dc MLDatasetChoice) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if dc.Ref != "" {
+		return e.EncodeElement(mlDatasetChoiceRefXML{Ref: dc.Ref}, start)
+	} else if dc.ComponentData != nil {
+		return e.EncodeElement(dc.ComponentData, start)
+	}
+
+	return nil
+}
+
+func (dc *MLDatasetChoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var choice mlDatasetChoiceXML
+	err := d.DecodeElement(&choice, &start)
+	if err != nil {
+		return err
+	}
+
+	if choice.Ref != "" {
+		dc.Ref = choice.Ref
+		return nil
+	}
+
+	if choice.ComponentData != (ComponentData{}) {
+		dc.ComponentData = &choice.ComponentData
+	}
+
+	return nil
+}
+
 func (sv SpecVersion) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(sv.String(), start)
 }

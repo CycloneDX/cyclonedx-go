@@ -217,3 +217,79 @@ func TestLicenses_UnmarshalXML(t *testing.T) {
 	err = xml.Unmarshal([]byte("<Licenses><somethingElse>expressionValue</somethingElse></Licenses>"), licenses)
 	assert.Error(t, err)
 }
+
+func TestMLDatasetChoice_MarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		choice := MLDatasetChoice{}
+		xmlBytes, err := xml.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, "", string(xmlBytes))
+	})
+
+	t.Run("WithRef", func(t *testing.T) {
+		choice := MLDatasetChoice{Ref: "foo"}
+		xmlBytes, err := xml.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, `<MLDatasetChoice><ref>foo</ref></MLDatasetChoice>`, string(xmlBytes))
+	})
+
+	t.Run("WithComponentData", func(t *testing.T) {
+		choice := MLDatasetChoice{
+			ComponentData: &ComponentData{
+				BOMRef: "foo",
+				Name:   "bar",
+			},
+		}
+		xmlBytes, err := xml.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, `<MLDatasetChoice bom-ref="foo"><name>bar</name></MLDatasetChoice>`, string(xmlBytes))
+	})
+
+	t.Run("WithRefAndComponentData", func(t *testing.T) {
+		choice := MLDatasetChoice{
+			Ref: "foo",
+			ComponentData: &ComponentData{
+				BOMRef: "bar",
+				Name:   "baz",
+			},
+		}
+		xmlBytes, err := xml.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, `<MLDatasetChoice><ref>foo</ref></MLDatasetChoice>`, string(xmlBytes))
+	})
+}
+
+func TestMLDatasetChoice_UnmarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		var choice MLDatasetChoice
+		err := xml.Unmarshal([]byte(`<MLDatasetChoice></MLDatasetChoice>`), &choice)
+		require.NoError(t, err)
+		require.Equal(t, MLDatasetChoice{}, choice)
+	})
+
+	t.Run("WithRef", func(t *testing.T) {
+		var choice MLDatasetChoice
+		err := xml.Unmarshal([]byte(`<MLDatasetChoice><ref>foo</ref></MLDatasetChoice>`), &choice)
+		require.NoError(t, err)
+		require.Equal(t, "foo", choice.Ref)
+		require.Nil(t, choice.ComponentData)
+	})
+
+	t.Run("WithComponentData", func(t *testing.T) {
+		var choice MLDatasetChoice
+		err := xml.Unmarshal([]byte(`<MLDatasetChoice bom-ref="foo"><name>bar</name></MLDatasetChoice>`), &choice)
+		require.NoError(t, err)
+		require.Empty(t, choice.Ref)
+		require.NotNil(t, choice.ComponentData)
+		require.Equal(t, "foo", choice.ComponentData.BOMRef)
+		require.Equal(t, "bar", choice.ComponentData.Name)
+	})
+
+	t.Run("WithRefAndComponentData", func(t *testing.T) {
+		var choice MLDatasetChoice
+		err := xml.Unmarshal([]byte(`<MLDatasetChoice bom-ref="bar"><ref>foo</ref><name>baz</name></MLDatasetChoice>`), &choice)
+		require.NoError(t, err)
+		require.Equal(t, "foo", choice.Ref)
+		require.Nil(t, choice.ComponentData)
+	})
+}

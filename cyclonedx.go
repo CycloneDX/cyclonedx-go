@@ -166,7 +166,57 @@ type Component struct {
 	Components         *[]Component          `json:"components,omitempty" xml:"components>component,omitempty"`
 	Evidence           *Evidence             `json:"evidence,omitempty" xml:"evidence,omitempty"`
 	ReleaseNotes       *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
+	ModelCard          *MLModelCard          `json:"modelCard,omitempty" xml:"modelCard,omitempty"`
+	Data               *ComponentData        `json:"data,omitempty" xml:"data,omitempty"`
 }
+
+type ComponentData struct {
+	BOMRef         string                   `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Type           ComponentDataType        `json:"type,omitempty" xml:"type,omitempty"`
+	Name           string                   `json:"name,omitempty" xml:"name,omitempty"`
+	Contents       *ComponentDataContents   `json:"contents,omitempty" xml:"contents,omitempty"`
+	Classification string                   `json:"classification,omitempty" xml:"classification,omitempty"`
+	SensitiveData  *[]string                `json:"sensitiveData,omitempty" xml:"sensitiveData,omitempty"`
+	Graphics       *ComponentDataGraphics   `json:"graphics,omitempty" xml:"graphics,omitempty"`
+	Description    string                   `json:"description,omitempty" xml:"description,omitempty"`
+	Governance     *ComponentDataGovernance `json:"governance,omitempty" xml:"governance,omitempty"`
+}
+
+type ComponentDataContents struct {
+	Attachment *AttachedText `json:"attachment,omitempty" xml:"attachment,omitempty"`
+	URL        string        `json:"url,omitempty" xml:"url,omitempty"`
+	Properties *[]Property   `json:"properties,omitempty" xml:"properties,omitempty"`
+}
+
+type ComponentDataGovernance struct {
+	Custodians *[]ComponentDataGovernanceResponsibleParty `json:"custodians,omitempty" xml:"custodians>custodian,omitempty"`
+	Stewards   *[]ComponentDataGovernanceResponsibleParty `json:"stewards,omitempty" xml:"stewards>steward,omitempty"`
+	Owners     *[]ComponentDataGovernanceResponsibleParty `json:"owners,omitempty" xml:"owners>owner,omitempty"`
+}
+
+type ComponentDataGovernanceResponsibleParty struct {
+	Organization *OrganizationalEntity  `json:"organization,omitempty" xml:"organization,omitempty"`
+	Contact      *OrganizationalContact `json:"contact,omitempty" xml:"contact,omitempty"`
+}
+
+type ComponentDataGraphic struct {
+	Name  string        `json:"name,omitempty" xml:"name,omitempty"`
+	Image *AttachedText `json:"image,omitempty" xml:"image,omitempty"`
+}
+
+type ComponentDataGraphics struct {
+	Description string                  `json:"description,omitempty" xml:"description,omitempty"`
+	Collection  *[]ComponentDataGraphic `json:"collection,omitempty" xml:"collection>graphic,omitempty"`
+}
+
+type ComponentDataType string
+
+const (
+	ComponentDataTypeConfiguration ComponentDataType = "configuration"
+	ComponentDataTypeDataset       ComponentDataType = "dataset"
+	ComponentDataTypeOther         ComponentDataType = "other"
+	ComponentDataTypeSourceCode    ComponentDataType = "source-code"
+)
 
 type Composition struct {
 	BOMRef          string               `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
@@ -258,6 +308,7 @@ const (
 	ERTypeLicense                 ExternalReferenceType = "license"
 	ERTypeMailingList             ExternalReferenceType = "mailing-list"
 	ERTypeMaturityReport          ExternalReferenceType = "maturity-report"
+	ERTypeModelCard               ExternalReferenceType = "model-card"
 	ERTypeOther                   ExternalReferenceType = "other"
 	ERTypePentestReport           ExternalReferenceType = "pentest-report"
 	ERTypeQualityMetrics          ExternalReferenceType = "quality-metrics"
@@ -449,6 +500,84 @@ type Metadata struct {
 	Supplier    *OrganizationalEntity    `json:"supplier,omitempty" xml:"supplier,omitempty"`
 	Licenses    *Licenses                `json:"licenses,omitempty" xml:"licenses,omitempty"`
 	Properties  *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type MLDatasetChoice struct {
+	Ref           string         `json:"-" xml:"-"`
+	ComponentData *ComponentData `json:"-" xml:"-"`
+}
+
+type MLInputOutputParameters struct {
+	Format string `json:"format,omitempty" xml:"format,omitempty"`
+}
+
+type MLModelCard struct {
+	BOMRef               string                     `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	ModelParameters      *MLModelParameters         `json:"modelParameters,omitempty" xml:"modelParameters,omitempty"`
+	QuantitativeAnalysis *MLQuantitativeAnalysis    `json:"quantitativeAnalysis,omitempty" xml:"quantitativeAnalysis,omitempty"`
+	Considerations       *MLModelCardConsiderations `json:"considerations,omitempty" xml:"considerations,omitempty"`
+}
+
+type MLModelCardConsiderations struct {
+	Users                 *[]string                          `json:"users,omitempty" xml:"users>user,omitempty"`
+	UseCases              *[]string                          `json:"useCases,omitempty" xml:"useCases>useCase,omitempty"`
+	TechnicalLimitations  *[]string                          `json:"technicalLimitations,omitempty" xml:"technicalLimitations>technicalLimitation,omitempty"`
+	PerformanceTradeoffs  *[]string                          `json:"performanceTradeoffs,omitempty" xml:"performanceTradeoffs>performanceTradeoff,omitempty"`
+	EthicalConsiderations *[]MLModelCardEthicalConsideration `json:"ethicalConsiderations,omitempty" xml:"ethicalConsiderations>ethicalConsideration,omitempty"`
+	FairnessAssessments   *[]MLModelCardFairnessAssessment   `json:"fairnessAssessments,omitempty" xml:"fairnessAssessments>fairnessAssessment,omitempty"`
+}
+
+type MLModelCardEthicalConsideration struct {
+	Name               string `json:"name,omitempty" xml:"name,omitempty"`
+	MitigationStrategy string `json:"mitigationStrategy,omitempty" xml:"mitigationStrategy,omitempty"`
+}
+
+type MLModelCardFairnessAssessment struct {
+	GroupAtRisk        string `json:"groupAtRisk,omitempty" xml:"groupAtRisk,omitempty"`
+	Benefits           string `json:"benefits,omitempty" xml:"benefits,omitempty"`
+	Harms              string `json:"harms,omitempty" xml:"harms,omitempty"`
+	MitigationStrategy string `json:"mitigationStrategy,omitempty" xml:"mitigationStrategy,omitempty"`
+}
+
+type MLModelParameters struct {
+	Approach           *MLModelParametersApproach `json:"approach,omitempty" xml:"approach,omitempty"`
+	Task               string                     `json:"task,omitempty" xml:"task,omitempty"`
+	ArchitectureFamily string                     `json:"architectureFamily,omitempty" xml:"architectureFamily,omitempty"`
+	ModelArchitecture  string                     `json:"modelArchitecture,omitempty" xml:"modelArchitecture,omitempty"`
+	Datasets           *[]MLDatasetChoice         `json:"datasets,omitempty" xml:"datasets>dataset,omitempty"`
+	Inputs             *[]MLInputOutputParameters `json:"inputs,omitempty" xml:"inputs>input,omitempty"`
+	Outputs            *[]MLInputOutputParameters `json:"outputs,omitempty" xml:"outputs>output,omitempty"`
+}
+
+type MLModelParametersApproach struct {
+	Type MLModelParametersApproachType `json:"type,omitempty" xml:"type,omitempty"`
+}
+
+type MLModelParametersApproachType string
+
+const (
+	MLModelParametersApproachTypeSupervised            MLModelParametersApproachType = "supervised"
+	MLModelParametersApproachTypeUnsupervised          MLModelParametersApproachType = "unsupervised"
+	MLModelParametersApproachTypeReinforcementLearning MLModelParametersApproachType = "reinforcement-learning"
+	MLModelParametersApproachTypeSemiSupervised        MLModelParametersApproachType = "semi-supervised"
+	MLModelParametersApproachTypeSelfSupervised        MLModelParametersApproachType = "self-supervised"
+)
+
+type MLQuantitativeAnalysis struct {
+	PerformanceMetrics *[]MLPerformanceMetric `json:"performanceMetrics,omitempty" xml:"performanceMetrics>performanceMetric,omitempty"`
+	Graphics           *ComponentDataGraphics `json:"graphics,omitempty" xml:"graphics,omitempty"`
+}
+
+type MLPerformanceMetric struct {
+	Type               string                                 `json:"type,omitempty" xml:"type,omitempty"`
+	Value              string                                 `json:"value,omitempty" xml:"value,omitempty"`
+	Slice              string                                 `json:"slice,omitempty" xml:"slice,omitempty"`
+	ConfidenceInterval *MLPerformanceMetricConfidenceInterval `json:"confidenceInterval,omitempty" xml:"confidenceInterval,omitempty"`
+}
+
+type MLPerformanceMetricConfidenceInterval struct {
+	LowerBound string `json:"lowerBound,omitempty" xml:"lowerBound,omitempty"`
+	UpperBound string `json:"upperBound,omitempty" xml:"upperBound,omitempty"`
 }
 
 type Note struct {
