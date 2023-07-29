@@ -116,6 +116,20 @@ func Bool(value bool) *bool {
 
 type BOMReference string
 
+type Callstack struct {
+	Frames *[]CallstackFrame `json:"frames,omitempty" xml:"frames>frame,omitempty"`
+}
+
+type CallstackFrame struct {
+	Package      string    `json:"package,omitempty" xml:"package,omitempty"`
+	Module       string    `json:"module,omitempty" xml:"module,omitempty"`
+	Function     string    `json:"function,omitempty" xml:"function,omitempty"`
+	Parameters   *[]string `json:"parameters,omitempty" xml:"parameters>parameter,omitempty"`
+	Line         *int      `json:"line,omitempty" xml:"line,omitempty"`
+	Column       *int      `json:"column,omitempty" xml:"column,omitempty"`
+	FullFilename string    `json:"fullFilename,omitempty" xml:"fullFilename,omitempty"`
+}
+
 type ComponentType string
 
 const (
@@ -275,8 +289,56 @@ type Diff struct {
 }
 
 type Evidence struct {
-	Licenses  *Licenses    `json:"licenses,omitempty" xml:"licenses,omitempty"`
-	Copyright *[]Copyright `json:"copyright,omitempty" xml:"copyright>text,omitempty"`
+	Identity    *EvidenceIdentity     `json:"identity,omitempty" xml:"identity,omitempty"`
+	Occurrences *[]EvidenceOccurrence `json:"occurrences,omitempty" xml:"occurrences>occurrence,omitempty"`
+	Callstack   *Callstack            `json:"callstack,omitempty" xml:"callstack,omitempty"`
+	Licenses    *Licenses             `json:"licenses,omitempty" xml:"licenses,omitempty"`
+	Copyright   *[]Copyright          `json:"copyright,omitempty" xml:"copyright>text,omitempty"`
+}
+
+type EvidenceIdentity struct {
+	Field      EvidenceIdentityFieldType `json:"field,omitempty" xml:"field,omitempty"`
+	Confidence *float32                  `json:"confidence,omitempty" xml:"confidence,omitempty"`
+	Methods    *[]EvidenceIdentityMethod `json:"methods,omitempty" xml:"methods>method,omitempty"`
+	Tools      *[]BOMReference           `json:"tools,omitempty" xml:"tools>tool,omitempty"`
+}
+
+type EvidenceIdentityFieldType string
+
+const (
+	EvidenceIdentityFieldTypeCPE     EvidenceIdentityFieldType = "cpe"
+	EvidenceIdentityFieldTypeGroup   EvidenceIdentityFieldType = "group"
+	EvidenceIdentityFieldTypeHash    EvidenceIdentityFieldType = "hash"
+	EvidenceIdentityFieldTypeName    EvidenceIdentityFieldType = "name"
+	EvidenceIdentityFieldTypePURL    EvidenceIdentityFieldType = "purl"
+	EvidenceIdentityFieldTypeSWID    EvidenceIdentityFieldType = "swid"
+	EvidenceIdentityFieldTypeVersion EvidenceIdentityFieldType = "version"
+)
+
+type EvidenceIdentityMethod struct {
+	Technique  EvidenceIdentityTechnique `json:"technique,omitempty" xml:"technique,omitempty"`
+	Confidence *float32                  `json:"confidence,omitempty" xml:"confidence,omitempty"`
+	Value      string                    `json:"value,omitempty" xml:"value,omitempty"`
+}
+
+type EvidenceIdentityTechnique string
+
+const (
+	EvidenceIdentityTechniqueASTFingerprint     EvidenceIdentityTechnique = "ast-fingerprint"
+	EvidenceIdentityTechniqueAttestation        EvidenceIdentityTechnique = "attestation"
+	EvidenceIdentityTechniqueBinaryAnalysis     EvidenceIdentityTechnique = "binary-analysis"
+	EvidenceIdentityTechniqueDynamicAnalysis    EvidenceIdentityTechnique = "dynamic-analysis"
+	EvidenceIdentityTechniqueFilename           EvidenceIdentityTechnique = "filename"
+	EvidenceIdentityTechniqueHashComparison     EvidenceIdentityTechnique = "hash-comparison"
+	EvidenceIdentityTechniqueInstrumentation    EvidenceIdentityTechnique = "instrumentation"
+	EvidenceIdentityTechniqueManifestAnalysis   EvidenceIdentityTechnique = "manifest-analysis"
+	EvidenceIdentityTechniqueOther              EvidenceIdentityTechnique = "other"
+	EvidenceIdentityTechniqueSourceCodeAnalysis EvidenceIdentityTechnique = "source-code-analysis"
+)
+
+type EvidenceOccurrence struct {
+	BOMRef   string `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Location string `json:"location,omitempty" xml:"location,omitempty"`
 }
 
 type ExternalReference struct {

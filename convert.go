@@ -140,6 +140,12 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 		if specVersion < SpecVersion1_5 {
 			c.ModelCard = nil
 			c.Data = nil
+
+			if c.Evidence != nil {
+				c.Evidence.Identity = nil
+				c.Evidence.Occurrences = nil
+				c.Evidence.Callstack = nil
+			}
 		}
 
 		if !specVersion.supportsComponentType(c.Type) {
