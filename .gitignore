@@ -15,7 +15,8 @@
 # vendor/
 
 # IntelliJ / GoLand
-.idea/
+.idea/*
+!.idea/icon.svg
 *.iml
 
 # SBOMs generated during CI
