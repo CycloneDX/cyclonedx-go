@@ -90,6 +90,7 @@ type BOM struct {
 	Properties         *[]Property          `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Vulnerabilities    *[]Vulnerability     `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
 	Annotations        *[]Annotation        `json:"annotations,omitempty" xml:"annotations>annotation,omitempty"`
+	Formulation        *[]Formula           `json:"formulation,omitempty" xml:"formulation>formula,omitempty"`
 }
 
 func NewBOM() *BOM {
@@ -228,6 +229,7 @@ type ComponentDataType string
 const (
 	ComponentDataTypeConfiguration ComponentDataType = "configuration"
 	ComponentDataTypeDataset       ComponentDataType = "dataset"
+	ComponentDataTypeDefinition    ComponentDataType = "definition"
 	ComponentDataTypeOther         ComponentDataType = "other"
 	ComponentDataTypeSourceCode    ComponentDataType = "source-code"
 )
@@ -286,6 +288,23 @@ type Dependency struct {
 type Diff struct {
 	Text *AttachedText `json:"text,omitempty" xml:"text,omitempty"`
 	URL  string        `json:"url,omitempty" xml:"url,omitempty"`
+}
+
+type EnvironmentVariables []EnvironmentVariableChoice
+
+type EnvironmentVariableChoice struct {
+	Property *Property `json:"-" xml:"-"`
+	Value    string    `json:"-" xml:"-"`
+}
+
+type Event struct {
+	UID          string                   `json:"uid,omitempty" xml:"uid,omitempty"`
+	Description  string                   `json:"description,omitempty" xml:"description,omitempty"`
+	TimeReceived string                   `json:"timeReceived,omitempty" xml:"timeReceived,omitempty"`
+	Data         *AttachedText            `json:"data,omitempty" xml:"data,omitempty"`
+	Source       *ResourceReferenceChoice `json:"source,omitempty" xml:"source,omitempty"`
+	Target       *ResourceReferenceChoice `json:"target,omitempty" xml:"target,omitempty"`
+	Properties   *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
 type Evidence struct {
@@ -359,15 +378,19 @@ const (
 	ERTypeBuildSystem             ExternalReferenceType = "build-system"
 	ERTypeCertificationReport     ExternalReferenceType = "certification-report"
 	ERTypeChat                    ExternalReferenceType = "chat"
+	ERTypeConfiguration           ExternalReferenceType = "configuration"
 	ERTypeCodifiedInfrastructure  ExternalReferenceType = "codified-infrastructure"
 	ERTypeComponentAnalysisReport ExternalReferenceType = "component-analysis-report"
 	ERTypeDistribution            ExternalReferenceType = "distribution"
 	ERTypeDistributionIntake      ExternalReferenceType = "distribution-intake"
 	ERTypeDocumentation           ExternalReferenceType = "documentation"
 	ERTypeDynamicAnalysisReport   ExternalReferenceType = "dynamic-analysis-report"
+	ERTypeEvidence                ExternalReferenceType = "evidence"
 	ERTypeExploitabilityStatement ExternalReferenceType = "exploitability-statement"
+	ERTypeFormulation             ExternalReferenceType = "formulation"
 	ERTypeIssueTracker            ExternalReferenceType = "issue-tracker"
 	ERTypeLicense                 ExternalReferenceType = "license"
+	ERTypeLog                     ExternalReferenceType = "log"
 	ERTypeMailingList             ExternalReferenceType = "mailing-list"
 	ERTypeMaturityReport          ExternalReferenceType = "maturity-report"
 	ERTypeModelCard               ExternalReferenceType = "model-card"
@@ -386,6 +409,14 @@ const (
 	ERTypeVulnerabilityAssertion  ExternalReferenceType = "vulnerability-assertion"
 	ERTypeWebsite                 ExternalReferenceType = "website"
 )
+
+type Formula struct {
+	BOMRef     string       `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Components *[]Component `json:"components,omitempty" xml:"components>component,omitempty"`
+	Services   *[]Service   `json:"services,omitempty" xml:"services>service,omitempty"`
+	Workflows  *[]Workflow  `json:"workflows,omitempty" xml:"workflows>workflow,omitempty"`
+	Properties *[]Property  `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
 
 type Hash struct {
 	Algorithm HashAlgorithm `json:"alg" xml:"alg,attr"`
@@ -664,6 +695,12 @@ type OrganizationalEntityOrContact struct {
 	Individual   *OrganizationalContact `json:"individual,omitempty" xml:"individual,omitempty"`
 }
 
+type Parameter struct {
+	Name     string `json:"name,omitempty" xml:"name,omitempty"`
+	Value    string `json:"value,omitempty" xml:"value,omitempty"`
+	DataType string `json:"dataType,omitempty" xml:"dataType,omitempty"`
+}
+
 type Patch struct {
 	Diff     *Diff     `json:"diff,omitempty" xml:"diff,omitempty"`
 	Resolves *[]Issue  `json:"resolves,omitempty" xml:"resolves>issue,omitempty"`
@@ -711,6 +748,11 @@ type ReleaseNotes struct {
 	Resolves      *[]Issue    `json:"resolves,omitempty" xml:"resolves>issue,omitempty"`
 	Notes         *[]Note     `json:"notes,omitempty" xml:"notes>note,omitempty"`
 	Properties    *[]Property `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type ResourceReferenceChoice struct {
+	Ref               string             `json:"ref,omitempty" xml:"ref,omitempty"`
+	ExternalReference *ExternalReference `json:"externalReference,omitempty" xml:"externalReference,omitempty"`
 }
 
 type Scope string
@@ -791,6 +833,140 @@ type SWID struct {
 	Patch      *bool         `json:"patch,omitempty" xml:"patch,attr,omitempty"`
 }
 
+type Task struct {
+	BOMRef             string                     `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	UID                string                     `json:"uid,omitempty" xml:"uid,omitempty"`
+	Name               string                     `json:"name,omitempty" xml:"name,omitempty"`
+	Description        string                     `json:"description,omitempty" xml:"description,omitempty"`
+	Properties         *[]Property                `json:"properties,omitempty" xml:"properties>property,omitempty"`
+	ResourceReferences *[]ResourceReferenceChoice `json:"resourceReferences,omitempty" xml:"resourceReferences>resourceReference,omitempty"`
+	TaskTypes          *[]TaskType                `json:"taskTypes,omitempty" xml:"taskTypes>taskType,omitempty"`
+	Trigger            *TaskTrigger               `json:"trigger,omitempty" xml:"trigger,omitempty"`
+	Steps              *[]TaskStep                `json:"steps,omitempty" xml:"steps>step,omitempty"`
+	Inputs             *[]TaskInput               `json:"inputs,omitempty" xml:"inputs>input,omitempty"`
+	Outputs            *[]TaskOutput              `json:"outputs,omitempty" xml:"outputs>output,omitempty"`
+	TimeStart          string                     `json:"timeStart,omitempty" xml:"timeStart,omitempty"`
+	TimeEnd            string                     `json:"timeEnd,omitempty" xml:"timeEnd,omitempty"`
+	Workspaces         *[]TaskWorkspace           `json:"workspaces,omitempty" xml:"workspaces>workspace,omitempty"`
+	RuntimeTopology    *[]Dependency              `json:"runtimeTopology,omitempty" xml:"runtimeTopology>dependency,omitempty"`
+}
+
+type TaskCommand struct {
+	Executed   string      `json:"executed,omitempty" xml:"executed,omitempty"`
+	Properties *[]Property `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type TaskInput struct {
+	Resource        *ResourceReferenceChoice `json:"resource,omitempty" xml:"resource,omitempty"`
+	Parameters      *[]Parameter             `json:"parameters,omitempty" xml:"parameters>parameter,omitempty"`
+	EnvironmentVars *EnvironmentVariables    `json:"environmentVars,omitempty" xml:"environmentVars,omitempty"`
+	Data            *AttachedText            `json:"data,omitempty" xml:"data,omitempty"`
+	Source          *ResourceReferenceChoice `json:"source,omitempty" xml:"source,omitempty"`
+	Target          *ResourceReferenceChoice `json:"target,omitempty" xml:"target,omitempty"`
+	Properties      *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type TaskOutput struct {
+	Resource        *ResourceReferenceChoice `json:"resource,omitempty" xml:"resource,omitempty"`
+	Parameters      *[]Parameter             `json:"parameters,omitempty" xml:"parameters>parameter,omitempty"`
+	EnvironmentVars *EnvironmentVariables    `json:"environmentVars,omitempty" xml:"environmentVars,omitempty"`
+	Data            *AttachedText            `json:"data,omitempty" xml:"data,omitempty"`
+	Type            TaskOutputType           `json:"type,omitempty" xml:"type,omitempty"`
+	Source          *ResourceReferenceChoice `json:"source,omitempty" xml:"source,omitempty"`
+	Target          *ResourceReferenceChoice `json:"target,omitempty" xml:"target,omitempty"`
+	Properties      *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type TaskOutputType string
+
+const (
+	TaskOutputTypeArtifact    TaskOutputType = "artifact"
+	TaskOutputTypeAttestation TaskOutputType = "attestation"
+	TaskOutputTypeEvidence    TaskOutputType = "evidence"
+	TaskOutputTypeLog         TaskOutputType = "log"
+	TaskOutputTypeMetrics     TaskOutputType = "metrics"
+	TaskOutputTypeOther       TaskOutputType = "other"
+)
+
+type TaskStep struct {
+	Name        string         `json:"name,omitempty" xml:"name,omitempty"`
+	Description string         `json:"description,omitempty" xml:"description,omitempty"`
+	Commands    *[]TaskCommand `json:"commands,omitempty" xml:"commands>command,omitempty"`
+	Properties  *[]Property    `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type TaskTrigger struct {
+	BOMRef             string                     `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	UID                string                     `json:"uid,omitempty" xml:"uid,omitempty"`
+	Name               string                     `json:"name,omitempty" xml:"name,omitempty"`
+	Description        string                     `json:"description,omitempty" xml:"description,omitempty"`
+	ResourceReferences *[]ResourceReferenceChoice `json:"resourceReferences,omitempty" xml:"resourceReferences>resourceReference,omitempty"`
+	Type               TaskTriggerType            `json:"type,omitempty" xml:"type,omitempty"`
+	Event              *Event                     `json:"event,omitempty" xml:"event,omitempty"`
+	Conditions         *[]TaskTriggerCondition    `json:"conditions,omitempty" xml:"conditions>condition,omitempty"`
+	TimeActivated      string                     `json:"timeActivated,omitempty" xml:"timeActivated,omitempty"`
+	Inputs             *[]TaskInput               `json:"inputs,omitempty" xml:"inputs>input,omitempty"`
+	Outputs            *[]TaskOutput              `json:"outputs,omitempty" xml:"outputs>output,omitempty"`
+	Properties         *[]Property                `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type TaskTriggerCondition struct {
+	Description string      `json:"description,omitempty" xml:"description,omitempty"`
+	Expression  string      `json:"expression,omitempty" xml:"expression,omitempty"`
+	Properties  *[]Property `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type TaskTriggerType string
+
+const (
+	TaskTriggerTypeAPI       TaskTriggerType = "api"
+	TaskTriggerTypeManual    TaskTriggerType = "manual"
+	TaskTriggerTypeScheduled TaskTriggerType = "scheduled"
+	TaskTriggerTypeWebhook   TaskTriggerType = "webhook"
+)
+
+type TaskType string
+
+const (
+	TaskTypeBuild   TaskType = "build"
+	TaskTypeClean   TaskType = "clean"
+	TaskTypeClone   TaskType = "clone"
+	TaskTypeCopy    TaskType = "copy"
+	TaskTypeDeliver TaskType = "deliver"
+	TaskTypeDeploy  TaskType = "deploy"
+	TaskTypeLint    TaskType = "lint"
+	TaskTypeMerge   TaskType = "merge"
+	TaskTypeOther   TaskType = "other"
+	TaskTypeRelease TaskType = "release"
+	TaskTypeScan    TaskType = "scan"
+	TaskTypeTest    TaskType = "test"
+)
+
+type TaskWorkspace struct {
+	BOMRef             string                     `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	UID                string                     `json:"uid,omitempty" xml:"uid,omitempty"`
+	Name               string                     `json:"name,omitempty" xml:"name,omitempty"`
+	Aliases            *[]string                  `json:"aliases,omitempty" xml:"aliases>alias,omitempty"`
+	Description        string                     `json:"description,omitempty" xml:"description,omitempty"`
+	ResourceReferences *[]ResourceReferenceChoice `json:"resourceReferences,omitempty" xml:"resourceReferences>resourceReference,omitempty"`
+	AccessMode         TaskWorkspaceAccessMode    `json:"accessMode,omitempty" xml:"accessMode,omitempty"`
+	MountPath          string                     `json:"mountPath,omitempty" xml:"mountPath,omitempty"`
+	ManagedDataType    string                     `json:"managedDataType,omitempty" xml:"managedDataType,omitempty"`
+	VolumeRequest      string                     `json:"volumeRequest,omitempty" xml:"volumeRequest,omitempty"`
+	Volume             *Volume                    `json:"volume,omitempty" xml:"volume,omitempty"`
+	Properties         *[]Property                `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type TaskWorkspaceAccessMode string
+
+const (
+	TaskWorkspaceAccessModeReadOnly      TaskWorkspaceAccessMode = "read-only"
+	TaskWorkspaceAccessModeReadWrite     TaskWorkspaceAccessMode = "read-write"
+	TaskWorkspaceAccessModeReadWriteOnce TaskWorkspaceAccessMode = "read-write-once"
+	TaskWorkspaceAccessModeWriteOnce     TaskWorkspaceAccessMode = "write-once"
+	TaskWorkspaceAccessModeWriteOnly     TaskWorkspaceAccessMode = "write-only"
+)
+
 type Tool struct {
 	Vendor             string               `json:"vendor,omitempty" xml:"vendor,omitempty"`
 	Name               string               `json:"name" xml:"name"`
@@ -798,6 +974,24 @@ type Tool struct {
 	Hashes             *[]Hash              `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
 	ExternalReferences *[]ExternalReference `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 }
+
+type Volume struct {
+	UID           string      `json:"uid,omitempty" xml:"uid,omitempty"`
+	Name          string      `json:"name,omitempty" xml:"name,omitempty"`
+	Mode          VolumeMode  `json:"mode,omitempty" xml:"mode,omitempty"`
+	Path          string      `json:"path,omitempty" xml:"path,omitempty"`
+	SizeAllocated string      `json:"sizeAllocated,omitempty" xml:"sizeAllocated,omitempty"`
+	Persistent    *bool       `json:"persistent,omitempty" xml:"persistent,omitempty"`
+	Remote        *bool       `json:"remote,omitempty" xml:"remote,omitempty"`
+	Properties    *[]Property `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type VolumeMode string
+
+const (
+	VolumeModeBlock      VolumeMode = "block"
+	VolumeModeFilesystem VolumeMode = "file-system"
+)
 
 type Vulnerability struct {
 	BOMRef         string                    `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
@@ -853,3 +1047,23 @@ const (
 	VulnerabilityStatusAffected    VulnerabilityStatus = "affected"
 	VulnerabilityStatusNotAffected VulnerabilityStatus = "unaffected"
 )
+
+type Workflow struct {
+	BOMRef             string                     `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	UID                string                     `json:"uid,omitempty" xml:"uid,omitempty"`
+	Name               string                     `json:"name,omitempty" xml:"name,omitempty"`
+	Description        string                     `json:"description,omitempty" xml:"description,omitempty"`
+	ResourceReferences *[]ResourceReferenceChoice `json:"resourceReferences,omitempty" xml:"resourceReferences>resourceReference,omitempty"`
+	Tasks              *[]Task                    `json:"tasks,omitempty" xml:"tasks>task,omitempty"`
+	TaskDependencies   *[]Dependency              `json:"taskDependencies,omitempty" xml:"taskDependencies>dependency"`
+	TaskTypes          *[]TaskType                `json:"taskTypes,omitempty" xml:"taskTypes>taskType,omitempty"`
+	Trigger            *TaskTrigger               `json:"trigger,omitempty" xml:"trigger,omitempty"`
+	Steps              *[]TaskStep                `json:"steps,omitempty" xml:"steps>step,omitempty"`
+	Inputs             *[]TaskInput               `json:"inputs,omitempty" xml:"inputs>input,omitempty"`
+	Outputs            *[]TaskOutput              `json:"outputs,omitempty" xml:"outputs>output,omitempty"`
+	TimeStart          string                     `json:"timeStart,omitempty" xml:"timeStart,omitempty"`
+	TimeEnd            string                     `json:"timeEnd,omitempty" xml:"timeEnd,omitempty"`
+	Workspaces         *[]TaskWorkspace           `json:"workspaces,omitempty" xml:"workspaces>workspace,omitempty"`
+	RuntimeTopology    *[]Dependency              `json:"runtimeTopology,omitempty" xml:"runtimeTopology>dependency,omitempty"`
+	Properties         *[]Property                `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}

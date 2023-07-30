@@ -23,6 +23,74 @@ import (
 	"testing"
 )
 
+func TestEnvironmentVariableChoice_MarshalJSON(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		choice := EnvironmentVariableChoice{}
+		jsonBytes, err := json.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, "{}", string(jsonBytes))
+	})
+
+	t.Run("WithProperty", func(t *testing.T) {
+		choice := EnvironmentVariableChoice{
+			Property: &Property{
+				Name:  "foo",
+				Value: "bar",
+			},
+		}
+		jsonBytes, err := json.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, `{"name":"foo","value":"bar"}`, string(jsonBytes))
+	})
+
+	t.Run("WithValue", func(t *testing.T) {
+		choice := EnvironmentVariableChoice{Value: "foo"}
+		jsonBytes, err := json.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, `"foo"`, string(jsonBytes))
+	})
+
+	t.Run("WithPropertyAndValue", func(t *testing.T) {
+		choice := EnvironmentVariableChoice{
+			Property: &Property{
+				Name:  "foo",
+				Value: "bar",
+			},
+			Value: "baz",
+		}
+		jsonBytes, err := json.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, `{"name":"foo","value":"bar"}`, string(jsonBytes))
+	})
+}
+
+func TestEnvironmentVariableChoice_UnmarshalJSON(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		var choice EnvironmentVariableChoice
+		err := json.Unmarshal([]byte(`{}`), &choice)
+		require.NoError(t, err)
+		require.Equal(t, EnvironmentVariableChoice{}, choice)
+	})
+
+	t.Run("WithProperty", func(t *testing.T) {
+		var choice EnvironmentVariableChoice
+		err := json.Unmarshal([]byte(`{"name":"foo","value":"bar"}`), &choice)
+		require.NoError(t, err)
+		require.NotNil(t, choice.Property)
+		require.Equal(t, "foo", choice.Property.Name)
+		require.Equal(t, "bar", choice.Property.Value)
+		require.Empty(t, choice.Value)
+	})
+
+	t.Run("WithValue", func(t *testing.T) {
+		var choice EnvironmentVariableChoice
+		err := json.Unmarshal([]byte(`"foo"`), &choice)
+		require.NoError(t, err)
+		require.Nil(t, choice.Property)
+		require.Equal(t, "foo", choice.Value)
+	})
+}
+
 func TestMLDatasetChoice_MarshalJSON(t *testing.T) {
 	t.Run("Empty", func(t *testing.T) {
 		choice := MLDatasetChoice{}

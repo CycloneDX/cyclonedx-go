@@ -19,7 +19,46 @@ package cyclonedx
 
 import (
 	"encoding/json"
+	"errors"
 )
+
+func (ev EnvironmentVariableChoice) MarshalJSON() ([]byte, error) {
+	if ev.Property != nil && *ev.Property != (Property{}) {
+		return json.Marshal(ev.Property)
+	} else if ev.Value != "" {
+		return json.Marshal(ev.Value)
+	}
+
+	return []byte("{}"), nil
+}
+
+func (ev *EnvironmentVariableChoice) UnmarshalJSON(bytes []byte) error {
+	var property Property
+	err := json.Unmarshal(bytes, &property)
+	if err != nil {
+		var ute *json.UnmarshalTypeError
+		if !errors.As(err, &ute) || ute.Value != "string" {
+			return err
+		}
+	}
+
+	if property != (Property{}) {
+		ev.Property = &property
+		return nil
+	}
+
+	var value string
+	err = json.Unmarshal(bytes, &value)
+	if err != nil {
+		var ute *json.UnmarshalTypeError
+		if !errors.As(err, &ute) || ute.Value != "object" {
+			return err
+		}
+	}
+
+	ev.Value = value
+	return nil
+}
 
 type mlDatasetChoiceRefJSON struct {
 	Ref string `json:"ref" xml:"-"`

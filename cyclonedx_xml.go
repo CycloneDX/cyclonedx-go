@@ -97,6 +97,75 @@ func (d *Dependency) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) erro
 	return nil
 }
 
+func (ev EnvironmentVariables) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(ev) == 0 {
+		return nil
+	}
+
+	err := e.EncodeToken(start)
+	if err != nil {
+		return err
+	}
+
+	for _, choice := range ev {
+		if choice.Property != nil && choice.Value != "" {
+			return fmt.Errorf("either property or value must be set, but not both")
+		}
+
+		if choice.Property != nil {
+			err = e.EncodeElement(choice.Property, xml.StartElement{Name: xml.Name{Local: "environmentVar"}})
+			if err != nil {
+				return err
+			}
+		} else if choice.Value != "" {
+			err = e.EncodeElement(choice.Value, xml.StartElement{Name: xml.Name{Local: "value"}})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return e.EncodeToken(start.End())
+}
+
+func (ev *EnvironmentVariables) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
+	envVars := make([]EnvironmentVariableChoice, 0)
+
+	for {
+		token, err := d.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch tokenType := token.(type) {
+		case xml.StartElement:
+			if tokenType.Name.Local == "value" {
+				var value string
+				err = d.DecodeElement(&value, &tokenType)
+				if err != nil {
+					return err
+				}
+				envVars = append(envVars, EnvironmentVariableChoice{Value: value})
+			} else if tokenType.Name.Local == "environmentVar" {
+				var property Property
+				err = d.DecodeElement(&property, &tokenType)
+				if err != nil {
+					return err
+				}
+				envVars = append(envVars, EnvironmentVariableChoice{Property: &property})
+			} else {
+				return fmt.Errorf("unknown element: %s", tokenType.Name.Local)
+			}
+		}
+	}
+
+	*ev = envVars
+	return nil
+}
+
 func (l Licenses) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if len(l) == 0 {
 		return nil

@@ -50,6 +50,7 @@ func (b *BOM) convert(specVersion SpecVersion) {
 	}
 	if specVersion < SpecVersion1_5 {
 		b.Annotations = nil
+		b.Formulation = nil
 	}
 
 	if b.Metadata != nil {
@@ -389,9 +390,13 @@ func (sv SpecVersion) supportsExternalReferenceType(ert ExternalReferenceType) b
 		ERTypeCertificationReport,
 		ERTypeCodifiedInfrastructure,
 		ERTypeComponentAnalysisReport,
+		ERTypeConfiguration,
 		ERTypeDistributionIntake,
 		ERTypeDynamicAnalysisReport,
+		ERTypeEvidence,
 		ERTypeExploitabilityStatement,
+		ERTypeFormulation,
+		ERTypeLog,
 		ERTypeMaturityReport,
 		ERTypeModelCard,
 		ERTypePentestReport,
