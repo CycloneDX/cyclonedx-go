@@ -52,7 +52,7 @@ func (c *Copyright) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	if err := d.DecodeElement(&text, &start); err != nil {
 		return err
 	}
-	(*c).Text = text
+	c.Text = text
 	return nil
 }
 

@@ -19,8 +19,9 @@ package cyclonedx
 
 import (
 	"fmt"
-	"github.com/terminalstatic/go-xsd-validate"
 	"sync"
+
+	"github.com/terminalstatic/go-xsd-validate"
 )
 
 var xmlSchemaFiles = map[SpecVersion]string{
@@ -34,8 +35,7 @@ var xmlSchemaFiles = map[SpecVersion]string{
 
 var xsdValidateInitOnce sync.Once
 
-type xmlValidator struct {
-}
+type xmlValidator struct{}
 
 func newXMLValidator() validator {
 	var initErr error

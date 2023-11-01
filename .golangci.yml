@@ -1,6 +1,16 @@
 linters:
   enable:
     - asciicheck
-    - gofmt
+    - errorlint
+    - gci
+    - gofumpt
     - gosec
     - wastedassign
+
+linters-settings:
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/CycloneDX)
+    custom-order: true
