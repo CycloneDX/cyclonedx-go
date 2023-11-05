@@ -19,6 +19,7 @@ package cyclonedx
 
 import (
 	"fmt"
+
 	"github.com/xeipuuv/gojsonschema"
 )
 
@@ -29,8 +30,7 @@ var jsonSchemaFiles = map[SpecVersion]string{
 	SpecVersion1_5: "file://./schema/bom-1.5.schema.json",
 }
 
-type jsonValidator struct {
-}
+type jsonValidator struct{}
 
 func newJSONValidator() validator {
 	return &jsonValidator{}
