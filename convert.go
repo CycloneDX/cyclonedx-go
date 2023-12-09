@@ -68,11 +68,7 @@ func (b *BOM) convert(specVersion SpecVersion) {
 
 		recurseComponent(b.Metadata.Component, componentConverter(specVersion))
 		convertLicenses(b.Metadata.Licenses, specVersion)
-		if b.Metadata.Tools != nil {
-			for i := range *b.Metadata.Tools {
-				convertTool(&(*b.Metadata.Tools)[i], specVersion)
-			}
-		}
+		convertTools(b.Metadata.Tools, specVersion)
 	}
 
 	if b.Components != nil {
@@ -267,6 +263,8 @@ func convertVulnerabilities(vulns *[]Vulnerability, specVersion SpecVersion) {
 	for i := range *vulns {
 		vuln := &(*vulns)[i]
 
+		convertTools(vuln.Tools, specVersion)
+
 		if specVersion < SpecVersion1_5 {
 			vuln.ProofOfConcept = nil
 			vuln.Rejected = ""
@@ -299,6 +297,50 @@ func serviceConverter(specVersion SpecVersion) func(*Service) {
 	}
 }
 
+// convertTools modifies a ToolsChoice such that it adheres to a given SpecVersion.
+func convertTools(tools *ToolsChoice, specVersion SpecVersion) {
+	if tools == nil {
+		return
+	}
+
+	if specVersion < SpecVersion1_5 {
+		convertedTools := make([]Tool, 0)
+		if tools.Components != nil {
+			for i := range *tools.Components {
+				tool := convertComponentToTool((*tools.Components)[i], specVersion)
+				if tool != nil {
+					convertedTools = append(convertedTools, *tool)
+				}
+			}
+			tools.Components = nil
+		}
+
+		if tools.Services != nil {
+			for i := range *tools.Services {
+				tool := convertServiceToTool((*tools.Services)[i], specVersion)
+				if tool != nil {
+					convertedTools = append(convertedTools, *tool)
+				}
+			}
+			tools.Services = nil
+		}
+
+		if len(convertedTools) > 0 {
+			if tools.Tools == nil {
+				tools.Tools = &convertedTools
+			} else {
+				*tools.Tools = append(*tools.Tools, convertedTools...)
+			}
+		}
+	}
+
+	if tools.Tools != nil {
+		for i := range *tools.Tools {
+			convertTool(&(*tools.Tools)[i], specVersion)
+		}
+	}
+}
+
 // convertTool modifies a Tool such that it adheres to a given SpecVersion.
 func convertTool(tool *Tool, specVersion SpecVersion) {
 	if tool == nil {
@@ -311,6 +353,40 @@ func convertTool(tool *Tool, specVersion SpecVersion) {
 
 	convertExternalReferences(tool.ExternalReferences, specVersion)
 	convertHashes(tool.Hashes, specVersion)
+}
+
+// convertComponentToTool converts a Component to a Tool for use in ToolsChoice.Tools.
+func convertComponentToTool(component Component, _ SpecVersion) *Tool {
+	tool := Tool{
+		Vendor:             component.Author,
+		Name:               component.Name,
+		Version:            component.Version,
+		Hashes:             component.Hashes,
+		ExternalReferences: component.ExternalReferences,
+	}
+
+	if component.Supplier != nil {
+		// There is no perfect 1:1 mapping for the Vendor field, but Supplier comes closest.
+		// https://github.com/CycloneDX/cyclonedx-go/issues/115#issuecomment-1688710539
+		tool.Vendor = component.Supplier.Name
+	}
+
+	return &tool
+}
+
+// convertServiceToTool converts a Service to a Tool for use in ToolsChoice.Tools.
+func convertServiceToTool(service Service, _ SpecVersion) *Tool {
+	tool := Tool{
+		Name:               service.Name,
+		Version:            service.Version,
+		ExternalReferences: service.ExternalReferences,
+	}
+
+	if service.Provider != nil {
+		tool.Vendor = service.Provider.Name
+	}
+
+	return &tool
 }
 
 func recurseComponent(component *Component, f func(c *Component)) {

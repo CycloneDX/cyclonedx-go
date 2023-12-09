@@ -20,6 +20,7 @@ package cyclonedx
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 func (ev EnvironmentVariableChoice) MarshalJSON() ([]byte, error) {
@@ -125,6 +126,60 @@ func (sv *SpecVersion) UnmarshalJSON(bytes []byte) error {
 		*sv = SpecVersion1_5
 	default:
 		return ErrInvalidSpecVersion
+	}
+
+	return nil
+}
+
+type toolsChoiceJSON struct {
+	Components *[]Component `json:"components,omitempty" xml:"-"`
+	Services   *[]Service   `json:"services,omitempty" xml:"-"`
+}
+
+func (tc ToolsChoice) MarshalJSON() ([]byte, error) {
+	if tc.Tools != nil && (tc.Components != nil || tc.Services != nil) {
+		return nil, fmt.Errorf("either a list of tools, or an object holding components and services can be used, but not both")
+	}
+
+	if tc.Tools != nil {
+		return json.Marshal(tc.Tools)
+	}
+
+	choiceJSON := toolsChoiceJSON{
+		Components: tc.Components,
+		Services:   tc.Services,
+	}
+	if choiceJSON.Components != nil || choiceJSON.Services != nil {
+		return json.Marshal(choiceJSON)
+	}
+
+	return []byte(nil), nil
+}
+
+func (tc *ToolsChoice) UnmarshalJSON(bytes []byte) error {
+	var choiceJSON toolsChoiceJSON
+	err := json.Unmarshal(bytes, &choiceJSON)
+	if err != nil {
+		var typeErr *json.UnmarshalTypeError
+		if !errors.As(err, &typeErr) || typeErr.Value != "array" {
+			return err
+		}
+
+		var legacyTools []Tool
+		err = json.Unmarshal(bytes, &legacyTools)
+		if err != nil {
+			return err
+		}
+
+		*tc = ToolsChoice{Tools: &legacyTools}
+		return nil
+	}
+
+	if choiceJSON.Components != nil || choiceJSON.Services != nil {
+		*tc = ToolsChoice{
+			Components: choiceJSON.Components,
+			Services:   choiceJSON.Services,
+		}
 	}
 
 	return nil

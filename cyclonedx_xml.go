@@ -299,6 +299,111 @@ func (sv *SpecVersion) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	return nil
 }
 
+// toolsChoiceMarshalXML is a helper struct for marshalling ToolsChoice.
+type toolsChoiceMarshalXML struct {
+	LegacyTools *[]Tool      `json:"-" xml:"tool,omitempty"`
+	Components  *[]Component `json:"-" xml:"components>component,omitempty"`
+	Services    *[]Service   `json:"-" xml:"services>service,omitempty"`
+}
+
+// toolsChoiceUnmarshalXML is a helper struct for unmarshalling tools represented
+// as components and / or services. It is intended to be used with the streaming XML API.
+//
+//	<components>   <-- cursor should be here when unmarshalling this!
+//	  <component>
+//	    <name>foo</name>
+//	  </component>
+//	</components>
+type toolsChoiceUnmarshalXML struct {
+	Components *[]Component `json:"-" xml:"component,omitempty"`
+	Services   *[]Service   `json:"-" xml:"service,omitempty"`
+}
+
+func (tc ToolsChoice) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if tc.Tools != nil && (tc.Components != nil || tc.Services != nil) {
+		return fmt.Errorf("either a list of tools, or an object holding components and services can be used, but not both")
+	}
+
+	if tc.Tools != nil {
+		return e.EncodeElement(toolsChoiceMarshalXML{LegacyTools: tc.Tools}, start)
+	}
+
+	tools := toolsChoiceMarshalXML{
+		Components: tc.Components,
+		Services:   tc.Services,
+	}
+	if tools.Components != nil || tools.Services != nil {
+		return e.EncodeElement(tools, start)
+	}
+
+	return nil
+}
+
+func (tc *ToolsChoice) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
+	var components []Component
+	var services []Service
+	legacyTools := make([]Tool, 0)
+
+	for {
+		token, err := d.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch tokenType := token.(type) {
+		case xml.StartElement:
+			if tokenType.Name.Local == "tool" {
+				var tool Tool
+				if err = d.DecodeElement(&tool, &tokenType); err != nil {
+					return err
+				}
+				legacyTools = append(legacyTools, tool)
+			} else if tokenType.Name.Local == "components" {
+				var foo toolsChoiceUnmarshalXML
+				if err = d.DecodeElement(&foo, &tokenType); err != nil {
+					return err
+				}
+				if foo.Components != nil {
+					components = *foo.Components
+				}
+			} else if tokenType.Name.Local == "services" {
+				var foo toolsChoiceUnmarshalXML
+				if err = d.DecodeElement(&foo, &tokenType); err != nil {
+					return err
+				}
+				if foo.Services != nil {
+					services = *foo.Services
+				}
+			} else {
+				return fmt.Errorf("unknown element: %s", tokenType.Name.Local)
+			}
+		}
+	}
+
+	choice := ToolsChoice{}
+	if len(legacyTools) > 0 && (len(components) > 0 || len(services) > 0) {
+		return fmt.Errorf("either a list of tools, or an object holding components and services can be used, but not both")
+	}
+	if len(components) > 0 {
+		choice.Components = &components
+	}
+	if len(services) > 0 {
+		choice.Services = &services
+	}
+	if len(legacyTools) > 0 {
+		choice.Tools = &legacyTools
+	}
+
+	if choice.Tools != nil || choice.Components != nil || choice.Services != nil {
+		*tc = choice
+	}
+
+	return nil
+}
+
 var xmlNamespaces = map[SpecVersion]string{
 	SpecVersion1_0: "http://cyclonedx.org/schema/bom/1.0",
 	SpecVersion1_1: "http://cyclonedx.org/schema/bom/1.1",

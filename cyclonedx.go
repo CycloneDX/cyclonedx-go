@@ -586,7 +586,7 @@ func (mt MediaType) WithVersion(specVersion SpecVersion) (string, error) {
 type Metadata struct {
 	Timestamp   string                   `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
 	Lifecycles  *[]Lifecycle             `json:"lifecycles,omitempty" xml:"lifecycles>lifecycle,omitempty"`
-	Tools       *[]Tool                  `json:"tools,omitempty" xml:"tools>tool,omitempty"`
+	Tools       *ToolsChoice             `json:"tools,omitempty" xml:"tools,omitempty"`
 	Authors     *[]OrganizationalContact `json:"authors,omitempty" xml:"authors>author,omitempty"`
 	Component   *Component               `json:"component,omitempty" xml:"component,omitempty"`
 	Manufacture *OrganizationalEntity    `json:"manufacture,omitempty" xml:"manufacture,omitempty"`
@@ -967,12 +967,27 @@ const (
 	TaskWorkspaceAccessModeWriteOnly     TaskWorkspaceAccessMode = "write-only"
 )
 
+// Deprecated: Use Component or Service instead.
 type Tool struct {
 	Vendor             string               `json:"vendor,omitempty" xml:"vendor,omitempty"`
 	Name               string               `json:"name" xml:"name"`
 	Version            string               `json:"version,omitempty" xml:"version,omitempty"`
 	Hashes             *[]Hash              `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
 	ExternalReferences *[]ExternalReference `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+}
+
+// ToolsChoice represents a union of either Tools (deprecated as of CycloneDX v1.5), and Components or Services.
+//
+// Encoding or decoding a ToolsChoice with both options present will raise an error.
+// When encoding to a SpecVersion lower than SpecVersion1_5, and Components or Services are set,
+// they will be automatically converted to legacy Tools.
+//
+// It is strongly recommended to use Components and Services. However, when consuming BOMs,
+// applications should still expect legacy Tools to be present, and handle them accordingly.
+type ToolsChoice struct {
+	Tools      *[]Tool      `json:"-" xml:"-"` // Deprecated: Use Components and Services instead.
+	Components *[]Component `json:"-" xml:"-"`
+	Services   *[]Service   `json:"-" xml:"-"`
 }
 
 type Volume struct {
@@ -1011,7 +1026,7 @@ type Vulnerability struct {
 	Updated        string                    `json:"updated,omitempty" xml:"updated,omitempty"`
 	Rejected       string                    `json:"rejected,omitempty" xml:"rejected,omitempty"`
 	Credits        *Credits                  `json:"credits,omitempty" xml:"credits,omitempty"`
-	Tools          *[]Tool                   `json:"tools,omitempty" xml:"tools>tool,omitempty"`
+	Tools          *ToolsChoice              `json:"tools,omitempty" xml:"tools,omitempty"`
 	Analysis       *VulnerabilityAnalysis    `json:"analysis,omitempty" xml:"analysis,omitempty"`
 	Affects        *[]Affects                `json:"affects,omitempty" xml:"affects>target,omitempty"`
 	Properties     *[]Property               `json:"properties,omitempty" xml:"properties>property,omitempty"`

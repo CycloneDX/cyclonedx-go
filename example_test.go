@@ -133,7 +133,7 @@ func Example_decode() {
 	}
 
 	fmt.Printf("Successfully decoded BOM of %s\n", bom.Metadata.Component.PackageURL)
-	fmt.Printf("- Generated: %s with %s\n", bom.Metadata.Timestamp, (*bom.Metadata.Tools)[0].Name)
+	fmt.Printf("- Generated: %s with %s\n", bom.Metadata.Timestamp, (*bom.Metadata.Tools.Tools)[0].Name)
 	fmt.Printf("- Components: %d\n", len(*bom.Components))
 
 	// Output:
