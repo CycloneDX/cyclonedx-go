@@ -26,57 +26,67 @@ import (
 )
 
 func TestBOMReference_MarshalXML(t *testing.T) {
-	// Marshal empty bomRef
-	bomRef := BOMReference("")
-	xmlBytes, err := xml.Marshal(bomRef)
-	assert.NoError(t, err)
-	assert.Equal(t, "<BOMReference ref=\"\"></BOMReference>", string(xmlBytes))
+	t.Run("Empty", func(t *testing.T) {
+		bomRef := BOMReference("")
+		xmlBytes, err := xml.Marshal(bomRef)
+		require.NoError(t, err)
+		require.Equal(t, "<BOMReference ref=\"\"></BOMReference>", string(xmlBytes))
+	})
 
-	// Marshal bomRef
-	bomRef = "bomRef"
-	xmlBytes, err = xml.Marshal(bomRef)
-	assert.NoError(t, err)
-	assert.Equal(t, "<BOMReference ref=\"bomRef\"></BOMReference>", string(xmlBytes))
+	t.Run("NonEmpty", func(t *testing.T) {
+		bomRef := BOMReference("bomRef")
+		xmlBytes, err := xml.Marshal(bomRef)
+		require.NoError(t, err)
+		require.Equal(t, "<BOMReference ref=\"bomRef\"></BOMReference>", string(xmlBytes))
+	})
 }
 
 func TestBOMReference_UnmarshalXML(t *testing.T) {
-	// Unmarshal empty bomRef
-	bomRef := new(BOMReference)
-	err := xml.Unmarshal([]byte("<BOMReference ref=\"\"></BOMReference>"), bomRef)
-	require.NoError(t, err)
-	require.Equal(t, "", string(*bomRef))
+	t.Run("Empty", func(t *testing.T) {
+		bomRef := new(BOMReference)
+		err := xml.Unmarshal([]byte("<BOMReference ref=\"\"></BOMReference>"), bomRef)
+		require.NoError(t, err)
+		require.Equal(t, "", string(*bomRef))
+	})
 
-	// Unmarshal bomRef
-	err = xml.Unmarshal([]byte("<BOMReference ref=\"bomRef\"></BOMReference>"), bomRef)
-	require.NoError(t, err)
-	require.Equal(t, "bomRef", string(*bomRef))
+	t.Run("NonEmpty", func(t *testing.T) {
+		bomRef := new(BOMReference)
+		err := xml.Unmarshal([]byte("<BOMReference ref=\"bomRef\"></BOMReference>"), bomRef)
+		require.NoError(t, err)
+		require.Equal(t, "bomRef", string(*bomRef))
+	})
 }
 
 func TestCopyright_MarshalXML(t *testing.T) {
-	// Marshal empty copyright
-	copyright := Copyright{}
-	xmlBytes, err := xml.Marshal(copyright)
-	require.NoError(t, err)
-	require.Equal(t, "<Copyright></Copyright>", string(xmlBytes))
+	t.Run("Empty", func(t *testing.T) {
+		copyright := Copyright{}
+		xmlBytes, err := xml.Marshal(copyright)
+		require.NoError(t, err)
+		require.Equal(t, "<Copyright></Copyright>", string(xmlBytes))
+	})
 
-	// Marshal copyright
-	copyright.Text = "copyright"
-	xmlBytes, err = xml.Marshal(copyright)
-	require.NoError(t, err)
-	require.Equal(t, "<Copyright>copyright</Copyright>", string(xmlBytes))
+	t.Run("NonEmpty", func(t *testing.T) {
+		copyright := Copyright{Text: "copyright"}
+		xmlBytes, err := xml.Marshal(copyright)
+		require.NoError(t, err)
+		require.Equal(t, "<Copyright>copyright</Copyright>", string(xmlBytes))
+	})
 }
 
 func TestCopyright_UnmarshalXML(t *testing.T) {
-	// Unmarshal empty copyright
-	copyright := new(Copyright)
-	err := xml.Unmarshal([]byte("<Copyright></Copyright>"), copyright)
-	require.NoError(t, err)
-	require.Equal(t, "", copyright.Text)
+	t.Run("Empty", func(t *testing.T) {
+		copyright := new(Copyright)
+		err := xml.Unmarshal([]byte("<Copyright></Copyright>"), copyright)
+		require.NoError(t, err)
+		require.Equal(t, "", copyright.Text)
+	})
 
-	// Unmarshal copyright
-	err = xml.Unmarshal([]byte("<Copyright>copyright</Copyright>"), copyright)
-	require.NoError(t, err)
-	require.Equal(t, "copyright", copyright.Text)
+	t.Run("NonEmpty", func(t *testing.T) {
+		copyright := new(Copyright)
+		err := xml.Unmarshal([]byte("<Copyright>copyright</Copyright>"), copyright)
+		require.NoError(t, err)
+		require.Equal(t, "copyright", copyright.Text)
+	})
 }
 
 func TestDependency_MarshalXML(t *testing.T) {
@@ -134,6 +144,72 @@ func TestDependency_UnmarshalXML(t *testing.T) {
 		require.Equal(t, "dependencyRef", dependency.Ref)
 		require.Equal(t, 1, len(*dependency.Dependencies))
 		require.Equal(t, "transitiveDependencyRef", (*dependency.Dependencies)[0])
+	})
+}
+
+func TestEnvironmentVariables_MarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		envVars := EnvironmentVariables{}
+		xmlBytes, err := xml.Marshal(envVars)
+		require.NoError(t, err)
+		require.Equal(t, "", string(xmlBytes))
+	})
+
+	t.Run("NonEmpty", func(t *testing.T) {
+		envVars := EnvironmentVariables{
+			EnvironmentVariableChoice{
+				Property: &Property{
+					Name:  "foo",
+					Value: "bar",
+				},
+			},
+			EnvironmentVariableChoice{
+				Value: "baz",
+			},
+		}
+		xmlBytes, err := xml.Marshal(envVars)
+		require.NoError(t, err)
+		require.Equal(t, `<EnvironmentVariables><environmentVar name="foo">bar</environmentVar><value>baz</value></EnvironmentVariables>`, string(xmlBytes))
+	})
+
+	t.Run("WithChoiceHavingBothPropertyAndValue", func(t *testing.T) {
+		envVars := EnvironmentVariables{
+			EnvironmentVariableChoice{
+				Property: &Property{
+					Name:  "foo",
+					Value: "bar",
+				},
+				Value: "baz",
+			},
+		}
+		_, err := xml.Marshal(envVars)
+		require.EqualError(t, err, "either property or value must be set, but not both")
+	})
+}
+
+func TestEnvironmentVariables_UnmarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		envVars := EnvironmentVariables{}
+		err := xml.Unmarshal([]byte("<EnvironmentVariables></EnvironmentVariables>"), &envVars)
+		require.NoError(t, err)
+		require.Empty(t, envVars)
+	})
+
+	t.Run("NonEmpty", func(t *testing.T) {
+		envVars := EnvironmentVariables{}
+		err := xml.Unmarshal([]byte(`
+<EnvironmentVariables>
+  <environmentVar name="foo">bar</environmentVar>
+  <value>baz</value>
+</EnvironmentVariables>`), &envVars)
+		require.NoError(t, err)
+		require.Len(t, envVars, 2)
+		require.NotNil(t, envVars[0].Property)
+		require.Equal(t, "foo", envVars[0].Property.Name)
+		require.Equal(t, "bar", envVars[0].Property.Value)
+		require.Empty(t, envVars[0].Value)
+		require.Nil(t, envVars[1].Property)
+		require.Equal(t, "baz", envVars[1].Value)
 	})
 }
 
@@ -216,4 +292,80 @@ func TestLicenses_UnmarshalXML(t *testing.T) {
 	licenses = new(Licenses)
 	err = xml.Unmarshal([]byte("<Licenses><somethingElse>expressionValue</somethingElse></Licenses>"), licenses)
 	assert.Error(t, err)
+}
+
+func TestMLDatasetChoice_MarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		choice := MLDatasetChoice{}
+		xmlBytes, err := xml.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, "", string(xmlBytes))
+	})
+
+	t.Run("WithRef", func(t *testing.T) {
+		choice := MLDatasetChoice{Ref: "foo"}
+		xmlBytes, err := xml.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, `<MLDatasetChoice><ref>foo</ref></MLDatasetChoice>`, string(xmlBytes))
+	})
+
+	t.Run("WithComponentData", func(t *testing.T) {
+		choice := MLDatasetChoice{
+			ComponentData: &ComponentData{
+				BOMRef: "foo",
+				Name:   "bar",
+			},
+		}
+		xmlBytes, err := xml.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, `<MLDatasetChoice bom-ref="foo"><name>bar</name></MLDatasetChoice>`, string(xmlBytes))
+	})
+
+	t.Run("WithRefAndComponentData", func(t *testing.T) {
+		choice := MLDatasetChoice{
+			Ref: "foo",
+			ComponentData: &ComponentData{
+				BOMRef: "bar",
+				Name:   "baz",
+			},
+		}
+		xmlBytes, err := xml.Marshal(choice)
+		require.NoError(t, err)
+		require.Equal(t, `<MLDatasetChoice><ref>foo</ref></MLDatasetChoice>`, string(xmlBytes))
+	})
+}
+
+func TestMLDatasetChoice_UnmarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		var choice MLDatasetChoice
+		err := xml.Unmarshal([]byte(`<MLDatasetChoice></MLDatasetChoice>`), &choice)
+		require.NoError(t, err)
+		require.Equal(t, MLDatasetChoice{}, choice)
+	})
+
+	t.Run("WithRef", func(t *testing.T) {
+		var choice MLDatasetChoice
+		err := xml.Unmarshal([]byte(`<MLDatasetChoice><ref>foo</ref></MLDatasetChoice>`), &choice)
+		require.NoError(t, err)
+		require.Equal(t, "foo", choice.Ref)
+		require.Nil(t, choice.ComponentData)
+	})
+
+	t.Run("WithComponentData", func(t *testing.T) {
+		var choice MLDatasetChoice
+		err := xml.Unmarshal([]byte(`<MLDatasetChoice bom-ref="foo"><name>bar</name></MLDatasetChoice>`), &choice)
+		require.NoError(t, err)
+		require.Empty(t, choice.Ref)
+		require.NotNil(t, choice.ComponentData)
+		require.Equal(t, "foo", choice.ComponentData.BOMRef)
+		require.Equal(t, "bar", choice.ComponentData.Name)
+	})
+
+	t.Run("WithRefAndComponentData", func(t *testing.T) {
+		var choice MLDatasetChoice
+		err := xml.Unmarshal([]byte(`<MLDatasetChoice bom-ref="bar"><ref>foo</ref><name>baz</name></MLDatasetChoice>`), &choice)
+		require.NoError(t, err)
+		require.Equal(t, "foo", choice.Ref)
+		require.Nil(t, choice.ComponentData)
+	})
 }
