@@ -416,7 +416,7 @@ type AlgorithmProperties struct {
 	Padding                  Padding                `json:"padding,omitempty" xml:"padding,omitempty"`
 	CryptoFunctions          *[]CryptoFunction      `json:"cryptoFunctions,omitempty" xml:"cryptoFunctions>cryptoFunction,omitempty"`
 	ClassicalSecurityLevel   int                    `json:"classicalSecurityLevel,omitempty" xml:"classicalSecurityLevel,omitempty"`
-	NistQuantumSecurityLevel int                    `json:"nistQuantumSecurityLevel,omitempty" xml:"nistQuantumSecurityLevel,omitempty"`
+	NistQuantumSecurityLevel int                    `json:"nistQuantumSecurityLevel" xml:"nistQuantumSecurityLevel"`
 }
 
 type CertificateProperties struct {
@@ -512,12 +512,12 @@ type Ikev2TransformTypes struct {
 	Prf   *[]BOMReference `json:"prf,omitempty" xml:"prf,omitempty"`
 	Integ *[]BOMReference `json:"integ,omitempty" xml:"integ,omitempty"`
 	Ke    *[]BOMReference `json:"ke,omitempty" xml:"ke,omitempty"`
-	Esn   bool            `json:"esn,omitempty" xml:"esn,omitempty"`
+	Esn   bool            `json:"esn" xml:"esn"`
 	Auth  *[]BOMReference `json:"auth,omitempty" xml:"auth,omitempty"`
 }
 
 type CryptoProperties struct {
-	AssetType                       AssetType                        `json:"assetType" xml:"assetType"` // TODO: What does omitempty mean?
+	AssetType                       AssetType                        `json:"assetType" xml:"assetType"`
 	AlgorithmProperties             *AlgorithmProperties             `json:"algorithmProperties,omitempty" xml:"algorithmProperties,omitempty"`
 	CertificateProperties           *CertificateProperties           `json:"certificateProperties,omitempty" xml:"certificateProperties,omitempty"`
 	RelatedCryptoMaterialProperties *RelatedCryptoMaterialProperties `json:"relatedCryptoMaterialProperties,omitempty" xml:"relatedCryptoMaterialProperties,omitempty"`
@@ -1085,7 +1085,7 @@ const (
 	SpecVersion1_3                        // 1.3
 	SpecVersion1_4                        // 1.4
 	SpecVersion1_5                        // 1.5
-	SpecVersion1_6                        //1.6
+	SpecVersion1_6                        // 1.6
 )
 
 type SWID struct {
