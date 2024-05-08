@@ -821,6 +821,7 @@ const (
 	SpecVersion1_3                        // 1.3
 	SpecVersion1_4                        // 1.4
 	SpecVersion1_5                        // 1.5
+	SpecVersion1_6                        // 1.6
 )
 
 type SWID struct {
