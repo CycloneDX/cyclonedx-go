@@ -356,8 +356,12 @@ const (
 )
 
 type EvidenceOccurrence struct {
-	BOMRef   string `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
-	Location string `json:"location,omitempty" xml:"location,omitempty"`
+	BOMRef            string `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Location          string `json:"location,omitempty" xml:"location,omitempty"`
+	Line              *int   `json:"line,omitempty" xml:"line,attr,omitempty"`
+	Offset            *int   `json:"offset,omitempty" xml:"offset,attr,omitempty"`
+	Symbol            string `json:"symbol,omitempty" xml:"symbol,attr,omitempty"`
+	AdditionalContext string `json:"additionalContext,omitempty" xml:"additionalContext,attr,omitempty"`
 }
 
 type ExternalReference struct {
