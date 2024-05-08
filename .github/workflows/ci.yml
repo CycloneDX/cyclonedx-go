@@ -37,7 +37,7 @@ jobs:
         check-latest: true
         cache: false
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@3cfe3a4abbb849e10058ce4af15d205b6da42804 # tag=v4.0.0
+      uses: golangci/golangci-lint-action@a4f60bb28d35aeee14e6880718e0c85ff1882e64 # tag=v6.0.1
       with:
         version: latest
         args: --verbose
