@@ -123,7 +123,6 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 		}
 
 		if specVersion < SpecVersion1_3 {
-			c.Evidence = nil
 			c.Properties = nil
 		}
 
@@ -137,22 +136,48 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 		if specVersion < SpecVersion1_5 {
 			c.ModelCard = nil
 			c.Data = nil
-
-			if c.Evidence != nil {
-				c.Evidence.Identity = nil
-				c.Evidence.Occurrences = nil
-				c.Evidence.Callstack = nil
-			}
 		}
 
 		if !specVersion.supportsComponentType(c.Type) {
 			c.Type = ComponentTypeApplication
 		}
+
 		convertExternalReferences(c.ExternalReferences, specVersion)
 		convertHashes(c.Hashes, specVersion)
 		convertLicenses(c.Licenses, specVersion)
+		convertEvidence(c, specVersion)
+
 		if !specVersion.supportsScope(c.Scope) {
 			c.Scope = ""
+		}
+	}
+}
+
+func convertEvidence(c *Component, specVersion SpecVersion) {
+	if c.Evidence == nil {
+		return
+	}
+
+	if specVersion < SpecVersion1_3 {
+		c.Evidence = nil
+		return
+	}
+
+	if specVersion < SpecVersion1_5 {
+		c.Evidence.Identity = nil
+		c.Evidence.Occurrences = nil
+		c.Evidence.Callstack = nil
+		return
+	}
+
+	for i := range *c.Evidence.Occurrences {
+		occ := &(*c.Evidence.Occurrences)[i]
+
+		if specVersion < SpecVersion1_6 {
+			occ.Line = nil
+			occ.Offset = nil
+			occ.Symbol = ""
+			occ.AdditionalContext = ""
 		}
 	}
 }
