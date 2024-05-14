@@ -192,4 +192,5 @@ var jsonSchemas = map[SpecVersion]string{
 	SpecVersion1_3: "http://cyclonedx.org/schema/bom-1.3.schema.json",
 	SpecVersion1_4: "http://cyclonedx.org/schema/bom-1.4.schema.json",
 	SpecVersion1_5: "http://cyclonedx.org/schema/bom-1.5.schema.json",
+	SpecVersion1_6: "http://cyclonedx.org/schema/bom-1.6.schema.json",
 }
