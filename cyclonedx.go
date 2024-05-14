@@ -95,10 +95,10 @@ type BOM struct {
 
 func NewBOM() *BOM {
 	return &BOM{
-		JSONSchema:  jsonSchemas[SpecVersion1_5],
-		XMLNS:       xmlNamespaces[SpecVersion1_5],
+		JSONSchema:  jsonSchemas[SpecVersion1_6],
+		XMLNS:       xmlNamespaces[SpecVersion1_6],
 		BOMFormat:   BOMFormat,
-		SpecVersion: SpecVersion1_5,
+		SpecVersion: SpecVersion1_6,
 		Version:     1,
 	}
 }
@@ -173,6 +173,8 @@ type Component struct {
 	Copyright          string                `json:"copyright,omitempty" xml:"copyright,omitempty"`
 	CPE                string                `json:"cpe,omitempty" xml:"cpe,omitempty"`
 	PackageURL         string                `json:"purl,omitempty" xml:"purl,omitempty"`
+	OmniborID          *[]string             `json:"omniborId,omitempty" xml:"omniborId,omitempty"`
+	SWHID              *[]string             `json:"swhid,omitempty" xml:"swhid,omitempty"`
 	SWID               *SWID                 `json:"swid,omitempty" xml:"swid,omitempty"`
 	Modified           *bool                 `json:"modified,omitempty" xml:"modified,omitempty"`
 	Pedigree           *Pedigree             `json:"pedigree,omitempty" xml:"pedigree,omitempty"`
@@ -325,13 +327,15 @@ type EvidenceIdentity struct {
 type EvidenceIdentityFieldType string
 
 const (
-	EvidenceIdentityFieldTypeCPE     EvidenceIdentityFieldType = "cpe"
-	EvidenceIdentityFieldTypeGroup   EvidenceIdentityFieldType = "group"
-	EvidenceIdentityFieldTypeHash    EvidenceIdentityFieldType = "hash"
-	EvidenceIdentityFieldTypeName    EvidenceIdentityFieldType = "name"
-	EvidenceIdentityFieldTypePURL    EvidenceIdentityFieldType = "purl"
-	EvidenceIdentityFieldTypeSWID    EvidenceIdentityFieldType = "swid"
-	EvidenceIdentityFieldTypeVersion EvidenceIdentityFieldType = "version"
+	EvidenceIdentityFieldTypeCPE       EvidenceIdentityFieldType = "cpe"
+	EvidenceIdentityFieldTypeGroup     EvidenceIdentityFieldType = "group"
+	EvidenceIdentityFieldTypeHash      EvidenceIdentityFieldType = "hash"
+	EvidenceIdentityFieldTypeName      EvidenceIdentityFieldType = "name"
+	EvidenceIdentityFieldTypePURL      EvidenceIdentityFieldType = "purl"
+	EvidenceIdentityFieldTypeOmniborID EvidenceIdentityFieldType = "omniborId"
+	EvidenceIdentityFieldTypeSWHID     EvidenceIdentityFieldType = "swhid"
+	EvidenceIdentityFieldTypeSWID      EvidenceIdentityFieldType = "swid"
+	EvidenceIdentityFieldTypeVersion   EvidenceIdentityFieldType = "version"
 )
 
 type EvidenceIdentityMethod struct {

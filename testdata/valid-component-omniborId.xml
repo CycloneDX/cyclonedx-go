@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<bom serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1" xmlns="http://cyclonedx.org/schema/bom/1.6">
+    <components>
+        <component type="application">
+            <author>Acme Super Heros</author>
+            <name>Acme Application</name>
+            <version>9.1.1</version>
+            <omniborId>gitoid:blob:sha1:a94a8fe5ccb19ba61c4c0873d391e987982fbbd3</omniborId>
+            <omniborId>gitoid:blob:sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08</omniborId>
+        </component>
+    </components>
+</bom>

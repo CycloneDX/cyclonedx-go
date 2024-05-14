@@ -89,7 +89,7 @@ func Example_encode() {
 
 	// Output:
 	// <?xml version="1.0" encoding="UTF-8"?>
-	// <bom xmlns="http://cyclonedx.org/schema/bom/1.5" version="1">
+	// <bom xmlns="http://cyclonedx.org/schema/bom/1.6" version="1">
 	//   <metadata>
 	//     <component bom-ref="pkg:golang/acme-inc/acme-app@v1.0.0" type="application">
 	//       <name>ACME Application</name>

@@ -145,6 +145,11 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 			}
 		}
 
+		if specVersion < SpecVersion1_6 {
+			c.SWHID = nil
+			c.OmniborID = nil
+		}
+
 		if !specVersion.supportsComponentType(c.Type) {
 			c.Type = ComponentTypeApplication
 		}
