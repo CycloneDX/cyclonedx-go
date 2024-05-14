@@ -411,4 +411,5 @@ var xmlNamespaces = map[SpecVersion]string{
 	SpecVersion1_3: "http://cyclonedx.org/schema/bom/1.3",
 	SpecVersion1_4: "http://cyclonedx.org/schema/bom/1.4",
 	SpecVersion1_5: "http://cyclonedx.org/schema/bom/1.5",
+	SpecVersion1_6: "http://cyclonedx.org/schema/bom/1.6",
 }
