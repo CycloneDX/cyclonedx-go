@@ -91,6 +91,7 @@ type BOM struct {
 	Vulnerabilities    *[]Vulnerability     `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
 	Annotations        *[]Annotation        `json:"annotations,omitempty" xml:"annotations>annotation,omitempty"`
 	Formulation        *[]Formula           `json:"formulation,omitempty" xml:"formulation>formula,omitempty"`
+	Definitions        *Definitions         `json:"definitions" xml:"definitions,omitempty"`
 }
 
 func NewBOM() *BOM {
@@ -279,6 +280,10 @@ const (
 	DataFlowOutbound      DataFlow = "outbound"
 	DataFlowUnknown       DataFlow = "unknown"
 )
+
+type Definitions struct {
+	Standards *[]StandardDefinition `json:"standards,omitempty" xml:"standards>standard,omitempty"`
+}
 
 type Dependency struct {
 	Ref          string    `json:"ref"`
@@ -497,6 +502,33 @@ const (
 	IssueTypeEnhancement IssueType = "enhancement"
 	IssueTypeSecurity    IssueType = "security"
 )
+
+type JSFSignature struct {
+	*JSFSigner `json:"-" xml:"-"`
+
+	Signers *[]JSFSigner `json:"signers,omitempty" xml:"-"`
+	Chain   *[]JSFSigner `json:"chain,omitempty" xml:"-"`
+}
+
+type JSFSigner struct {
+	Algorithm       string       `json:"algorithm" xml:"-"`
+	KeyID           string       `json:"keyId,omitempty" xml:"-"`
+	PublicKey       JSFPublicKey `json:"publicKey,omitempty" xml:"-"`
+	CertificatePath *[]string    `json:"certificatePath,omitempty" xml:"-"`
+	Excludes        *[]string    `json:"excludes,omitempty" xml:"-"`
+	Value           string       `json:"value" xml:"-"`
+}
+
+type JSFPublicKey struct {
+	KTY string `json:"kty,omitempty" xml:"-"`
+
+	CRV string `json:"crv,omitempty" xml:"-"`
+	X   string `json:"x,omitempty" xml:"-"`
+	Y   string `json:"y,omitempty" xml:"-"`
+
+	N string `json:"n,omitempty" xml:"-"`
+	E string `json:"e,omitempty" xml:"-"`
+}
 
 type License struct {
 	BOMRef     string        `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
@@ -823,6 +855,39 @@ const (
 	SpecVersion1_5                        // 1.5
 	SpecVersion1_6                        // 1.6
 )
+
+type StandardDefinition struct {
+	BOMRef      string `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Name        string `json:"name,omitempty" xml:"name,omitempty"`
+	Version     string `json:"version,omitempty" xml:"version,omitempty"`
+	Description string `json:"description,omitempty" xml:"description,omitempty"`
+	Owner       string `json:"owner,omitempty" xml:"owner,omitempty"`
+
+	Requirements       *[]StandardRequirement `json:"requirements,omitempty" xml:"requirements>requirement,omitempty"`
+	Levels             *[]StandardLevel       `json:"levels,omitempty" xml:"levels>level,omitempty"`
+	ExternalReferences *[]ExternalReference   `json:"externalReferences,omitempty" xml:"externalReferences,omitempty"`
+	Signature          *JSFSignature          `json:"signature,omitempty" xml:"-"`
+}
+
+type StandardRequirement struct {
+	BOMRef             string               `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Identifier         string               `json:"identifier,omitempty" xml:"identifier,omitempty"`
+	Title              string               `json:"title,omitempty" xml:"title,omitempty"`
+	Text               string               `json:"text,omitempty" xml:"text,omitempty"`
+	Descriptions       *[]string            `json:"descriptions,omitempty" xml:"descriptions>description,omitempty"`
+	OpenCRE            *[]string            `json:"openCre,omitempty" xml:"openCre,omitempty"`
+	Parent             string               `json:"parent,omitempty" xml:"parent,omitempty"`
+	Properties         *[]Property          `json:"properties,omitempty" xml:"properties>property,omitempty"`
+	ExternalReferences *[]ExternalReference `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+}
+
+type StandardLevel struct {
+	BOMRef       string    `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Identifier   string    `json:"identifier,omitempty" xml:"identifier,omitempty"`
+	Title        string    `json:"title,omitempty" xml:"title,omitempty"`
+	Description  string    `json:"description,omitempty" xml:"description,omitempty"`
+	Requirements *[]string `json:"requirements,omitempty" xml:"requirements>requirement,omitempty"`
+}
 
 type SWID struct {
 	Text       *AttachedText `json:"text,omitempty" xml:"text,omitempty"`
