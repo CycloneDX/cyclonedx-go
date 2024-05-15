@@ -31,6 +31,7 @@ var xmlSchemaFiles = map[SpecVersion]string{
 	SpecVersion1_3: "./schema/bom-1.3.xsd",
 	SpecVersion1_4: "./schema/bom-1.4.xsd",
 	SpecVersion1_5: "./schema/bom-1.5.xsd",
+	SpecVersion1_6: "./schema/bom-1.6.xsd",
 }
 
 var xsdValidateInitOnce sync.Once
