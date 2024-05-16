@@ -91,7 +91,7 @@ type BOM struct {
 	Vulnerabilities    *[]Vulnerability     `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
 	Annotations        *[]Annotation        `json:"annotations,omitempty" xml:"annotations>annotation,omitempty"`
 	Formulation        *[]Formula           `json:"formulation,omitempty" xml:"formulation>formula,omitempty"`
-	Definitions        *Definitions         `json:"definitions" xml:"definitions,omitempty"`
+	Definitions        *Definitions         `json:"definitions,omitempty" xml:"definitions,omitempty"`
 }
 
 func NewBOM() *BOM {
@@ -873,7 +873,7 @@ type StandardDefinition struct {
 
 	Requirements       *[]StandardRequirement `json:"requirements,omitempty" xml:"requirements>requirement,omitempty"`
 	Levels             *[]StandardLevel       `json:"levels,omitempty" xml:"levels>level,omitempty"`
-	ExternalReferences *[]ExternalReference   `json:"externalReferences,omitempty" xml:"externalReferences,omitempty"`
+	ExternalReferences *[]ExternalReference   `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 	Signature          *JSFSignature          `json:"signature,omitempty" xml:"-"`
 }
 
