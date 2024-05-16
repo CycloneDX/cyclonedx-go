@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 )
 
 // bomReferenceXML is temporarily used for marshalling and unmarshalling
@@ -293,9 +292,6 @@ func (sv *SpecVersion) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		*sv = SpecVersion1_4
 	case SpecVersion1_5.String():
 		*sv = SpecVersion1_5
-	case SpecVersion1_6.String():
-		log.Default().Println("Warning: Support for v1.6 in cyclonedx-go is work in progress.")
-		*sv = SpecVersion1_6
 	default:
 		return ErrInvalidSpecVersion
 	}
@@ -415,5 +411,4 @@ var xmlNamespaces = map[SpecVersion]string{
 	SpecVersion1_3: "http://cyclonedx.org/schema/bom/1.3",
 	SpecVersion1_4: "http://cyclonedx.org/schema/bom/1.4",
 	SpecVersion1_5: "http://cyclonedx.org/schema/bom/1.5",
-	SpecVersion1_6: "http://cyclonedx.org/schema/bom/1.6",
 }

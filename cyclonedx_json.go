@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 )
 
 func (ev EnvironmentVariableChoice) MarshalJSON() ([]byte, error) {
@@ -125,9 +124,6 @@ func (sv *SpecVersion) UnmarshalJSON(bytes []byte) error {
 		*sv = SpecVersion1_4
 	case SpecVersion1_5.String():
 		*sv = SpecVersion1_5
-	case SpecVersion1_6.String():
-		log.Default().Println("Warning: Support for v1.6 in cyclonedx-go is work in progress.")
-		*sv = SpecVersion1_6
 	default:
 		return ErrInvalidSpecVersion
 	}
@@ -196,5 +192,4 @@ var jsonSchemas = map[SpecVersion]string{
 	SpecVersion1_3: "http://cyclonedx.org/schema/bom-1.3.schema.json",
 	SpecVersion1_4: "http://cyclonedx.org/schema/bom-1.4.schema.json",
 	SpecVersion1_5: "http://cyclonedx.org/schema/bom-1.5.schema.json",
-	SpecVersion1_6: "http://cyclonedx.org/schema/bom-1.6.schema.json",
 }

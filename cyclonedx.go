@@ -131,6 +131,23 @@ type CallstackFrame struct {
 	FullFilename string    `json:"fullFilename,omitempty" xml:"fullFilename,omitempty"`
 }
 
+type CertificateProperties struct {
+	SubjectName           string       `json:"subjectName,omitempty" xml:"subjectName,omitempty"`
+	IssuerName            string       `json:"issuerName,omitempty" xml:"issuerName,omitempty"`
+	NotValidBefore        string       `json:"notValidBefore,omitempty" xml:"notValidBefore,omitempty"`
+	NotValidAfter         string       `json:"notValidAfter,omitempty" xml:"notValidAfter,omitempty"`
+	SignatureAlgorithmRef BOMReference `json:"signatureAlgorithmRef,omitempty" xml:"signatureAlgorithmRef,omitempty"`
+	SubjectPublicKeyRef   BOMReference `json:"subjectPublicKeyRef,omitempty" xml:"subjectPublicKeyRef,omitempty"`
+	CertificateFormat     string       `json:"certificateFormat,omitempty" xml:"certificateFormat,omitempty"`
+	CertificateExtension  string       `json:"certificateExtension,omitempty" xml:"certificateExtension,omitempty"`
+}
+
+type CipherSuite struct {
+	Name        string          `json:"name,omitempty" xml:"name,omitempty"`
+	Algorithms  *[]BOMReference `json:"algorithms,omitempty" xml:"algorithms,omitempty"`
+	Identifiers *[]string       `json:"identifiers,omitempty" xml:"identifiers,omitempty"`
+}
+
 type ComponentType string
 
 const (
@@ -268,123 +285,86 @@ type Credits struct {
 	Individuals   *[]OrganizationalContact `json:"individuals,omitempty" xml:"individuals>individual,omitempty"`
 }
 
+type CryptoAlgorithmMode string
+
+const (
+	CryptoAlgorithmModeCBC     CryptoAlgorithmMode = "cbc"
+	CryptoAlgorithmModeECB     CryptoAlgorithmMode = "ecb"
+	CryptoAlgorithmModeCCM     CryptoAlgorithmMode = "ccm"
+	CryptoAlgorithmModeGCM     CryptoAlgorithmMode = "gcm"
+	CryptoAlgorithmModeCFB     CryptoAlgorithmMode = "cfb"
+	CryptoAlgorithmModeOFB     CryptoAlgorithmMode = "ofb"
+	CryptoAlgorithmModeCTR     CryptoAlgorithmMode = "ctr"
+	CryptoAlgorithmModeOther   CryptoAlgorithmMode = "other"
+	CryptoAlgorithmModeUnknown CryptoAlgorithmMode = "unknown"
+)
+
+type CryptoAlgorithmProperties struct {
+	Primitive                CryptoPrimitive             `json:"primitive,omitempty" xml:"primitive,omitempty"`
+	ParameterSetIdentifier   string                      `json:"parameterSetIdentifier,omitempty" xml:"parameterSetIdentifier,omitempty"`
+	Curve                    string                      `json:"curve,omitempty" xml:"curve,omitempty"`
+	ExecutionEnvironment     CryptoExecutionEnvironment  `json:"executionEnvironment,omitempty" xml:"executionEnvironment,omitempty"`
+	ImplementationPlatform   ImplementationPlatform      `json:"implementationPlatform,omitempty" xml:"implementationPlatform,omitempty"`
+	CertificationLevel       *[]CryptoCertificationLevel `json:"certificationLevel,omitempty" xml:"certificationLevel,omitempty"`
+	Mode                     CryptoAlgorithmMode         `json:"mode,omitempty" xml:"mode,omitempty"`
+	Padding                  CryptoPadding               `json:"padding,omitempty" xml:"padding,omitempty"`
+	CryptoFunctions          *[]CryptoFunction           `json:"cryptoFunctions,omitempty" xml:"cryptoFunctions>cryptoFunction,omitempty"`
+	ClassicalSecurityLevel   *int                        `json:"classicalSecurityLevel,omitempty" xml:"classicalSecurityLevel,omitempty"`
+	NistQuantumSecurityLevel *int                        `json:"nistQuantumSecurityLevel" xml:"nistQuantumSecurityLevel"`
+}
+
 type CryptoAssetType string
 
 const (
-	AssetTypeAlgorithm             CryptoAssetType = "algorithm"
-	AssetTypeCertificate           CryptoAssetType = "certificate"
-	AssetTypeProtocol              CryptoAssetType = "protocol"
-	AssetTypeRelatedCryptoMaterial CryptoAssetType = "related-crypto-material"
-)
-
-type CryptoPrimitive string
-
-const (
-	PrimitiveDRBG         CryptoPrimitive = "drbg"
-	PrimitiveMAC          CryptoPrimitive = "mac"
-	PrimitiveBlockCipher  CryptoPrimitive = "block-cipher"
-	PrimitiveStreamCipher CryptoPrimitive = "stream-cipher"
-	PrimitiveSignature    CryptoPrimitive = "signature"
-	PrimitiveHash         CryptoPrimitive = "hash"
-	PrimitivePKE          CryptoPrimitive = "pke"
-	PrimitiveXOF          CryptoPrimitive = "xof"
-	PrimitiveKDF          CryptoPrimitive = "kdf"
-	PrimitiveKeyAgree     CryptoPrimitive = "key-agree"
-	PrimitiveKEM          CryptoPrimitive = "kem"
-	PrimitiveAE           CryptoPrimitive = "ae"
-	PrimitiveCombiner     CryptoPrimitive = "combiner"
-	PrimitiveOther        CryptoPrimitive = "other"
-	PrimitiveUnknown      CryptoPrimitive = "unknown"
-)
-
-type CryptoExecutionEnvironment string
-
-const (
-	ExecutionEnvironmentSoftwarePlainRAM     CryptoExecutionEnvironment = "software-plain-ram"
-	ExecutionEnvironmentSoftwareEncryptedRAM CryptoExecutionEnvironment = "software-encrypted-ram"
-	ExecutionEnvironmentSoftwareTEE          CryptoExecutionEnvironment = "software-tee"
-	ExecutionEnvironmentHardware             CryptoExecutionEnvironment = "hardware"
-	ExecutionEnvironmentOther                CryptoExecutionEnvironment = "other"
-	ExecutionEnvironmentUnknown              CryptoExecutionEnvironment = "unknown"
-)
-
-type ImplementationPlatform string
-
-const (
-	ImplementationPlatformGeneric ImplementationPlatform = "generic"
-	ImplementationPlatformX86_32  ImplementationPlatform = "x86_32"
-	ImplementationPlatformX86_64  ImplementationPlatform = "x86_64"
-	ImplementationPlatformARMv7A  ImplementationPlatform = "armv7-a"
-	ImplementationPlatformARMv7M  ImplementationPlatform = "armv7-m"
-	ImplementationPlatformARMv8A  ImplementationPlatform = "armv8-a"
-	ImplementationPlatformARMv8M  ImplementationPlatform = "armv8-m"
-	ImplementationPlatformARMv9A  ImplementationPlatform = "armv9-a"
-	ImplementationPlatformARMv9M  ImplementationPlatform = "armv9-m"
-	ImplementationPlatformS390x   ImplementationPlatform = "s390x"
-	ImplementationPlatformPPC64   ImplementationPlatform = "ppc64"
-	ImplementationPlatformPPC64LE ImplementationPlatform = "ppc64le"
-	ImplementationPlatformOther   ImplementationPlatform = "other"
-	ImplementationPlatformUnknown ImplementationPlatform = "unknown"
+	CryptoAssetTypeAlgorithm             CryptoAssetType = "algorithm"
+	CryptoAssetTypeCertificate           CryptoAssetType = "certificate"
+	CryptoAssetTypeProtocol              CryptoAssetType = "protocol"
+	CryptoAssetTypeRelatedCryptoMaterial CryptoAssetType = "related-crypto-material"
 )
 
 type CryptoCertificationLevel string
 
 const (
-	CertificationLevelNone         CryptoCertificationLevel = "none"
-	CertificationLevelFIPS140_1_L1 CryptoCertificationLevel = "fips140-1-l1"
-	CertificationLevelFIPS140_1_L2 CryptoCertificationLevel = "fips140-1-l2"
-	CertificationLevelFIPS140_1_L3 CryptoCertificationLevel = "fips140-1-l3"
-	CertificationLevelFIPS140_1_L4 CryptoCertificationLevel = "fips140-1-l4"
-	CertificationLevelFIPS140_2_L1 CryptoCertificationLevel = "fips140-2-l1"
-	CertificationLevelFIPS140_2_L2 CryptoCertificationLevel = "fips140-2-l2"
-	CertificationLevelFIPS140_2_L3 CryptoCertificationLevel = "fips140-2-l3"
-	CertificationLevelFIPS140_2_L4 CryptoCertificationLevel = "fips140-2-l4"
-	CertificationLevelFIPS140_3_L1 CryptoCertificationLevel = "fips140-3-l1"
-	CertificationLevelFIPS140_3_L2 CryptoCertificationLevel = "fips140-3-l2"
-	CertificationLevelFIPS140_3_L3 CryptoCertificationLevel = "fips140-3-l3"
-	CertificationLevelFIPS140_3_L4 CryptoCertificationLevel = "fips140-3-l4"
-	CertificationLevelCCEAL1       CryptoCertificationLevel = "cc-eal1"
-	CertificationLevelCCEAL1Plus   CryptoCertificationLevel = "cc-eal1+"
-	CertificationLevelCCEAL2       CryptoCertificationLevel = "cc-eal2"
-	CertificationLevelCCEAL2Plus   CryptoCertificationLevel = "cc-eal2+"
-	CertificationLevelCCEAL3       CryptoCertificationLevel = "cc-eal3"
-	CertificationLevelCCEAL3Plus   CryptoCertificationLevel = "cc-eal3+"
-	CertificationLevelCCEAL4       CryptoCertificationLevel = "cc-eal4"
-	CertificationLevelCCEAL4Plus   CryptoCertificationLevel = "cc-eal4+"
-	CertificationLevelCCEAL5       CryptoCertificationLevel = "cc-eal5"
-	CertificationLevelCCEAL5Plus   CryptoCertificationLevel = "cc-eal5+"
-	CertificationLevelCCEAL6       CryptoCertificationLevel = "cc-eal6"
-	CertificationLevelCCEAL6Plus   CryptoCertificationLevel = "cc-eal6+"
-	CertificationLevelCCEAL7       CryptoCertificationLevel = "cc-eal7"
-	CertificationLevelCCEAL7Plus   CryptoCertificationLevel = "cc-eal7+"
-	CertificationLevelOther        CryptoCertificationLevel = "other"
-	CertificationLevelUnknown      CryptoCertificationLevel = "unknown"
+	CryptoCertificationLevelNone         CryptoCertificationLevel = "none"
+	CryptoCertificationLevelFIPS140_1_L1 CryptoCertificationLevel = "fips140-1-l1"
+	CryptoCertificationLevelFIPS140_1_L2 CryptoCertificationLevel = "fips140-1-l2"
+	CryptoCertificationLevelFIPS140_1_L3 CryptoCertificationLevel = "fips140-1-l3"
+	CryptoCertificationLevelFIPS140_1_L4 CryptoCertificationLevel = "fips140-1-l4"
+	CryptoCertificationLevelFIPS140_2_L1 CryptoCertificationLevel = "fips140-2-l1"
+	CryptoCertificationLevelFIPS140_2_L2 CryptoCertificationLevel = "fips140-2-l2"
+	CryptoCertificationLevelFIPS140_2_L3 CryptoCertificationLevel = "fips140-2-l3"
+	CryptoCertificationLevelFIPS140_2_L4 CryptoCertificationLevel = "fips140-2-l4"
+	CryptoCertificationLevelFIPS140_3_L1 CryptoCertificationLevel = "fips140-3-l1"
+	CryptoCertificationLevelFIPS140_3_L2 CryptoCertificationLevel = "fips140-3-l2"
+	CryptoCertificationLevelFIPS140_3_L3 CryptoCertificationLevel = "fips140-3-l3"
+	CryptoCertificationLevelFIPS140_3_L4 CryptoCertificationLevel = "fips140-3-l4"
+	CryptoCertificationLevelCCEAL1       CryptoCertificationLevel = "cc-eal1"
+	CryptoCertificationLevelCCEAL1Plus   CryptoCertificationLevel = "cc-eal1+"
+	CryptoCertificationLevelCCEAL2       CryptoCertificationLevel = "cc-eal2"
+	CryptoCertificationLevelCCEAL2Plus   CryptoCertificationLevel = "cc-eal2+"
+	CryptoCertificationLevelCCEAL3       CryptoCertificationLevel = "cc-eal3"
+	CryptoCertificationLevelCCEAL3Plus   CryptoCertificationLevel = "cc-eal3+"
+	CryptoCertificationLevelCCEAL4       CryptoCertificationLevel = "cc-eal4"
+	CryptoCertificationLevelCCEAL4Plus   CryptoCertificationLevel = "cc-eal4+"
+	CryptoCertificationLevelCCEAL5       CryptoCertificationLevel = "cc-eal5"
+	CryptoCertificationLevelCCEAL5Plus   CryptoCertificationLevel = "cc-eal5+"
+	CryptoCertificationLevelCCEAL6       CryptoCertificationLevel = "cc-eal6"
+	CryptoCertificationLevelCCEAL6Plus   CryptoCertificationLevel = "cc-eal6+"
+	CryptoCertificationLevelCCEAL7       CryptoCertificationLevel = "cc-eal7"
+	CryptoCertificationLevelCCEAL7Plus   CryptoCertificationLevel = "cc-eal7+"
+	CryptoCertificationLevelOther        CryptoCertificationLevel = "other"
+	CryptoCertificationLevelUnknown      CryptoCertificationLevel = "unknown"
 )
 
-type CryptoAlgorithmMode string
+type CryptoExecutionEnvironment string
 
 const (
-	ModeCBC     CryptoAlgorithmMode = "cbc"
-	ModeECB     CryptoAlgorithmMode = "ecb"
-	ModeCCM     CryptoAlgorithmMode = "ccm"
-	ModeGCM     CryptoAlgorithmMode = "gcm"
-	ModeCFB     CryptoAlgorithmMode = "cfb"
-	ModeOFB     CryptoAlgorithmMode = "ofb"
-	ModeCTR     CryptoAlgorithmMode = "ctr"
-	ModeOther   CryptoAlgorithmMode = "other"
-	ModeUnknown CryptoAlgorithmMode = "unknown"
-)
-
-type CryptoPadding string
-
-const (
-	PaddingPKCS5    CryptoPadding = "pkcs5"
-	PaddingPKCS7    CryptoPadding = "pkcs7"
-	PaddingPKCS1v15 CryptoPadding = "pkcs1v15"
-	PaddingOAEP     CryptoPadding = "oaep"
-	PaddingRaw      CryptoPadding = "raw"
-	PaddingOther    CryptoPadding = "other"
-	PaddingUnknown  CryptoPadding = "unknown"
+	CryptoExecutionEnvironmentSoftwarePlainRAM     CryptoExecutionEnvironment = "software-plain-ram"
+	CryptoExecutionEnvironmentSoftwareEncryptedRAM CryptoExecutionEnvironment = "software-encrypted-ram"
+	CryptoExecutionEnvironmentSoftwareTEE          CryptoExecutionEnvironment = "software-tee"
+	CryptoExecutionEnvironmentHardware             CryptoExecutionEnvironment = "hardware"
+	CryptoExecutionEnvironmentOther                CryptoExecutionEnvironment = "other"
+	CryptoExecutionEnvironmentUnknown              CryptoExecutionEnvironment = "unknown"
 )
 
 type CryptoFunction string
@@ -405,129 +385,91 @@ const (
 	CryptoFunctionUnknown     CryptoFunction = "unknown"
 )
 
-type CryptoAlgorithmProperties struct {
-	Primitive                CryptoPrimitive              `json:"primitive,omitempty" xml:"primitive,omitempty"`
-	ParameterSetIdentifier   string                 `json:"parameterSetIdentifier,omitempty" xml:"parameterSetIdentifier,omitempty"`
-	Curve                    string                 `json:"curve,omitempty" xml:"curve,omitempty"`
-	ExecutionEnvironment     CryptoExecutionEnvironment   `json:"executionEnvironment,omitempty" xml:"executionEnvironment,omitempty"`
-	ImplementationPlatform   ImplementationPlatform `json:"implementationPlatform,omitempty" xml:"implementationPlatform,omitempty"`
-	CertificationLevel       *[]CryptoCertificationLevel  `json:"certificationLevel,omitempty" xml:"certificationLevel,omitempty"`
-	Mode                     CryptoAlgorithmMode                   `json:"mode,omitempty" xml:"mode,omitempty"`
-	Padding                  CryptoPadding                `json:"padding,omitempty" xml:"padding,omitempty"`
-	CryptoFunctions          *[]CryptoFunction      `json:"cryptoFunctions,omitempty" xml:"cryptoFunctions>cryptoFunction,omitempty"`
-	ClassicalSecurityLevel   int                    `json:"classicalSecurityLevel,omitempty" xml:"classicalSecurityLevel,omitempty"`
-	NistQuantumSecurityLevel int                    `json:"nistQuantumSecurityLevel" xml:"nistQuantumSecurityLevel"`
-}
-
-type CertificateProperties struct {
-	SubjectName           string       `json:"subjectName,omitempty" xml:"subjectName,omitempty"`
-	IssuerName            string       `json:"issuerName,omitempty" xml:"issuerName,omitempty"`
-	NotValidBefore        string       `json:"notValidBefore,omitempty" xml:"notValidBefore,omitempty"`
-	NotValidAfter         string       `json:"notValidAfter,omitempty" xml:"notValidAfter,omitempty"`
-	SignatureAlgorithmRef BOMReference `json:"signatureAlgorithmRef,omitempty" xml:"signatureAlgorithmRef,omitempty"`
-	SubjectPublicKeyRef   BOMReference `json:"subjectPublicKeyRef,omitempty" xml:"subjectPublicKeyRef,omitempty"`
-	CertificateFormat     string       `json:"certificateFormat,omitempty" xml:"certificateFormat,omitempty"`
-	CertificateExtension  string       `json:"certificateExtension,omitempty" xml:"certificateExtension,omitempty"`
-}
-
-type RelatedCryptoMaterialType string
-
-const (
-	TypePrivateKey           RelatedCryptoMaterialType = "private-key"
-	TypePublicKey            RelatedCryptoMaterialType = "public-key"
-	TypeSecretKey            RelatedCryptoMaterialType = "secret-key"
-	TypeKey                  RelatedCryptoMaterialType = "key"
-	TypeCiphertext           RelatedCryptoMaterialType = "ciphertext"
-	TypeSignature            RelatedCryptoMaterialType = "signature"
-	TypeDigest               RelatedCryptoMaterialType = "digest"
-	TypeInitializationVector RelatedCryptoMaterialType = "initialization-vector"
-	TypeNonce                RelatedCryptoMaterialType = "nonce"
-	TypeSeed                 RelatedCryptoMaterialType = "seed"
-	TypeSalt                 RelatedCryptoMaterialType = "salt"
-	TypeSharedSecret         RelatedCryptoMaterialType = "shared-secret"
-	TypeTag                  RelatedCryptoMaterialType = "tag"
-	TypeAdditionalData       RelatedCryptoMaterialType = "additional-data"
-	TypePassword             RelatedCryptoMaterialType = "password"
-	TypeCredential           RelatedCryptoMaterialType = "credential"
-	TypeToken                RelatedCryptoMaterialType = "token"
-	TypeOther                RelatedCryptoMaterialType = "other"
-	TypeUnknown              RelatedCryptoMaterialType = "unknown"
-)
-
 type CryptoKeyState string
 
 const (
-	StatePreActivation CryptoKeyState = "pre-activation"
-	StateActive        CryptoKeyState = "active"
-	StateSuspended     CryptoKeyState = "suspended"
-	StateDeactivated   CryptoKeyState = "deactivated"
-	StateCompromised   CryptoKeyState = "compromised"
-	StateDestroyed     CryptoKeyState = "destroyed"
+	CryptoKeyStatePreActivation CryptoKeyState = "pre-activation"
+	CryptoKeyStateActive        CryptoKeyState = "active"
+	CryptoKeyStateSuspended     CryptoKeyState = "suspended"
+	CryptoKeyStateDeactivated   CryptoKeyState = "deactivated"
+	CryptoKeyStateCompromised   CryptoKeyState = "compromised"
+	CryptoKeyStateDestroyed     CryptoKeyState = "destroyed"
 )
 
-type RelatedCryptoMaterialProperties struct {
-	Type           RelatedCryptoMaterialType         `json:"type,omitempty" xml:"type,omitempty"`
-	ID             string       `json:"id,omitempty" xml:"id,omitempty"`
-	State          CryptoKeyState        `json:"state,omitempty" xml:"state,omitempty"`
-	AlgorithmRef   BOMReference `json:"algorithmRef,omitempty" xml:"algorithmRef,omitempty"`
-	CreationDate   string       `json:"creationDate,omitempty" xml:"creationDate,omitempty"`
-	ActivationDate string       `json:"activationDate,omitempty" xml:"activationDate,omitempty"`
-	UpdateDate     string       `json:"updateDate,omitempty" xml:"updateDate,omitempty"`
-	ExpirationDate string       `json:"expirationDate,omitempty" xml:"expirationDate,omitempty"`
-	Value          string       `json:"value,omitempty" xml:"value,omitempty"`
-	Size           int          `json:"size,omitempty" xml:"size,omitempty"`
-	Format         string       `json:"format,omitempty" xml:"format,omitempty"`
-	SecuredBy      *SecuredBy   `json:"securedBy,omitempty" xml:"securedBy,omitempty"`
+type CryptoPadding string
+
+const (
+	CryptoPaddingPKCS5    CryptoPadding = "pkcs5"
+	CryptoPaddingPKCS7    CryptoPadding = "pkcs7"
+	CryptoPaddingPKCS1v15 CryptoPadding = "pkcs1v15"
+	CryptoPaddingOAEP     CryptoPadding = "oaep"
+	CryptoPaddingRaw      CryptoPadding = "raw"
+	CryptoPaddingOther    CryptoPadding = "other"
+	CryptoPaddingUnknown  CryptoPadding = "unknown"
+)
+
+type CryptoPrimitive string
+
+const (
+	CryptoPrimitiveDRBG         CryptoPrimitive = "drbg"
+	CryptoPrimitiveMAC          CryptoPrimitive = "mac"
+	CryptoPrimitiveBlockCipher  CryptoPrimitive = "block-cipher"
+	CryptoPrimitiveStreamCipher CryptoPrimitive = "stream-cipher"
+	CryptoPrimitiveSignature    CryptoPrimitive = "signature"
+	CryptoPrimitiveHash         CryptoPrimitive = "hash"
+	CryptoPrimitivePKE          CryptoPrimitive = "pke"
+	CryptoPrimitiveXOF          CryptoPrimitive = "xof"
+	CryptoPrimitiveKDF          CryptoPrimitive = "kdf"
+	CryptoPrimitiveKeyAgree     CryptoPrimitive = "key-agree"
+	CryptoPrimitiveKEM          CryptoPrimitive = "kem"
+	CryptoPrimitiveAE           CryptoPrimitive = "ae"
+	CryptoPrimitiveCombiner     CryptoPrimitive = "combiner"
+	CryptoPrimitiveOther        CryptoPrimitive = "other"
+	CryptoPrimitiveUnknown      CryptoPrimitive = "unknown"
+)
+
+type CryptoProperties struct {
+	AssetType                       CryptoAssetType                  `json:"assetType" xml:"assetType"`
+	AlgorithmProperties             *CryptoAlgorithmProperties       `json:"algorithmProperties,omitempty" xml:"algorithmProperties,omitempty"`
+	CertificateProperties           *CertificateProperties           `json:"certificateProperties,omitempty" xml:"certificateProperties,omitempty"`
+	RelatedCryptoMaterialProperties *RelatedCryptoMaterialProperties `json:"relatedCryptoMaterialProperties,omitempty" xml:"relatedCryptoMaterialProperties,omitempty"`
+	ProtocolProperties              *CryptoProtocolProperties        `json:"protocolProperties,omitempty" xml:"protocolProperties,omitempty"`
+	OID                             string                           `json:"oid,omitempty" xml:"oid,omitempty"`
 }
 
 type CryptoProtocolProperties struct {
-	Type                CryptoProtocolType        `json:"type,omitempty" xml:"type,omitempty"`
-	Version             string              `json:"version,omitempty" xml:"version,omitempty"`
-	CipherSuites        *[]CipherSuite      `json:"cipherSuites,omitempty" xml:"cipherSuites,omitempty"`
-	Ikev2TransformTypes Ikev2TransformTypes `json:"ikev2TransformTypes,omitempty" xml:"ikev2TransformTypes,omitempty"`
-	CryptoRefArray      *[]BOMReference     `json:"cryptoRefArray,omitempty" xml:"cryptoRefArray,omitempty"`
+	Type                CryptoProtocolType   `json:"type,omitempty" xml:"type,omitempty"`
+	Version             string               `json:"version,omitempty" xml:"version,omitempty"`
+	CipherSuites        *[]CipherSuite       `json:"cipherSuites,omitempty" xml:"cipherSuites,omitempty"`
+	IKEv2TransformTypes *IKEv2TransformTypes `json:"ikev2TransformTypes,omitempty" xml:"ikev2TransformTypes,omitempty"`
+	CryptoRefArray      *[]BOMReference      `json:"cryptoRefArray,omitempty" xml:"cryptoRefArray,omitempty"`
 }
 
 type CryptoProtocolType string
 
 const (
-	TLS     CryptoProtocolType = "tls"
-	SSH     CryptoProtocolType = "ssh"
-	IPSec   CryptoProtocolType = "ipsec"
-	IKE     CryptoProtocolType = "ike"
-	SSTP    CryptoProtocolType = "sstp"
-	WPA     CryptoProtocolType = "wpa"
-	Other   CryptoProtocolType = "other"
-	Unknown CryptoProtocolType = "unknown"
+	CryptoProtocolTypeTLS     CryptoProtocolType = "tls"
+	CryptoProtocolTypeSSH     CryptoProtocolType = "ssh"
+	CryptoProtocolTypeIPSec   CryptoProtocolType = "ipsec"
+	CryptoProtocolTypeIKE     CryptoProtocolType = "ike"
+	CryptoProtocolTypeSSTP    CryptoProtocolType = "sstp"
+	CryptoProtocolTypeWPA     CryptoProtocolType = "wpa"
+	CryptoProtocolTypeOther   CryptoProtocolType = "other"
+	CryptoProtocolTypeUnknown CryptoProtocolType = "unknown"
 )
 
-type CipherSuite struct {
-	Name        string          `json:"name,omitempty" xml:"name,omitempty"`
-	Algorithms   *[]BOMReference `json:"algorithms,omitempty" xml:"algorithms,omitempty"`
-	Identifiers *[]string       `json:"identifiers,omitempty" xml:"identifiers,omitempty"`
-}
-
-type Ikev2TransformTypes struct {
+type IKEv2TransformTypes struct {
 	Encr  *[]BOMReference `json:"encr,omitempty" xml:"encr,omitempty"`
-	Prf   *[]BOMReference `json:"prf,omitempty" xml:"prf,omitempty"`
+	PRF   *[]BOMReference `json:"prf,omitempty" xml:"prf,omitempty"`
 	Integ *[]BOMReference `json:"integ,omitempty" xml:"integ,omitempty"`
-	Ke    *[]BOMReference `json:"ke,omitempty" xml:"ke,omitempty"`
-	Esn   bool            `json:"esn" xml:"esn"`
+	KE    *[]BOMReference `json:"ke,omitempty" xml:"ke,omitempty"`
+	ESN   bool            `json:"esn" xml:"esn"`
 	Auth  *[]BOMReference `json:"auth,omitempty" xml:"auth,omitempty"`
 }
 
-type CryptoProperties struct {
-	AssetType                       CryptoAssetType                        `json:"assetType" xml:"assetType"`
-	AlgorithmProperties             *CryptoAlgorithmProperties             `json:"algorithmProperties,omitempty" xml:"algorithmProperties,omitempty"`
-	CertificateProperties           *CertificateProperties           `json:"certificateProperties,omitempty" xml:"certificateProperties,omitempty"`
-	RelatedCryptoMaterialProperties *RelatedCryptoMaterialProperties `json:"relatedCryptoMaterialProperties,omitempty" xml:"relatedCryptoMaterialProperties,omitempty"`
-	ProtocolProperties              *CryptoProtocolProperties              `json:"protocolProperties,omitempty" xml:"protocolProperties,omitempty"`
-	OID                             string                           `json:"oid,omitempty" xml:"oid,omitempty"`
-}
-
 type SecuredBy struct {
-	Mechanism    string        `json:"mechanism,omitempty" xml:"mechanism,omitempty"`
-	AlgorithmRef *BOMReference `json:"algorithmRef,omitempty" xml:"algorithmRef,omitempty"`
+	Mechanism    string       `json:"mechanism,omitempty" xml:"mechanism,omitempty"`
+	AlgorithmRef BOMReference `json:"algorithmRef,omitempty" xml:"algorithmRef,omitempty"`
 }
 
 type DataClassification struct {
@@ -743,6 +685,25 @@ const (
 	IASInTriage             ImpactAnalysisState = "in_triage"
 	IASFalsePositive        ImpactAnalysisState = "false_positive"
 	IASNotAffected          ImpactAnalysisState = "not_affected"
+)
+
+type ImplementationPlatform string
+
+const (
+	ImplementationPlatformGeneric ImplementationPlatform = "generic"
+	ImplementationPlatformX86_32  ImplementationPlatform = "x86_32"
+	ImplementationPlatformX86_64  ImplementationPlatform = "x86_64"
+	ImplementationPlatformARMv7A  ImplementationPlatform = "armv7-a"
+	ImplementationPlatformARMv7M  ImplementationPlatform = "armv7-m"
+	ImplementationPlatformARMv8A  ImplementationPlatform = "armv8-a"
+	ImplementationPlatformARMv8M  ImplementationPlatform = "armv8-m"
+	ImplementationPlatformARMv9A  ImplementationPlatform = "armv9-a"
+	ImplementationPlatformARMv9M  ImplementationPlatform = "armv9-m"
+	ImplementationPlatformS390x   ImplementationPlatform = "s390x"
+	ImplementationPlatformPPC64   ImplementationPlatform = "ppc64"
+	ImplementationPlatformPPC64LE ImplementationPlatform = "ppc64le"
+	ImplementationPlatformOther   ImplementationPlatform = "other"
+	ImplementationPlatformUnknown ImplementationPlatform = "unknown"
 )
 
 type Issue struct {
@@ -1000,6 +961,45 @@ type Property struct {
 	Value string `json:"value" xml:",chardata"`
 }
 
+type RelatedCryptoMaterialProperties struct {
+	Type           RelatedCryptoMaterialType `json:"type,omitempty" xml:"type,omitempty"`
+	ID             string                    `json:"id,omitempty" xml:"id,omitempty"`
+	State          CryptoKeyState            `json:"state,omitempty" xml:"state,omitempty"`
+	AlgorithmRef   BOMReference              `json:"algorithmRef,omitempty" xml:"algorithmRef,omitempty"`
+	CreationDate   string                    `json:"creationDate,omitempty" xml:"creationDate,omitempty"`
+	ActivationDate string                    `json:"activationDate,omitempty" xml:"activationDate,omitempty"`
+	UpdateDate     string                    `json:"updateDate,omitempty" xml:"updateDate,omitempty"`
+	ExpirationDate string                    `json:"expirationDate,omitempty" xml:"expirationDate,omitempty"`
+	Value          string                    `json:"value,omitempty" xml:"value,omitempty"`
+	Size           *int                      `json:"size,omitempty" xml:"size,omitempty"`
+	Format         string                    `json:"format,omitempty" xml:"format,omitempty"`
+	SecuredBy      *SecuredBy                `json:"securedBy,omitempty" xml:"securedBy,omitempty"`
+}
+
+type RelatedCryptoMaterialType string
+
+const (
+	RelatedCryptoMaterialTypePrivateKey           RelatedCryptoMaterialType = "private-key"
+	RelatedCryptoMaterialTypePublicKey            RelatedCryptoMaterialType = "public-key"
+	RelatedCryptoMaterialTypeSecretKey            RelatedCryptoMaterialType = "secret-key"
+	RelatedCryptoMaterialTypeKey                  RelatedCryptoMaterialType = "key"
+	RelatedCryptoMaterialTypeCiphertext           RelatedCryptoMaterialType = "ciphertext"
+	RelatedCryptoMaterialTypeSignature            RelatedCryptoMaterialType = "signature"
+	RelatedCryptoMaterialTypeDigest               RelatedCryptoMaterialType = "digest"
+	RelatedCryptoMaterialTypeInitializationVector RelatedCryptoMaterialType = "initialization-vector"
+	RelatedCryptoMaterialTypeNonce                RelatedCryptoMaterialType = "nonce"
+	RelatedCryptoMaterialTypeSeed                 RelatedCryptoMaterialType = "seed"
+	RelatedCryptoMaterialTypeSalt                 RelatedCryptoMaterialType = "salt"
+	RelatedCryptoMaterialTypeSharedSecret         RelatedCryptoMaterialType = "shared-secret"
+	RelatedCryptoMaterialTypeTag                  RelatedCryptoMaterialType = "tag"
+	RelatedCryptoMaterialTypeAdditionalData       RelatedCryptoMaterialType = "additional-data"
+	RelatedCryptoMaterialTypePassword             RelatedCryptoMaterialType = "password"
+	RelatedCryptoMaterialTypeCredential           RelatedCryptoMaterialType = "credential"
+	RelatedCryptoMaterialTypeToken                RelatedCryptoMaterialType = "token"
+	RelatedCryptoMaterialTypeOther                RelatedCryptoMaterialType = "other"
+	RelatedCryptoMaterialTypeUnknown              RelatedCryptoMaterialType = "unknown"
+)
+
 type ReleaseNotes struct {
 	Type          string      `json:"type" xml:"type"`
 	Title         string      `json:"title,omitempty" xml:"title,omitempty"`
@@ -1085,7 +1085,6 @@ const (
 	SpecVersion1_3                        // 1.3
 	SpecVersion1_4                        // 1.4
 	SpecVersion1_5                        // 1.5
-	SpecVersion1_6                        // 1.6
 )
 
 type SWID struct {
