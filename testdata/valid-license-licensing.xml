@@ -7,7 +7,7 @@
             <name>cryptographic-provider</name>
             <version>2.2.0</version>
             <licenses>
-                <license bom-ref="acme-license-1">
+                <license bom-ref="acme-license-1" acknowledgement="concluded">
                     <name>Acme Commercial License</name>
                     <licensing>
                         <altIds>

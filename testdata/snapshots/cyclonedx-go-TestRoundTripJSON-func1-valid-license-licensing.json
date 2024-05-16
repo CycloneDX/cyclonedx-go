@@ -15,6 +15,7 @@
           "license": {
             "bom-ref": "acme-license-1",
             "name": "Acme Commercial License",
+            "acknowledgement": "concluded",
             "licensing": {
               "altIds": [
                 "acme",
