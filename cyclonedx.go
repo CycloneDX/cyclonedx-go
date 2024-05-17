@@ -764,14 +764,22 @@ type JSFPublicKey struct {
 }
 
 type License struct {
-	BOMRef     string        `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
-	ID         string        `json:"id,omitempty" xml:"id,omitempty"`
-	Name       string        `json:"name,omitempty" xml:"name,omitempty"`
-	Text       *AttachedText `json:"text,omitempty" xml:"text,omitempty"`
-	URL        string        `json:"url,omitempty" xml:"url,omitempty"`
-	Licensing  *Licensing    `json:"licensing,omitempty" xml:"licensing,omitempty"`
-	Properties *[]Property   `json:"properties,omitempty" xml:"properties>property,omitempty"`
+	BOMRef          string                 `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	ID              string                 `json:"id,omitempty" xml:"id,omitempty"`
+	Name            string                 `json:"name,omitempty" xml:"name,omitempty"`
+	Acknowledgement LicenseAcknowledgement `json:"acknowledgement,omitempty" xml:"acknowledgement,attr,omitempty"`
+	Text            *AttachedText          `json:"text,omitempty" xml:"text,omitempty"`
+	URL             string                 `json:"url,omitempty" xml:"url,omitempty"`
+	Licensing       *Licensing             `json:"licensing,omitempty" xml:"licensing,omitempty"`
+	Properties      *[]Property            `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
+
+type LicenseAcknowledgement string
+
+const (
+	LicenseAcknowledgementDeclared  LicenseAcknowledgement = "declared"
+	LicenseAcknowledgementConcluded LicenseAcknowledgement = "concluded"
+)
 
 type Licenses []LicenseChoice
 

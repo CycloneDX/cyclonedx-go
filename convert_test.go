@@ -69,3 +69,27 @@ func Test_componentConverter_convertEvidence(t *testing.T) {
 		assert.Zero(t, occ.AdditionalContext)
 	})
 }
+
+func Test_convertLicenses(t *testing.T) {
+	t.Run("spec 1.5 and lower", func(t *testing.T) {
+		bom := NewBOM()
+		bom.Metadata = &Metadata{
+			Licenses: &Licenses{
+				{License: &License{Name: "Apache License 2.0", Acknowledgement: LicenseAcknowledgementDeclared}},
+			},
+		}
+		bom.Components = &[]Component{
+			{
+				Name: "foo",
+				Licenses: &Licenses{
+					{License: &License{Name: "Apache License 2.0", Acknowledgement: LicenseAcknowledgementConcluded}},
+				},
+			},
+		}
+
+		bom.convert(SpecVersion1_5)
+
+		assert.Zero(t, (*bom.Metadata.Licenses)[0].License.Acknowledgement)
+		assert.Zero(t, (*(*bom.Components)[0].Licenses)[0].License.Acknowledgement)
+	})
+}

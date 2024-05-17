@@ -178,16 +178,18 @@ func convertEvidence(c *Component, specVersion SpecVersion) {
 		return
 	}
 
-	for i := range *c.Evidence.Occurrences {
-		occ := &(*c.Evidence.Occurrences)[i]
+	if specVersion < SpecVersion1_6 {
+		for i := range *c.Evidence.Occurrences {
+			occ := &(*c.Evidence.Occurrences)[i]
 
-		if specVersion < SpecVersion1_6 {
 			occ.Line = nil
 			occ.Offset = nil
 			occ.Symbol = ""
 			occ.AdditionalContext = ""
 		}
 	}
+
+	convertLicenses(c.Evidence.Licenses, specVersion)
 }
 
 func convertCompositions(comps *[]Composition, specVersion SpecVersion) {
@@ -283,6 +285,15 @@ func convertLicenses(licenses *Licenses, specVersion SpecVersion) {
 				choice.License.BOMRef = ""
 				choice.License.Licensing = nil
 				choice.License.Properties = nil
+			}
+		}
+	}
+
+	if specVersion < SpecVersion1_6 {
+		for i := range *licenses {
+			choice := &(*licenses)[i]
+			if choice.License != nil {
+				choice.License.Acknowledgement = ""
 			}
 		}
 	}
