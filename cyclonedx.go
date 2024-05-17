@@ -91,7 +91,7 @@ type BOM struct {
 	Vulnerabilities    *[]Vulnerability     `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
 	Annotations        *[]Annotation        `json:"annotations,omitempty" xml:"annotations>annotation,omitempty"`
 	Formulation        *[]Formula           `json:"formulation,omitempty" xml:"formulation>formula,omitempty"`
-	Definitions        *Definitions         `json:"definitions" xml:"definitions,omitempty"`
+	Definitions        *Definitions         `json:"definitions,omitempty" xml:"definitions,omitempty"`
 }
 
 func NewBOM() *BOM {
