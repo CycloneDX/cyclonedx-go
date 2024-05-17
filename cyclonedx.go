@@ -310,7 +310,7 @@ type CryptoAlgorithmProperties struct {
 	Padding                  CryptoPadding               `json:"padding,omitempty" xml:"padding,omitempty"`
 	CryptoFunctions          *[]CryptoFunction           `json:"cryptoFunctions,omitempty" xml:"cryptoFunctions>cryptoFunction,omitempty"`
 	ClassicalSecurityLevel   *int                        `json:"classicalSecurityLevel,omitempty" xml:"classicalSecurityLevel,omitempty"`
-	NistQuantumSecurityLevel *int                        `json:"nistQuantumSecurityLevel" xml:"nistQuantumSecurityLevel"`
+	NistQuantumSecurityLevel *int                        `json:"nistQuantumSecurityLevel,omitempty" xml:"nistQuantumSecurityLevel,omitempty"`
 }
 
 type CryptoAssetType string
