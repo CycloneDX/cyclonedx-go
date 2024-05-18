@@ -53,6 +53,7 @@ func (b *BOM) convert(specVersion SpecVersion) {
 		b.Formulation = nil
 	}
 	if specVersion < SpecVersion1_6 {
+		b.Declarations = nil
 		b.Definitions = nil
 	}
 

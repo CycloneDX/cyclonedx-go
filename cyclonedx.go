@@ -63,10 +63,42 @@ type Annotator struct {
 	Service      *Service               `json:"service,omitempty" xml:"service,omitempty"`
 }
 
+type Assessor struct {
+	BOMRef       BOMReference          `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	ThirdParty   bool                  `json:"thirdParty,omitempty" xml:"thirdParty,omitempty"`
+	Organization *OrganizationalEntity `json:"organization,omitempty" xml:"organization,omitempty"`
+}
+
 type AttachedText struct {
 	Content     string `json:"content" xml:",chardata"`
 	ContentType string `json:"contentType,omitempty" xml:"content-type,attr,omitempty"`
 	Encoding    string `json:"encoding,omitempty" xml:"encoding,attr,omitempty"`
+}
+
+type Attestation struct {
+	Summary   string            `json:"summary,omitempty" xml:"summary,omitempty"`
+	Assessor  BOMReference      `json:"assessor,omitempty" xml:"assessor,omitempty"`
+	Map       *[]AttestationMap `json:"map,omitempty" xml:"map,omitempty"`
+	Signature *JSFSignature     `json:"signature,omitempty" xml:"-"`
+}
+
+type AttestationMap struct {
+	Requirement   string                  `json:"requirement,omitempty" xml:"requirement,omitempty"`
+	Claims        *[]BOMReference         `json:"claims,omitempty" xml:"claims>claim,omitempty"`
+	CounterClaims *[]BOMReference         `json:"counterClaims,omitempty" xml:"counterClaims>counterClaim,omitempty"`
+	Conformance   *AttestationConformance `json:"conformance,omitempty" xml:"conformance,omitempty"`
+	Confidence    *AttestationConfidence  `json:"confidence,omitempty" xml:"confidence,omitempty"`
+}
+
+type AttestationConformance struct {
+	Score                *float64        `json:"score,omitempty" xml:"score,omitempty"`
+	Rationale            string          `json:"rationale,omitempty" xml:"rationale,omitempty"`
+	MitigationStrategies *[]BOMReference `json:"mitigationStrategies,omitempty" xml:"mitigationStrategies>mitigationStrategy,omitempty"`
+}
+
+type AttestationConfidence struct {
+	Score     *float64 `json:"score,omitempty" xml:"score,omitempty"`
+	Rationale string   `json:"rationale,omitempty" xml:"rationale,omitempty"`
 }
 
 type BOM struct {
@@ -91,6 +123,7 @@ type BOM struct {
 	Vulnerabilities    *[]Vulnerability     `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
 	Annotations        *[]Annotation        `json:"annotations,omitempty" xml:"annotations>annotation,omitempty"`
 	Formulation        *[]Formula           `json:"formulation,omitempty" xml:"formulation>formula,omitempty"`
+	Declarations       *Declarations        `json:"declarations,omitempty" xml:"declarations,omitempty"`
 	Definitions        *Definitions         `json:"definitions,omitempty" xml:"definitions,omitempty"`
 }
 
@@ -141,6 +174,18 @@ type CertificateProperties struct {
 	SubjectPublicKeyRef   BOMReference `json:"subjectPublicKeyRef,omitempty" xml:"subjectPublicKeyRef,omitempty"`
 	CertificateFormat     string       `json:"certificateFormat,omitempty" xml:"certificateFormat,omitempty"`
 	CertificateExtension  string       `json:"certificateExtension,omitempty" xml:"certificateExtension,omitempty"`
+}
+
+type Claim struct {
+	BOMRef               string               `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Target               BOMReference         `json:"target,omitempty" xml:"target,omitempty"`
+	Predicate            string               `json:"predicate,omitempty" xml:"predicate,omitempty"`
+	MitigationStrategies *[]BOMReference      `json:"mitigationStrategies,omitempty" xml:"mitigationStrategies>mitigationStrategy,omitempty"`
+	Reasoning            string               `json:"reasoning,omitempty" xml:"reasoning,omitempty"`
+	Evidence             *[]BOMReference      `json:"evidence,omitempty" xml:"evidence,omitempty"`
+	CounterEvidence      *[]BOMReference      `json:"counterEvidence,omitempty" xml:"counterEvidence,omitempty"`
+	ExternalReferences   *[]ExternalReference `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+	Signature            *JSFSignature        `json:"signature,omitempty" xml:"-"`
 }
 
 type CipherSuite struct {
@@ -208,27 +253,21 @@ type Component struct {
 }
 
 type ComponentData struct {
-	BOMRef         string                   `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
-	Type           ComponentDataType        `json:"type,omitempty" xml:"type,omitempty"`
-	Name           string                   `json:"name,omitempty" xml:"name,omitempty"`
-	Contents       *ComponentDataContents   `json:"contents,omitempty" xml:"contents,omitempty"`
-	Classification string                   `json:"classification,omitempty" xml:"classification,omitempty"`
-	SensitiveData  *[]string                `json:"sensitiveData,omitempty" xml:"sensitiveData,omitempty"`
-	Graphics       *ComponentDataGraphics   `json:"graphics,omitempty" xml:"graphics,omitempty"`
-	Description    string                   `json:"description,omitempty" xml:"description,omitempty"`
-	Governance     *ComponentDataGovernance `json:"governance,omitempty" xml:"governance,omitempty"`
+	BOMRef         string                 `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Type           ComponentDataType      `json:"type,omitempty" xml:"type,omitempty"`
+	Name           string                 `json:"name,omitempty" xml:"name,omitempty"`
+	Contents       *ComponentDataContents `json:"contents,omitempty" xml:"contents,omitempty"`
+	Classification string                 `json:"classification,omitempty" xml:"classification,omitempty"`
+	SensitiveData  *[]string              `json:"sensitiveData,omitempty" xml:"sensitiveData,omitempty"`
+	Graphics       *ComponentDataGraphics `json:"graphics,omitempty" xml:"graphics,omitempty"`
+	Description    string                 `json:"description,omitempty" xml:"description,omitempty"`
+	Governance     *DataGovernance        `json:"governance,omitempty" xml:"governance,omitempty"`
 }
 
 type ComponentDataContents struct {
 	Attachment *AttachedText `json:"attachment,omitempty" xml:"attachment,omitempty"`
 	URL        string        `json:"url,omitempty" xml:"url,omitempty"`
 	Properties *[]Property   `json:"properties,omitempty" xml:"properties,omitempty"`
-}
-
-type ComponentDataGovernance struct {
-	Custodians *[]ComponentDataGovernanceResponsibleParty `json:"custodians,omitempty" xml:"custodians>custodian,omitempty"`
-	Stewards   *[]ComponentDataGovernanceResponsibleParty `json:"stewards,omitempty" xml:"stewards>steward,omitempty"`
-	Owners     *[]ComponentDataGovernanceResponsibleParty `json:"owners,omitempty" xml:"owners>owner,omitempty"`
 }
 
 type ComponentDataGovernanceResponsibleParty struct {
@@ -489,8 +528,69 @@ const (
 	DataFlowUnknown       DataFlow = "unknown"
 )
 
+type DataGovernance struct {
+	Custodians *[]ComponentDataGovernanceResponsibleParty `json:"custodians,omitempty" xml:"custodians>custodian,omitempty"`
+	Stewards   *[]ComponentDataGovernanceResponsibleParty `json:"stewards,omitempty" xml:"stewards>steward,omitempty"`
+	Owners     *[]ComponentDataGovernanceResponsibleParty `json:"owners,omitempty" xml:"owners>owner,omitempty"`
+}
+
+type Declarations struct {
+	Assessors    *[]Assessor            `json:"assessors,omitempty" xml:"assessors>assessor,omitempty"`
+	Attestations *[]Attestation         `json:"attestations,omitempty" xml:"attestations>attestation,omitempty"`
+	Claims       *[]Claim               `json:"claims,omitempty" xml:"claims>claim,omitempty"`
+	Evidence     *[]DeclarationEvidence `json:"evidence,omitempty" xml:"evidence>evidence,omitempty"`
+	Targets      *Targets               `json:"targets,omitempty" xml:"targets,omitempty"`
+	Affirmation  *Affirmation           `json:"affirmation,omitempty" xml:"affirmation,omitempty"`
+	Signature    *JSFSignature          `json:"signature,omitempty" xml:"-"`
+}
+
+type DeclarationEvidence struct {
+	BOMRef       string                 `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	PropertyName string                 `json:"propertyName,omitempty" xml:"propertyName,omitempty"`
+	Description  string                 `json:"description,omitempty" xml:"description,omitempty"`
+	Data         *[]EvidenceData        `json:"data,omitempty" xml:"data,omitempty"`
+	Created      string                 `json:"created,omitempty" xml:"created,omitempty"`
+	Expires      string                 `json:"expires,omitempty" xml:"expires,omitempty"`
+	Author       *OrganizationalContact `json:"author,omitempty" xml:"author,omitempty"`
+	Reviewer     *OrganizationalContact `json:"reviewer,omitempty" xml:"reviewer,omitempty"`
+	Signature    *JSFSignature          `json:"signature,omitempty" xml:"-"`
+}
+
 type Definitions struct {
 	Standards *[]StandardDefinition `json:"standards,omitempty" xml:"standards>standard,omitempty"`
+}
+
+type EvidenceData struct {
+	Name           string                `json:"name,omitempty" xml:"name,omitempty"`
+	Contents       *EvidenceDataContents `json:"contents,omitempty" xml:"contents,omitempty"`
+	Classification *DataClassification   `json:"classification,omitempty" xml:"data>classification,omitempty"`
+	SensitiveData  *[]string             `json:"sensitiveData,omitempty" xml:"sensitiveData,omitempty"`
+	Governance     *DataGovernance       `json:"governance,omitempty" xml:"governance,omitempty"`
+}
+
+type EvidenceDataContents struct {
+	Attachment *AttachedText `json:"attachment,omitempty" xml:"attachment,omitempty"`
+	URL        string        `json:"url,omitempty" xml:"url,omitempty"`
+}
+
+type Targets struct {
+	Organizations *[]OrganizationalEntity `json:"organizations,omitempty" xml:"organizations>organization,omitempty"`
+	Components    *[]Component            `json:"components,omitempty" xml:"components>component,omitempty"`
+	Services      *[]Service              `json:"services,omitempty" xml:"services>service,omitempty"`
+}
+
+type Affirmation struct {
+	Statement   string        `json:"statement,omitempty" xml:"statement,omitempty"`
+	Signatories *[]Signatory  `json:"signatories,omitempty" xml:"signatories>signatory,omitempty"`
+	Signature   *JSFSignature `json:"signature,omitempty" xml:"-"`
+}
+
+type Signatory struct {
+	Name              string                `json:"name,omitempty" xml:"name,omitempty"`
+	Role              string                `json:"role,omitempty" xml:"role,omitempty"`
+	Signature         *JSFSignature         `json:"signature,omitempty" xml:"-"`
+	Organization      *OrganizationalEntity `json:"organization,omitempty" xml:"organization,omitempty"`
+	ExternalReference *ExternalReference    `json:"externalReference,omitempty" xml:"externalReference,omitempty"`
 }
 
 type Dependency struct {
