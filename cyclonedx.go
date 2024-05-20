@@ -221,35 +221,37 @@ type Commit struct {
 }
 
 type Component struct {
-	BOMRef             string                `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
-	MIMEType           string                `json:"mime-type,omitempty" xml:"mime-type,attr,omitempty"`
-	Type               ComponentType         `json:"type" xml:"type,attr"`
-	Supplier           *OrganizationalEntity `json:"supplier,omitempty" xml:"supplier,omitempty"`
-	Author             string                `json:"author,omitempty" xml:"author,omitempty"`
-	Publisher          string                `json:"publisher,omitempty" xml:"publisher,omitempty"`
-	Group              string                `json:"group,omitempty" xml:"group,omitempty"`
-	Name               string                `json:"name" xml:"name"`
-	Version            string                `json:"version,omitempty" xml:"version,omitempty"`
-	Description        string                `json:"description,omitempty" xml:"description,omitempty"`
-	Scope              Scope                 `json:"scope,omitempty" xml:"scope,omitempty"`
-	Hashes             *[]Hash               `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
-	Licenses           *Licenses             `json:"licenses,omitempty" xml:"licenses,omitempty"`
-	Copyright          string                `json:"copyright,omitempty" xml:"copyright,omitempty"`
-	CPE                string                `json:"cpe,omitempty" xml:"cpe,omitempty"`
-	PackageURL         string                `json:"purl,omitempty" xml:"purl,omitempty"`
-	OmniborID          *[]string             `json:"omniborId,omitempty" xml:"omniborId,omitempty"`
-	SWHID              *[]string             `json:"swhid,omitempty" xml:"swhid,omitempty"`
-	SWID               *SWID                 `json:"swid,omitempty" xml:"swid,omitempty"`
-	Modified           *bool                 `json:"modified,omitempty" xml:"modified,omitempty"`
-	Pedigree           *Pedigree             `json:"pedigree,omitempty" xml:"pedigree,omitempty"`
-	ExternalReferences *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
-	Properties         *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
-	Components         *[]Component          `json:"components,omitempty" xml:"components>component,omitempty"`
-	Evidence           *Evidence             `json:"evidence,omitempty" xml:"evidence,omitempty"`
-	ReleaseNotes       *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
-	ModelCard          *MLModelCard          `json:"modelCard,omitempty" xml:"modelCard,omitempty"`
-	Data               *ComponentData        `json:"data,omitempty" xml:"data,omitempty"`
-	CryptoProperties   *CryptoProperties     `json:"cryptoProperties,omitempty" xml:"cryptoProperties,omitempty"`
+	BOMRef             string                   `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	MIMEType           string                   `json:"mime-type,omitempty" xml:"mime-type,attr,omitempty"`
+	Type               ComponentType            `json:"type" xml:"type,attr"`
+	Supplier           *OrganizationalEntity    `json:"supplier,omitempty" xml:"supplier,omitempty"`
+	Manufacturer       *OrganizationalEntity    `json:"manufacturer,omitempty" xml:"manufacturer,omitempty"`
+	Author             string                   `json:"author,omitempty" xml:"author,omitempty"` // Deprecated: Use authors or manufacturer instead.
+	Authors            *[]OrganizationalContact `json:"authors,omitempty" xml:"authors>author,omitempty"`
+	Publisher          string                   `json:"publisher,omitempty" xml:"publisher,omitempty"`
+	Group              string                   `json:"group,omitempty" xml:"group,omitempty"`
+	Name               string                   `json:"name" xml:"name"`
+	Version            string                   `json:"version,omitempty" xml:"version,omitempty"`
+	Description        string                   `json:"description,omitempty" xml:"description,omitempty"`
+	Scope              Scope                    `json:"scope,omitempty" xml:"scope,omitempty"`
+	Hashes             *[]Hash                  `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
+	Licenses           *Licenses                `json:"licenses,omitempty" xml:"licenses,omitempty"`
+	Copyright          string                   `json:"copyright,omitempty" xml:"copyright,omitempty"`
+	CPE                string                   `json:"cpe,omitempty" xml:"cpe,omitempty"`
+	PackageURL         string                   `json:"purl,omitempty" xml:"purl,omitempty"`
+	OmniborID          *[]string                `json:"omniborId,omitempty" xml:"omniborId,omitempty"`
+	SWHID              *[]string                `json:"swhid,omitempty" xml:"swhid,omitempty"`
+	SWID               *SWID                    `json:"swid,omitempty" xml:"swid,omitempty"`
+	Modified           *bool                    `json:"modified,omitempty" xml:"modified,omitempty"`
+	Pedigree           *Pedigree                `json:"pedigree,omitempty" xml:"pedigree,omitempty"`
+	ExternalReferences *[]ExternalReference     `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+	Properties         *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
+	Components         *[]Component             `json:"components,omitempty" xml:"components>component,omitempty"`
+	Evidence           *Evidence                `json:"evidence,omitempty" xml:"evidence,omitempty"`
+	ReleaseNotes       *ReleaseNotes            `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
+	ModelCard          *MLModelCard             `json:"modelCard,omitempty" xml:"modelCard,omitempty"`
+	Data               *ComponentData           `json:"data,omitempty" xml:"data,omitempty"`
+	CryptoProperties   *CryptoProperties        `json:"cryptoProperties,omitempty" xml:"cryptoProperties,omitempty"`
 }
 
 type ComponentData struct {
@@ -957,15 +959,16 @@ func (mt MediaType) WithVersion(specVersion SpecVersion) (string, error) {
 }
 
 type Metadata struct {
-	Timestamp   string                   `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
-	Lifecycles  *[]Lifecycle             `json:"lifecycles,omitempty" xml:"lifecycles>lifecycle,omitempty"`
-	Tools       *ToolsChoice             `json:"tools,omitempty" xml:"tools,omitempty"`
-	Authors     *[]OrganizationalContact `json:"authors,omitempty" xml:"authors>author,omitempty"`
-	Component   *Component               `json:"component,omitempty" xml:"component,omitempty"`
-	Manufacture *OrganizationalEntity    `json:"manufacture,omitempty" xml:"manufacture,omitempty"`
-	Supplier    *OrganizationalEntity    `json:"supplier,omitempty" xml:"supplier,omitempty"`
-	Licenses    *Licenses                `json:"licenses,omitempty" xml:"licenses,omitempty"`
-	Properties  *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
+	Timestamp    string                   `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
+	Lifecycles   *[]Lifecycle             `json:"lifecycles,omitempty" xml:"lifecycles>lifecycle,omitempty"`
+	Tools        *ToolsChoice             `json:"tools,omitempty" xml:"tools,omitempty"`
+	Authors      *[]OrganizationalContact `json:"authors,omitempty" xml:"authors>author,omitempty"`
+	Component    *Component               `json:"component,omitempty" xml:"component,omitempty"`
+	Manufacture  *OrganizationalEntity    `json:"manufacture,omitempty" xml:"manufacture,omitempty"` // Deprecated: Use Component Manufacturer instead.
+	Manufacturer *OrganizationalEntity    `json:"manufacturer,omitempty" xml:"manufacturer,omitempty"`
+	Supplier     *OrganizationalEntity    `json:"supplier,omitempty" xml:"supplier,omitempty"`
+	Licenses     *Licenses                `json:"licenses,omitempty" xml:"licenses,omitempty"`
+	Properties   *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
 type MLDatasetChoice struct {
