@@ -1059,6 +1059,7 @@ type OrganizationalContact struct {
 
 type OrganizationalEntity struct {
 	Name    string                   `json:"name" xml:"name"`
+	Address *PostalAddress           `json:"address,omitempty" xml:"address,omitempty"`
 	URL     *[]string                `json:"url,omitempty" xml:"url,omitempty"`
 	Contact *[]OrganizationalContact `json:"contact,omitempty" xml:"contact,omitempty"`
 }
@@ -1096,6 +1097,16 @@ type Pedigree struct {
 	Commits     *[]Commit    `json:"commits,omitempty" xml:"commits>commit,omitempty"`
 	Patches     *[]Patch     `json:"patches,omitempty" xml:"patches>patch,omitempty"`
 	Notes       string       `json:"notes,omitempty" xml:"notes,omitempty"`
+}
+
+type PostalAddress struct {
+	BOMRef              string `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Country             string `json:"country,omitempty" xml:"country,omitempty"`
+	Region              string `json:"region,omitempty" xml:"region,omitempty"`
+	Locality            string `json:"locality,omitempty" xml:"locality,omitempty"`
+	PostOfficeBoxNumber string `json:"postOfficeBoxNumber,omitempty" xml:"postOfficeBoxNumber,omitempty"`
+	PostalCode          string `json:"postalCode,omitempty" xml:"postalCode,omitempty"`
+	StreetAddress       string `json:"streetAddress,omitempty" xml:"streetAddress,omitempty"`
 }
 
 type ProofOfConcept struct {
