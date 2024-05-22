@@ -156,3 +156,22 @@ func Test_convertTools_OrganizationalEntity(t *testing.T) {
 		assert.Nil(t, (*bom.Annotations)[0].Annotator.Service.Provider.Address)
 	})
 }
+
+func Test_convertModelCard(t *testing.T) {
+	t.Run("spec 1.5 and lower", func(t *testing.T) {
+		bom := NewBOM()
+		bom.Metadata = &Metadata{
+			Component: &Component{
+				ModelCard: &MLModelCard{
+					Considerations: &MLModelCardConsiderations{
+						EnvironmentalConsiderations: &MLModelCardEnvironmentalConsiderations{},
+					},
+				},
+			},
+		}
+
+		bom.convert(SpecVersion1_5)
+
+		assert.Nil(t, bom.Metadata.Component.ModelCard.Considerations.EnvironmentalConsiderations)
+	})
+}

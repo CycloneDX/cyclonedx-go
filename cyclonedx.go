@@ -985,12 +985,18 @@ type MLModelCard struct {
 }
 
 type MLModelCardConsiderations struct {
-	Users                 *[]string                          `json:"users,omitempty" xml:"users>user,omitempty"`
-	UseCases              *[]string                          `json:"useCases,omitempty" xml:"useCases>useCase,omitempty"`
-	TechnicalLimitations  *[]string                          `json:"technicalLimitations,omitempty" xml:"technicalLimitations>technicalLimitation,omitempty"`
-	PerformanceTradeoffs  *[]string                          `json:"performanceTradeoffs,omitempty" xml:"performanceTradeoffs>performanceTradeoff,omitempty"`
-	EthicalConsiderations *[]MLModelCardEthicalConsideration `json:"ethicalConsiderations,omitempty" xml:"ethicalConsiderations>ethicalConsideration,omitempty"`
-	FairnessAssessments   *[]MLModelCardFairnessAssessment   `json:"fairnessAssessments,omitempty" xml:"fairnessAssessments>fairnessAssessment,omitempty"`
+	Users                       *[]string                               `json:"users,omitempty" xml:"users>user,omitempty"`
+	UseCases                    *[]string                               `json:"useCases,omitempty" xml:"useCases>useCase,omitempty"`
+	TechnicalLimitations        *[]string                               `json:"technicalLimitations,omitempty" xml:"technicalLimitations>technicalLimitation,omitempty"`
+	PerformanceTradeoffs        *[]string                               `json:"performanceTradeoffs,omitempty" xml:"performanceTradeoffs>performanceTradeoff,omitempty"`
+	EthicalConsiderations       *[]MLModelCardEthicalConsideration      `json:"ethicalConsiderations,omitempty" xml:"ethicalConsiderations>ethicalConsideration,omitempty"`
+	EnvironmentalConsiderations *MLModelCardEnvironmentalConsiderations `json:"environmentalConsiderations,omitempty" xml:"environmentalConsiderations,omitempty"`
+	FairnessAssessments         *[]MLModelCardFairnessAssessment        `json:"fairnessAssessments,omitempty" xml:"fairnessAssessments>fairnessAssessment,omitempty"`
+}
+
+type MLModelCardEnvironmentalConsiderations struct {
+	EnergyConsumptions *[]MLModelEnergyConsumption `json:"energyConsumptions,omitempty" xml:"energyConsumptions>energyConsumption,omitempty"`
+	Properties         *[]Property                 `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
 type MLModelCardEthicalConsideration struct {
@@ -1004,6 +1010,72 @@ type MLModelCardFairnessAssessment struct {
 	Harms              string `json:"harms,omitempty" xml:"harms,omitempty"`
 	MitigationStrategy string `json:"mitigationStrategy,omitempty" xml:"mitigationStrategy,omitempty"`
 }
+
+type MLModelCO2Measure struct {
+	Value float32        `json:"value" xml:"value"`
+	Unit  MLModelCO2Unit `json:"unit" xml:"unit"`
+}
+
+type MLModelCO2Unit string
+
+const MLModelCO2UnitTCO2Eq MLModelCO2Unit = "tCO2eq"
+
+type MLModelEnergyConsumption struct {
+	Activity           MLModelEnergyConsumptionActivity `json:"activity" xml:"activity"`
+	EnergyProviders    *[]MLModelEnergyProvider         `json:"energyProviders" xml:"energyProviders"`
+	ActivityEnergyCost MLModelEnergyMeasure             `json:"activityEnergyCost" xml:"activityEnergyCost"`
+	CO2CostEquivalent  *MLModelCO2Measure               `json:"co2CostEquivalent,omitempty" xml:"co2CostEquivalent,omitempty"`
+	CO2CostOffset      *MLModelCO2Measure               `json:"co2CostOffset,omitempty" xml:"co2CostOffset,omitempty"`
+	Properties         *[]Property                      `json:"properties,omitempty" xml:"properties>property,omitempty"`
+}
+
+type MLModelEnergyConsumptionActivity string
+
+const (
+	MLModelEnergyConsumptionActivityDesign          MLModelEnergyConsumptionActivity = "design"
+	MLModelEnergyConsumptionActivityDataCollection  MLModelEnergyConsumptionActivity = "data-collection"
+	MLModelEnergyConsumptionActivityDataPreparation MLModelEnergyConsumptionActivity = "data-preparation"
+	MLModelEnergyConsumptionActivityTraining        MLModelEnergyConsumptionActivity = "training"
+	MLModelEnergyConsumptionActivityFineTuning      MLModelEnergyConsumptionActivity = "fine-tuning"
+	MLModelEnergyConsumptionActivityValidation      MLModelEnergyConsumptionActivity = "validation"
+	MLModelEnergyConsumptionActivityDeployment      MLModelEnergyConsumptionActivity = "deployment"
+	MLModelEnergyConsumptionActivityInference       MLModelEnergyConsumptionActivity = "inference"
+	MLModelEnergyConsumptionActivityOther           MLModelEnergyConsumptionActivity = "other"
+)
+
+type MLModelEnergyMeasure struct {
+	Value float32           `json:"value" xml:"value"`
+	Unit  MLModelEnergyUnit `json:"unit" xml:"unit"`
+}
+
+type MLModelEnergyProvider struct {
+	BOMRef             string                `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Description        string                `json:"description,omitempty" xml:"description,omitempty"`
+	Organization       *OrganizationalEntity `json:"organization" xml:"organization"`
+	EnergySource       MLModelEnergySource   `json:"energySource" xml:"energySource"`
+	EnergyProvided     *MLModelEnergyMeasure `json:"energyProvided" xml:"energyProvided"`
+	ExternalReferences *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+}
+
+type MLModelEnergySource string
+
+const (
+	MLModelEnergySourceCoal       MLModelEnergySource = "coal"
+	MLModelEnergySourceOil        MLModelEnergySource = "oil"
+	MLModelEnergySourceNaturalGas MLModelEnergySource = "natural-gas"
+	MLModelEnergySourceNuclear    MLModelEnergySource = "nuclear"
+	MLModelEnergySourceWind       MLModelEnergySource = "wind"
+	MLModelEnergySourceSolar      MLModelEnergySource = "solar"
+	MLModelEnergySourceGeothermal MLModelEnergySource = "geothermal"
+	MLModelEnergySourceHydropower MLModelEnergySource = "hydropower"
+	MLModelEnergySourceBiofuel    MLModelEnergySource = "biofuel"
+	MLModelEnergySourceUnknown    MLModelEnergySource = "unknown"
+	MLModelEnergySourceOther      MLModelEnergySource = "other"
+)
+
+type MLModelEnergyUnit string
+
+const MLModelEnergyUnitKWH MLModelEnergyUnit = "kWh"
 
 type MLModelParameters struct {
 	Approach           *MLModelParametersApproach `json:"approach,omitempty" xml:"approach,omitempty"`

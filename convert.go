@@ -157,6 +157,7 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 		convertHashes(c.Hashes, specVersion)
 		convertLicenses(c.Licenses, specVersion)
 		convertEvidence(c, specVersion)
+		convertModelCard(c, specVersion)
 
 		if !specVersion.supportsScope(c.Scope) {
 			c.Scope = ""
@@ -325,6 +326,18 @@ func convertOrganizationalEntity(org *OrganizationalEntity, specVersion SpecVers
 
 	if specVersion < SpecVersion1_6 {
 		org.Address = nil
+	}
+}
+
+func convertModelCard(c *Component, specVersion SpecVersion) {
+	if c.ModelCard == nil {
+		return
+	}
+
+	if specVersion < SpecVersion1_6 {
+		if c.ModelCard.Considerations != nil {
+			c.ModelCard.Considerations.EnvironmentalConsiderations = nil
+		}
 	}
 }
 
