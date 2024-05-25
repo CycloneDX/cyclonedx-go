@@ -66,13 +66,11 @@ func (b *BOM) convert(specVersion SpecVersion) {
 			b.Metadata.Lifecycles = nil
 		}
 
-		if specVersion < SpecVersion1_5 {
-			b.Metadata.Lifecycles = nil
-		}
-
 		recurseComponent(b.Metadata.Component, componentConverter(specVersion))
 		convertLicenses(b.Metadata.Licenses, specVersion)
 		convertTools(b.Metadata.Tools, specVersion)
+		convertOrganizationalEntity(b.Metadata.Manufacture, specVersion)
+		convertOrganizationalEntity(b.Metadata.Supplier, specVersion)
 	}
 
 	if b.Components != nil {
@@ -97,6 +95,10 @@ func (b *BOM) convert(specVersion SpecVersion) {
 
 	if b.ExternalReferences != nil {
 		convertExternalReferences(b.ExternalReferences, specVersion)
+	}
+
+	if b.Annotations != nil {
+		convertAnnotations(b.Annotations, specVersion)
 	}
 
 	b.SpecVersion = specVersion
@@ -293,10 +295,36 @@ func convertLicenses(licenses *Licenses, specVersion SpecVersion) {
 	if specVersion < SpecVersion1_6 {
 		for i := range *licenses {
 			choice := &(*licenses)[i]
-			if choice.License != nil {
-				choice.License.Acknowledgement = ""
+			if choice.License == nil {
+				continue
+			}
+
+			choice.License.Acknowledgement = ""
+
+			if choice.License.Licensing == nil {
+				continue
+			}
+
+			if choice.License.Licensing.Licensor != nil {
+				convertOrganizationalEntity(choice.License.Licensing.Licensor.Organization, specVersion)
+			}
+			if choice.License.Licensing.Licensee != nil {
+				convertOrganizationalEntity(choice.License.Licensing.Licensee.Organization, specVersion)
+			}
+			if choice.License.Licensing.Purchaser != nil {
+				convertOrganizationalEntity(choice.License.Licensing.Purchaser.Organization, specVersion)
 			}
 		}
+	}
+}
+
+func convertOrganizationalEntity(org *OrganizationalEntity, specVersion SpecVersion) {
+	if org == nil {
+		return
+	}
+
+	if specVersion < SpecVersion1_6 {
+		org.Address = nil
 	}
 }
 
@@ -316,6 +344,16 @@ func convertVulnerabilities(vulns *[]Vulnerability, specVersion SpecVersion) {
 			vuln.Workaround = ""
 		}
 
+		if specVersion < SpecVersion1_6 {
+			if vuln.Credits != nil {
+				if vuln.Credits.Organizations != nil {
+					for i := range *vuln.Credits.Organizations {
+						convertOrganizationalEntity(&(*vuln.Credits.Organizations)[i], specVersion)
+					}
+				}
+			}
+		}
+
 		if vuln.Ratings != nil {
 			for j := range *vuln.Ratings {
 				rating := &(*vuln.Ratings)[j]
@@ -323,6 +361,25 @@ func convertVulnerabilities(vulns *[]Vulnerability, specVersion SpecVersion) {
 					rating.Method = ScoringMethodOther
 				}
 			}
+		}
+	}
+}
+
+func convertAnnotations(annotations *[]Annotation, specVersion SpecVersion) {
+	if annotations == nil {
+		return
+	}
+
+	if specVersion < SpecVersion1_6 {
+		for i := range *annotations {
+			ann := (*annotations)[i]
+
+			if ann.Annotator == nil {
+				continue
+			}
+
+			convertOrganizationalEntity(ann.Annotator.Organization, specVersion)
+			recurseService(ann.Annotator.Service, serviceConverter(specVersion))
 		}
 	}
 }
@@ -338,6 +395,7 @@ func serviceConverter(specVersion SpecVersion) func(*Service) {
 			s.ReleaseNotes = nil
 		}
 
+		convertOrganizationalEntity(s.Provider, specVersion)
 		convertExternalReferences(s.ExternalReferences, specVersion)
 	}
 }
@@ -376,6 +434,12 @@ func convertTools(tools *ToolsChoice, specVersion SpecVersion) {
 			} else {
 				*tools.Tools = append(*tools.Tools, convertedTools...)
 			}
+		}
+	}
+
+	if tools.Services != nil {
+		for i := range *tools.Services {
+			convertOrganizationalEntity((*tools.Services)[i].Provider, specVersion)
 		}
 	}
 
