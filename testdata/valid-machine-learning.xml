@@ -77,6 +77,36 @@
                             <mitigationStrategy>Strategy used to address this risk</mitigationStrategy>
                         </ethicalConsideration>
                     </ethicalConsiderations>
+                    <environmentalConsiderations>
+                        <energyConsumptions>
+                            <energyConsumption>
+                                <activity>training</activity>
+                                <energyProviders bom-ref="energy-provider-a">
+                                    <description>An energy provider.</description>
+                                    <organization>
+                                        <name>Unlimited Energy Inc.</name>
+                                    </organization>
+                                    <energySource>other</energySource>
+                                    <energyProvided>
+                                        <value>1.0</value>
+                                        <unit>kWh</unit>
+                                    </energyProvided>
+                                </energyProviders>
+                                <activityEnergyCost>
+                                    <value>1.0</value>
+                                    <unit>kWh</unit>
+                                </activityEnergyCost>
+                                <co2CostEquivalent>
+                                    <value>1.0</value>
+                                    <unit>tCO2eq</unit>
+                                </co2CostEquivalent>
+                                <co2CostOffset>
+                                    <value>1.0</value>
+                                    <unit>tCO2eq</unit>
+                                </co2CostOffset>
+                            </energyConsumption>
+                        </energyConsumptions>
+                    </environmentalConsiderations>
                     <fairnessAssessments>
                         <fairnessAssessment>
                             <groupAtRisk>The groups or individuals at risk of being systematically disadvantaged by the model</groupAtRisk>
