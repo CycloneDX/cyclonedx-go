@@ -6,6 +6,7 @@
   "metadata": {
     "authors": [
       {
+        "bom-ref": "author-1",
         "name": "Samantha Wright",
         "email": "samantha.wright@example.com",
         "phone": "800-555-1212"

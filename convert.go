@@ -71,6 +71,12 @@ func (b *BOM) convert(specVersion SpecVersion) {
 		convertTools(b.Metadata.Tools, specVersion)
 		convertOrganizationalEntity(b.Metadata.Manufacture, specVersion)
 		convertOrganizationalEntity(b.Metadata.Supplier, specVersion)
+
+		if b.Metadata.Authors != nil {
+			for i := range *b.Metadata.Authors {
+				convertOrganizationalContact(&(*b.Metadata.Authors)[i], specVersion)
+			}
+		}
 	}
 
 	if b.Components != nil {
@@ -324,8 +330,28 @@ func convertOrganizationalEntity(org *OrganizationalEntity, specVersion SpecVers
 		return
 	}
 
+	if specVersion < SpecVersion1_5 {
+		org.BOMRef = ""
+
+		if org.Contact != nil {
+			for i := range *org.Contact {
+				convertOrganizationalContact(&(*org.Contact)[i], specVersion)
+			}
+		}
+	}
+
 	if specVersion < SpecVersion1_6 {
 		org.Address = nil
+	}
+}
+
+func convertOrganizationalContact(c *OrganizationalContact, specVersion SpecVersion) {
+	if c == nil {
+		return
+	}
+
+	if specVersion < SpecVersion1_5 {
+		c.BOMRef = ""
 	}
 }
 
@@ -362,6 +388,12 @@ func convertVulnerabilities(vulns *[]Vulnerability, specVersion SpecVersion) {
 				if vuln.Credits.Organizations != nil {
 					for i := range *vuln.Credits.Organizations {
 						convertOrganizationalEntity(&(*vuln.Credits.Organizations)[i], specVersion)
+					}
+				}
+
+				if vuln.Credits.Individuals != nil {
+					for i := range *vuln.Credits.Individuals {
+						convertOrganizationalContact(&(*vuln.Credits.Individuals)[i], specVersion)
 					}
 				}
 			}
