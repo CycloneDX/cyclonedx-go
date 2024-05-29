@@ -1124,12 +1124,14 @@ type Note struct {
 }
 
 type OrganizationalContact struct {
-	Name  string `json:"name,omitempty" xml:"name,omitempty"`
-	Email string `json:"email,omitempty" xml:"email,omitempty"`
-	Phone string `json:"phone,omitempty" xml:"phone,omitempty"`
+	BOMRef string `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Name   string `json:"name,omitempty" xml:"name,omitempty"`
+	Email  string `json:"email,omitempty" xml:"email,omitempty"`
+	Phone  string `json:"phone,omitempty" xml:"phone,omitempty"`
 }
 
 type OrganizationalEntity struct {
+	BOMRef  string                   `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
 	Name    string                   `json:"name" xml:"name"`
 	Address *PostalAddress           `json:"address,omitempty" xml:"address,omitempty"`
 	URL     *[]string                `json:"url,omitempty" xml:"url,omitempty"`
