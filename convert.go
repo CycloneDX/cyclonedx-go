@@ -66,6 +66,10 @@ func (b *BOM) convert(specVersion SpecVersion) {
 			b.Metadata.Lifecycles = nil
 		}
 
+		if specVersion < SpecVersion1_6 {
+			b.Metadata.Manufacturer = nil
+		}
+
 		recurseComponent(b.Metadata.Component, componentConverter(specVersion))
 		convertLicenses(b.Metadata.Licenses, specVersion)
 		convertTools(b.Metadata.Tools, specVersion)
@@ -153,6 +157,8 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 		if specVersion < SpecVersion1_6 {
 			c.SWHID = nil
 			c.OmniborID = nil
+			c.Manufacturer = nil
+			c.Authors = nil
 		}
 
 		if !specVersion.supportsComponentType(c.Type) {

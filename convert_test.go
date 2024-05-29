@@ -175,3 +175,47 @@ func Test_convertModelCard(t *testing.T) {
 		assert.Nil(t, bom.Metadata.Component.ModelCard.Considerations.EnvironmentalConsiderations)
 	})
 }
+
+func Test_convertManufacturer(t *testing.T) {
+	t.Run("spec 1.5 and lower", func(t *testing.T) {
+		bom := NewBOM()
+		bom.Metadata = &Metadata{
+			Manufacturer: &OrganizationalEntity{
+				Name: "Acme, Inc.",
+			},
+		}
+		bom.Components = &[]Component{
+			{
+				Name: "foo",
+				Manufacturer: &OrganizationalEntity{
+					Name: "Acme, Inc.",
+				},
+			},
+		}
+
+		bom.convert(SpecVersion1_5)
+
+		assert.Nil(t, bom.Metadata.Manufacturer)
+		assert.Nil(t, (*bom.Components)[0].Manufacturer)
+	})
+}
+
+func Test_convertAuthors(t *testing.T) {
+	t.Run("spec 1.5 and lower", func(t *testing.T) {
+		bom := NewBOM()
+		bom.Components = &[]Component{
+			{
+				Name: "foo",
+				Authors: &[]OrganizationalContact{
+					{
+						Name: "Acme Professional Services",
+					},
+				},
+			},
+		}
+
+		bom.convert(SpecVersion1_5)
+
+		assert.Nil(t, (*bom.Components)[0].Authors)
+	})
+}
