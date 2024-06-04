@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bom xmlns="http://cyclonedx.org/schema/bom/1.5" serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1">
+<bom xmlns="http://cyclonedx.org/schema/bom/1.6" serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1">
   <components>
     <component bom-ref="component-a" type="machine-learning-model">
       <publisher>Acme Inc</publisher>
@@ -77,6 +77,36 @@
               <mitigationStrategy>Strategy used to address this risk</mitigationStrategy>
             </ethicalConsideration>
           </ethicalConsiderations>
+          <environmentalConsiderations>
+            <energyConsumptions>
+              <energyConsumption>
+                <activity>training</activity>
+                <energyProviders bom-ref="energy-provider-a">
+                  <description>An energy provider.</description>
+                  <organization>
+                    <name>Unlimited Energy Inc.</name>
+                  </organization>
+                  <energySource>other</energySource>
+                  <energyProvided>
+                    <value>1</value>
+                    <unit>kWh</unit>
+                  </energyProvided>
+                </energyProviders>
+                <activityEnergyCost>
+                  <value>1</value>
+                  <unit>kWh</unit>
+                </activityEnergyCost>
+                <co2CostEquivalent>
+                  <value>1</value>
+                  <unit>tCO2eq</unit>
+                </co2CostEquivalent>
+                <co2CostOffset>
+                  <value>1</value>
+                  <unit>tCO2eq</unit>
+                </co2CostOffset>
+              </energyConsumption>
+            </energyConsumptions>
+          </environmentalConsiderations>
           <fairnessAssessments>
             <fairnessAssessment>
               <groupAtRisk>The groups or individuals at risk of being systematically disadvantaged by the model</groupAtRisk>

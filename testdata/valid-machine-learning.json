@@ -1,6 +1,6 @@
 {
   "bomFormat": "CycloneDX",
-  "specVersion": "1.5",
+  "specVersion": "1.6",
   "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
   "version": 1,
   "components": [
@@ -29,8 +29,16 @@
               "classification": "public"
             }
           ],
-          "inputs": [ { "format": "string" } ],
-          "outputs": [ { "format": "byte[]" } ]
+          "inputs": [
+            {
+              "format": "string"
+            }
+          ],
+          "outputs": [
+            {
+              "format": "byte[]"
+            }
+          ]
         },
         "quantitativeAnalysis": {
           "performanceMetrics": [
@@ -77,6 +85,39 @@
               "mitigationStrategy": "Strategy used to address this risk"
             }
           ],
+          "environmentalConsiderations": {
+            "energyConsumptions": [
+              {
+                "activity": "training",
+                "energyProviders": [
+                  {
+                    "bom-ref": "energy-provider-a",
+                    "description": "An energy provider.",
+                    "organization": {
+                      "name": "Unlimited Energy Inc."
+                    },
+                    "energySource": "other",
+                    "energyProvided": {
+                      "value": 1,
+                      "unit": "kWh"
+                    }
+                  }
+                ],
+                "activityEnergyCost": {
+                  "value": 1,
+                  "unit": "kWh"
+                },
+                "co2CostEquivalent": {
+                  "value": 1,
+                  "unit": "tCO2eq"
+                },
+                "co2CostOffset": {
+                  "value": 1,
+                  "unit": "tCO2eq"
+                }
+              }
+            ]
+          },
           "fairnessAssessments": [
             {
               "groupAtRisk": "The groups or individuals at risk of being systematically disadvantaged by the model",

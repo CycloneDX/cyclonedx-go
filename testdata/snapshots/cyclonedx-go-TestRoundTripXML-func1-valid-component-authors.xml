@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.6" serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1">
+  <components>
+    <component type="application">
+      <authors>
+        <author>
+          <name>Anthony Edward Stark</name>
+          <email>ironman@example.org</email>
+          <phone>555-212-970-4133</phone>
+        </author>
+        <author>
+          <name>Peter Benjamin Parker</name>
+          <email>spiderman@example.org</email>
+        </author>
+      </authors>
+      <name>Acme Application</name>
+      <version>9.1.1</version>
+    </component>
+  </components>
+</bom>
