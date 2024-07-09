@@ -12,8 +12,8 @@ workflows:
           context:
             - snyk-bot-slack
           channel: team-unify-alerts
-          trusted-branch: main
+          trusted-branch: master
           filters:
             branches:
               ignore:
-                - main
+                - master
