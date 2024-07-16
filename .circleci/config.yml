@@ -3,6 +3,20 @@ version: 2.1
 orbs:
   prodsec: snyk/prodsec-orb@1
 
+go_image: &go_image
+  resource_class: small
+  docker:
+    - image: cimg/go:1.21
+
+jobs:
+  security-scans:
+    <<: *go_image
+    steps:
+      - checkout
+      - prodsec/security_scans:
+          mode: auto
+          iac-scan: disabled
+
 workflows:
   version: 2
   CICD:
@@ -17,3 +31,7 @@ workflows:
             branches:
               ignore:
                 - master
+
+      - security-scans:
+          name: Security Scans
+          context: analysis_unify
