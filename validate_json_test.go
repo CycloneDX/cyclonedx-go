@@ -18,6 +18,7 @@
 package cyclonedx
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/xeipuuv/gojsonschema"
@@ -60,5 +61,5 @@ func (jv jsonValidator) Validate(bom []byte, specVersion SpecVersion) error {
 		errSummary += fmt.Sprintf("\n  - %s", verr.String())
 	}
 
-	return fmt.Errorf(errSummary)
+	return errors.New(errSummary)
 }
