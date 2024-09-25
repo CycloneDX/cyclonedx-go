@@ -1073,7 +1073,7 @@
           "title": "AI/ML Model Card"
         },
         "data": {
-          "type": "array",
+          "type": "object",
           "items": {"$ref": "#/definitions/componentData"},
           "title": "Data",
           "description": "This object SHOULD be specified for any component of type `data` and MUST NOT be specified for other component types."
