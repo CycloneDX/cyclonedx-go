@@ -250,7 +250,7 @@ type Component struct {
 	Evidence           *Evidence                `json:"evidence,omitempty" xml:"evidence,omitempty"`
 	ReleaseNotes       *ReleaseNotes            `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
 	ModelCard          *MLModelCard             `json:"modelCard,omitempty" xml:"modelCard,omitempty"`
-	Data               *ComponentData           `json:"data,omitempty" xml:"data,omitempty"`
+	Data               *[]ComponentData         `json:"data,omitempty" xml:"data,omitempty"`
 	CryptoProperties   *CryptoProperties        `json:"cryptoProperties,omitempty" xml:"cryptoProperties,omitempty"`
 }
 
