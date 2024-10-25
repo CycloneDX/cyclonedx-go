@@ -369,3 +369,345 @@ func TestMLDatasetChoice_UnmarshalXML(t *testing.T) {
 		require.Nil(t, choice.ComponentData)
 	})
 }
+
+func TestEvidence_MarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		evidence := Evidence{}
+		xmlBytes, err := xml.Marshal(evidence)
+		require.NoError(t, err)
+		require.Equal(t, "", string(xmlBytes))
+	})
+
+	t.Run("WithOccurrences", func(t *testing.T) {
+		evidence := Evidence{
+			Occurrences: &[]EvidenceOccurrence{
+				{
+					BOMRef:   "d6bf237e-4e11-4713-9f62-56d18d5e2079",
+					Location: "/path/to/component",
+				},
+				{
+					BOMRef:   "b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175",
+					Location: "/another/path/to/component",
+				},
+			},
+		}
+		xmlBytes, err := xml.Marshal(evidence)
+		require.NoError(t, err)
+		require.Equal(t, `<Evidence><occurrences><occurrence bom-ref="d6bf237e-4e11-4713-9f62-56d18d5e2079"><location>/path/to/component</location></occurrence><occurrence bom-ref="b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175"><location>/another/path/to/component</location></occurrence></occurrences></Evidence>`, string(xmlBytes))
+	})
+
+	t.Run("WithCallstack", func(t *testing.T) {
+		evidence := Evidence{
+			Callstack: &Callstack{
+				Frames: &[]CallstackFrame{
+					{
+						Package:  "com.apache.logging.log4j.core",
+						Module:   "Logger.class",
+						Function: "logMessage",
+						Parameters: &[]string{
+							"com.acme.HelloWorld",
+							"Level.INFO",
+						},
+						Line:         toPointer(t, 150),
+						Column:       toPointer(t, 17),
+						FullFilename: "/path/to/log4j-core-2.14.0.jar!/org/apache/logging/log4j/core/Logger.class",
+					},
+					{
+						Module:       "HelloWorld.class",
+						Function:     "main",
+						Line:         toPointer(t, 20),
+						Column:       toPointer(t, 12),
+						FullFilename: "/path/to/HelloWorld.class",
+					},
+				},
+			},
+		}
+		xmlBytes, err := xml.Marshal(evidence)
+		require.NoError(t, err)
+		require.Equal(t, `<Evidence><callstack><frames><frame><package>com.apache.logging.log4j.core</package><module>Logger.class</module><function>logMessage</function><parameters><parameter>com.acme.HelloWorld</parameter><parameter>Level.INFO</parameter></parameters><line>150</line><column>17</column><fullFilename>/path/to/log4j-core-2.14.0.jar!/org/apache/logging/log4j/core/Logger.class</fullFilename></frame><frame><module>HelloWorld.class</module><function>main</function><line>20</line><column>12</column><fullFilename>/path/to/HelloWorld.class</fullFilename></frame></frames></callstack></Evidence>`, string(xmlBytes))
+	})
+	t.Run("WithLicenses", func(t *testing.T) {
+		evidence := Evidence{
+			Licenses: &Licenses{
+				{
+					License: &License{
+						ID:  "Apache-2.0",
+						URL: "http://www.apache.org/licenses/LICENSE-2.0",
+					},
+				},
+				{
+					License: &License{
+						ID:  "LGPL-2.1-only",
+						URL: "https://opensource.org/licenses/LGPL-2.1",
+					},
+				},
+			},
+		}
+		xmlBytes, err := xml.Marshal(evidence)
+		require.NoError(t, err)
+		require.Equal(t, `<Evidence><licenses><license><id>Apache-2.0</id><url>http://www.apache.org/licenses/LICENSE-2.0</url></license><license><id>LGPL-2.1-only</id><url>https://opensource.org/licenses/LGPL-2.1</url></license></licenses></Evidence>`, string(xmlBytes))
+	})
+	t.Run("WithCopyright", func(t *testing.T) {
+		evidence := Evidence{
+			Copyright: &[]Copyright{
+				{
+					Text: "Copyright 2012 Google Inc. All Rights Reserved.",
+				},
+				{
+					Text: "Copyright (C) 2004,2005 Dave Brosius <dbrosius@users.sourceforge.net>",
+				},
+			},
+		}
+		xmlBytes, err := xml.Marshal(evidence)
+		require.NoError(t, err)
+		require.Equal(t, `<Evidence><copyright><text>Copyright 2012 Google Inc. All Rights Reserved.</text><text>Copyright (C) 2004,2005 Dave Brosius &lt;dbrosius@users.sourceforge.net&gt;</text></copyright></Evidence>`, string(xmlBytes))
+	})
+
+	t.Run("WithIdentify", func(t *testing.T) {
+		evidence := Evidence{
+			Identity: &[]EvidenceIdentity{
+				{
+					Field:      EvidenceIdentityFieldTypePURL,
+					Confidence: toPointer(t, float32(1)),
+					Methods: &[]EvidenceIdentityMethod{
+						{
+							Technique:  "filename",
+							Confidence: toPointer(t, float32(0.1)),
+							Value:      "findbugs-project-3.0.0.jar",
+						},
+						{
+							Technique:  "ast-fingerprint",
+							Confidence: toPointer(t, float32(0.9)),
+							Value:      "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab",
+						},
+					},
+					Tools: &[]BOMReference{
+						"bom-ref-of-tool-that-performed-analysis",
+					},
+				},
+			},
+		}
+		xmlBytes, err := xml.Marshal(evidence)
+		require.NoError(t, err)
+		require.Equal(t, `<Evidence><identity><field>purl</field><confidence>1</confidence><methods><method><technique>filename</technique><confidence>0.1</confidence><value>findbugs-project-3.0.0.jar</value></method><method><technique>ast-fingerprint</technique><confidence>0.9</confidence><value>61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab</value></method></methods><tools><tool ref="bom-ref-of-tool-that-performed-analysis"></tool></tools></identity></Evidence>`, string(xmlBytes))
+	})
+}
+
+func TestEvidence_UnmarshalXML(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		var evidence Evidence
+		err := xml.Unmarshal([]byte(`<evidence></evidence>`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, Evidence{}, evidence)
+	})
+
+	t.Run("WithOccurrences", func(t *testing.T) {
+		var evidence Evidence
+		err := xml.Unmarshal([]byte(`
+<evidence>
+	<occurrences>
+		<occurrence bom-ref="d6bf237e-4e11-4713-9f62-56d18d5e2079">
+			<location>/path/to/component</location>
+		</occurrence>
+		<occurrence bom-ref="b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175">
+			<location>/another/path/to/component</location>
+		</occurrence>
+	</occurrences>
+</evidence>`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, &[]EvidenceOccurrence{
+			{
+				BOMRef:   "d6bf237e-4e11-4713-9f62-56d18d5e2079",
+				Location: "/path/to/component",
+			},
+			{
+				BOMRef:   "b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175",
+				Location: "/another/path/to/component",
+			},
+		}, evidence.Occurrences)
+	})
+
+	t.Run("WithCallstack", func(t *testing.T) {
+		var evidence Evidence
+		err := xml.Unmarshal([]byte(`
+<evidence>
+	<callstack>
+		<frames>
+			<frame>
+				<package>com.apache.logging.log4j.core</package>
+				<module>Logger.class</module>
+				<function>logMessage</function>
+				<parameters>
+					<parameter>com.acme.HelloWorld</parameter>
+					<parameter>Level.INFO</parameter>
+				</parameters>
+				<line>150</line>
+				<column>17</column>
+				<fullFilename>/path/to/log4j-core-2.14.0.jar!/org/apache/logging/log4j/core/Logger.class</fullFilename>
+			</frame>
+			<frame>
+				<module>HelloWorld.class</module>
+				<function>main</function>
+				<line>20</line>
+				<column>12</column>
+				<fullFilename>/path/to/HelloWorld.class</fullFilename>
+			</frame>
+		</frames>
+	</callstack>
+</evidence>`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, &Callstack{
+			Frames: &[]CallstackFrame{
+				{
+					Package:  "com.apache.logging.log4j.core",
+					Module:   "Logger.class",
+					Function: "logMessage",
+					Parameters: &[]string{
+						"com.acme.HelloWorld",
+						"Level.INFO",
+					},
+					Line:         toPointer(t, 150),
+					Column:       toPointer(t, 17),
+					FullFilename: "/path/to/log4j-core-2.14.0.jar!/org/apache/logging/log4j/core/Logger.class",
+				},
+				{
+					Module:       "HelloWorld.class",
+					Function:     "main",
+					Line:         toPointer(t, 20),
+					Column:       toPointer(t, 12),
+					FullFilename: "/path/to/HelloWorld.class",
+				},
+			},
+		}, evidence.Callstack)
+	})
+	t.Run("WithLicenses", func(t *testing.T) {
+		var evidence Evidence
+		err := xml.Unmarshal([]byte(`
+<evidence>
+	<licenses>
+		<license>
+			<id>Apache-2.0</id>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+		<license>
+			<id>LGPL-2.1-only</id>
+			<url>https://opensource.org/licenses/LGPL-2.1</url>
+		</license>
+	</licenses>
+</evidence>`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, &Licenses{
+			{
+				License: &License{
+					ID:  "Apache-2.0",
+					URL: "http://www.apache.org/licenses/LICENSE-2.0",
+				},
+			},
+			{
+				License: &License{
+					ID:  "LGPL-2.1-only",
+					URL: "https://opensource.org/licenses/LGPL-2.1",
+				},
+			},
+		}, evidence.Licenses)
+	})
+
+	t.Run("WithCopyright", func(t *testing.T) {
+		var evidence Evidence
+		err := xml.Unmarshal([]byte(`
+<evidence>
+	<copyright>
+		<text><![CDATA[Copyright 2012 Google Inc. All Rights Reserved.]]></text>
+		<text><![CDATA[Copyright (C) 2004,2005 Dave Brosius <dbrosius@users.sourceforge.net>]]></text>
+	</copyright>
+</evidence>`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, &[]Copyright{
+			{
+				Text: "Copyright 2012 Google Inc. All Rights Reserved.",
+			},
+			{
+				Text: "Copyright (C) 2004,2005 Dave Brosius <dbrosius@users.sourceforge.net>",
+			},
+		}, evidence.Copyright)
+	})
+
+	t.Run("WithIdentifyAsStruct", func(t *testing.T) {
+		var evidence Evidence
+		err := xml.Unmarshal([]byte(`
+<evidence>
+	<identity>
+		<field>purl</field>
+		<confidence>1</confidence>
+		<methods>
+			<method>
+				<technique>filename</technique>
+				<confidence>0.1</confidence>
+				<value>findbugs-project-3.0.0.jar</value>
+			</method>
+			<method>
+				<technique>ast-fingerprint</technique>
+				<confidence>0.9</confidence>
+				<value>61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab</value>
+			</method>
+		</methods>
+		<tools>
+			<tool ref="bom-ref-of-tool-that-performed-analysis"/>
+		</tools>
+	</identity>
+</evidence>`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, &[]EvidenceIdentity{
+			{
+				Field:      EvidenceIdentityFieldTypePURL,
+				Confidence: toPointer(t, float32(1)),
+				Methods: &[]EvidenceIdentityMethod{
+					{
+						Technique:  "filename",
+						Confidence: toPointer(t, float32(0.1)),
+						Value:      "findbugs-project-3.0.0.jar",
+					},
+					{
+						Technique:  "ast-fingerprint",
+						Confidence: toPointer(t, float32(0.9)),
+						Value:      "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab",
+					},
+				},
+				Tools: &[]BOMReference{
+					"bom-ref-of-tool-that-performed-analysis",
+				},
+			},
+		}, evidence.Identity)
+	})
+
+	t.Run("WithIdentifyAsArray", func(t *testing.T) {
+		var evidence Evidence
+		err := xml.Unmarshal([]byte(`
+<evidence>
+	<identity>
+		<field>purl</field>
+		<confidence>1</confidence>
+	</identity>
+	<identity>
+		<field>name</field>
+		<confidence>0.1</confidence>
+	</identity>
+</evidence>`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, &[]EvidenceIdentity{
+			{
+				Field:      EvidenceIdentityFieldTypePURL,
+				Confidence: toPointer(t, float32(1)),
+			},
+			{
+				Field:      EvidenceIdentityFieldTypeName,
+				Confidence: toPointer(t, float32(0.1)),
+			},
+		}, evidence.Identity)
+	})
+}
+
+func toPointer[V int | float32](t *testing.T, v V) *V {
+	t.Helper()
+	return &v
+}

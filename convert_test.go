@@ -42,7 +42,7 @@ func Test_componentConverter_convertEvidence(t *testing.T) {
 
 		comp := Component{
 			Evidence: &Evidence{
-				Identity:    &EvidenceIdentity{},
+				Identity:    &[]EvidenceIdentity{},
 				Occurrences: &[]EvidenceOccurrence{},
 				Callstack:   &Callstack{},
 				Copyright:   &[]Copyright{{Text: "foo"}},
