@@ -521,34 +521,6 @@ func (ev *Evidence) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 	return nil
 }
 
-//func (eic *EvidenceIdentityChoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-//	// Try to decode as single struct
-//	var evidenceIdentity []EvidenceIdentity
-//	err := d.DecodeElement(&evidenceIdentity, &start)
-//	if err != nil {
-//		// Try to decode as array
-//		var evidenceIdentities []EvidenceIdentity
-//		err = d.DecodeElement(&evidenceIdentities, &start)
-//		if err != nil {
-//			return fmt.Errorf("unable to decode EvidenceIdentity as array or single struct (depricated): %v", err)
-//		}
-//		*eic = EvidenceIdentityChoice{
-//			EvidenceIdentities: evidenceIdentities,
-//		}
-//		return nil
-//	}
-//
-//	//if evidenceIdentity.Field != "" {
-//	//	*eic = EvidenceIdentityChoice{
-//	//		EvidenceIdentities: []EvidenceIdentity{
-//	//			evidenceIdentity,
-//	//		},
-//	//	}
-//	//}
-//
-//	return nil
-//}
-
 var xmlNamespaces = map[SpecVersion]string{
 	SpecVersion1_0: "http://cyclonedx.org/schema/bom/1.0",
 	SpecVersion1_1: "http://cyclonedx.org/schema/bom/1.1",
