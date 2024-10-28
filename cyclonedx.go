@@ -623,7 +623,7 @@ type Event struct {
 }
 
 type Evidence struct {
-	Identity    *[]EvidenceIdentity   `json:",omitempty" xml:"-"`
+	Identity    *[]EvidenceIdentity   `json:"identity,omitempty" xml:"-"`
 	Occurrences *[]EvidenceOccurrence `json:"occurrences,omitempty" xml:"-"`
 	Callstack   *Callstack            `json:"callstack,omitempty" xml:"-"`
 	Licenses    *Licenses             `json:"licenses,omitempty" xml:"-"`
