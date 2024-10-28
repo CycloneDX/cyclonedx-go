@@ -63,6 +63,14 @@ func Test_componentConverter_convertEvidence(t *testing.T) {
 
 		comp := Component{
 			Evidence: &Evidence{
+				Identity: &[]EvidenceIdentity{
+					{
+						Field: EvidenceIdentityFieldTypePURL,
+					},
+					{
+						Field: EvidenceIdentityFieldTypeName,
+					},
+				},
 				Occurrences: &[]EvidenceOccurrence{
 					{
 						BOMRef:            "foo",
@@ -78,6 +86,7 @@ func Test_componentConverter_convertEvidence(t *testing.T) {
 
 		convert(&comp)
 
+		require.Len(t, *comp.Evidence.Identity, 1)
 		require.Len(t, *comp.Evidence.Occurrences, 1)
 		occ := (*comp.Evidence.Occurrences)[0]
 		assert.Nil(t, occ.Line)
