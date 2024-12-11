@@ -16,11 +16,11 @@ jobs:
       contents: write
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # tag=v4.2.1
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # tag=v4.2.2
       with:
         fetch-depth: 0
     - name: Setup Go
-      uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # tag=v5.0.2
+      uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # tag=v5.1.0
       with:
         go-version: "1.22"
         check-latest: true
@@ -29,7 +29,7 @@ jobs:
       with:
         version: v1
     - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@286f3b13b1b49da4ac219696163fb8c1c93e1200 # tag=v6.0.0
+      uses: goreleaser/goreleaser-action@9ed2f89a662bf1735a48bc8557fd212fa902bebf # tag=v6.1.0
       with:
         version: latest
         args: release --clean
