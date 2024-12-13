@@ -187,6 +187,53 @@ func (tc *ToolsChoice) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
+func (ev *Evidence) UnmarshalJSON(bytes []byte) error {
+	type Alias Evidence
+	var aux = &struct {
+		Identity json.RawMessage `json:"identity"`
+		*Alias
+	}{
+		Alias: (*Alias)(ev),
+	}
+
+	if err := json.Unmarshal(bytes, &aux); err != nil {
+		return err
+	}
+
+	// Try to unmarshal Identity field as struct
+	if aux.Identity != nil {
+		var identity EvidenceIdentity
+		err := json.Unmarshal(aux.Identity, &identity)
+		if err != nil {
+			var typeErr *json.UnmarshalTypeError
+			if !errors.As(err, &typeErr) || typeErr.Value != "array" {
+				return err
+			}
+
+			// Try to unmarshal Identity field as array
+			var identities []EvidenceIdentity
+			err = json.Unmarshal(aux.Identity, &identities)
+			if err != nil {
+				return err
+			}
+
+			if len(identities) > 0 {
+				ev.Identity = &identities
+			}
+			return nil
+		}
+
+		// The field is required, so we can check for emptiness using this field.
+		// cf. https://cyclonedx.org/docs/1.6/json/#metadata_component_evidence_identity_oneOf_i0_items_field
+		if identity.Field != "" {
+			ev.Identity = &[]EvidenceIdentity{
+				identity,
+			}
+		}
+	}
+	return nil
+}
+
 var jsonSchemas = map[SpecVersion]string{
 	SpecVersion1_0: "",
 	SpecVersion1_1: "",

@@ -623,11 +623,11 @@ type Event struct {
 }
 
 type Evidence struct {
-	Identity    *EvidenceIdentity     `json:"identity,omitempty" xml:"identity,omitempty"`
-	Occurrences *[]EvidenceOccurrence `json:"occurrences,omitempty" xml:"occurrences>occurrence,omitempty"`
-	Callstack   *Callstack            `json:"callstack,omitempty" xml:"callstack,omitempty"`
-	Licenses    *Licenses             `json:"licenses,omitempty" xml:"licenses,omitempty"`
-	Copyright   *[]Copyright          `json:"copyright,omitempty" xml:"copyright>text,omitempty"`
+	Identity    *[]EvidenceIdentity   `json:"identity,omitempty" xml:"-"`
+	Occurrences *[]EvidenceOccurrence `json:"occurrences,omitempty" xml:"-"`
+	Callstack   *Callstack            `json:"callstack,omitempty" xml:"-"`
+	Licenses    *Licenses             `json:"licenses,omitempty" xml:"-"`
+	Copyright   *[]Copyright          `json:"copyright,omitempty" xml:"-"`
 }
 
 type EvidenceIdentity struct {

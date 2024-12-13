@@ -195,6 +195,13 @@ func convertEvidence(c *Component, specVersion SpecVersion) {
 	}
 
 	if specVersion < SpecVersion1_6 {
+		// Spec version 1.5 uses only one Identity.
+		// cf. https://cyclonedx.org/docs/1.5/json/#components_items_evidence_identity
+		if c.Evidence.Identity != nil {
+			ids := *c.Evidence.Identity
+			ids = ids[:1]
+			c.Evidence.Identity = &ids
+		}
 		if c.Evidence.Occurrences != nil {
 			for i := range *c.Evidence.Occurrences {
 				occ := &(*c.Evidence.Occurrences)[i]

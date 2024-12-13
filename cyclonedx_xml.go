@@ -406,6 +406,121 @@ func (tc *ToolsChoice) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 	return nil
 }
 
+// EvidenceMarshalXML is temporarily used for marshalling
+// Evidence instances from XML.
+type EvidenceMarshalXML struct {
+	Identity    *[]EvidenceIdentity   `json:"-" xml:"identity,omitempty"`
+	Occurrences *[]EvidenceOccurrence `json:"-" xml:"occurrences>occurrence,omitempty"`
+	Callstack   *Callstack            `json:"-" xml:"callstack,omitempty"`
+	Licenses    *Licenses             `json:"-" xml:"licenses,omitempty"`
+	Copyright   *[]Copyright          `json:"-" xml:"copyright>text,omitempty"`
+}
+
+// EvidenceUnmarshalXML is temporarily used for unmarshalling
+// Evidence instances from XML.
+type EvidenceUnmarshalXML struct {
+	Occurrences *[]EvidenceOccurrence `json:"-" xml:"occurrence,omitempty"`
+	Copyright   *[]Copyright          `json:"-" xml:"text,omitempty"`
+}
+
+func (ev Evidence) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	evidenceXML := EvidenceMarshalXML{}
+	empty := true
+	if ev.Identity != nil {
+		evidenceXML.Identity = ev.Identity
+		empty = false
+	}
+	if ev.Occurrences != nil {
+		evidenceXML.Occurrences = ev.Occurrences
+		empty = false
+	}
+	if ev.Callstack != nil {
+		evidenceXML.Callstack = ev.Callstack
+		empty = false
+	}
+	if ev.Licenses != nil {
+		evidenceXML.Licenses = ev.Licenses
+		empty = false
+	}
+	if ev.Copyright != nil {
+		evidenceXML.Copyright = ev.Copyright
+		empty = false
+	}
+
+	if !empty {
+		return e.EncodeElement(evidenceXML, start)
+	}
+
+	return nil
+}
+
+func (ev *Evidence) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
+	var evidence Evidence
+	var identifies []EvidenceIdentity
+
+	for {
+		token, err := d.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch tokenType := token.(type) {
+		case xml.StartElement:
+			if tokenType.Name.Local == "identity" {
+				var identity EvidenceIdentity
+				if err = d.DecodeElement(&identity, &tokenType); err != nil {
+					return err
+				}
+				identifies = append(identifies, identity)
+			} else if tokenType.Name.Local == "occurrences" {
+				var evidenceXml EvidenceUnmarshalXML
+				if err = d.DecodeElement(&evidenceXml, &tokenType); err != nil {
+					return err
+				}
+				if evidenceXml.Occurrences != nil {
+					evidence.Occurrences = evidenceXml.Occurrences
+				}
+			} else if tokenType.Name.Local == "callstack" {
+				var cs Callstack
+				if err = d.DecodeElement(&cs, &tokenType); err != nil {
+					return err
+				}
+				if cs.Frames != nil {
+					evidence.Callstack = &cs
+				}
+			} else if tokenType.Name.Local == "licenses" {
+				var licenses Licenses
+				if err = d.DecodeElement(&licenses, &tokenType); err != nil {
+					return err
+				}
+				if len(licenses) > 0 {
+					evidence.Licenses = &licenses
+				}
+			} else if tokenType.Name.Local == "copyright" {
+				var evidenceXml EvidenceUnmarshalXML
+				if err = d.DecodeElement(&evidenceXml, &tokenType); err != nil {
+					return err
+				}
+				if evidenceXml.Copyright != nil {
+					evidence.Copyright = evidenceXml.Copyright
+				}
+			} else {
+				return fmt.Errorf("unknown element: %s", tokenType.Name.Local)
+			}
+		}
+	}
+
+	if len(identifies) > 0 {
+		evidence.Identity = &identifies
+	}
+
+	*ev = evidence
+	return nil
+}
+
 var xmlNamespaces = map[SpecVersion]string{
 	SpecVersion1_0: "http://cyclonedx.org/schema/bom/1.0",
 	SpecVersion1_1: "http://cyclonedx.org/schema/bom/1.1",

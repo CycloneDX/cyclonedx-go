@@ -19,8 +19,9 @@ package cyclonedx
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestEnvironmentVariableChoice_MarshalJSON(t *testing.T) {
@@ -164,5 +165,168 @@ func TestMLDatasetChoice_UnmarshalJSON(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, "foo", choice.Ref)
 		require.Nil(t, choice.ComponentData)
+	})
+}
+
+func TestEvidence_MarshalJSON(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		evidence := Evidence{}
+		jsonBytes, err := json.Marshal(evidence)
+		require.NoError(t, err)
+		require.Equal(t, "{}", string(jsonBytes))
+	})
+
+	t.Run("WithOccurrences", func(t *testing.T) {
+		evidence := Evidence{
+			Occurrences: &[]EvidenceOccurrence{
+				{
+					BOMRef:   "d6bf237e-4e11-4713-9f62-56d18d5e2079",
+					Location: "/path/to/component",
+				},
+				{
+					BOMRef:   "b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175",
+					Location: "/another/path/to/component",
+				},
+			},
+		}
+		jsonBytes, err := json.Marshal(evidence)
+		require.NoError(t, err)
+		require.Equal(t, `{"occurrences":[{"bom-ref":"d6bf237e-4e11-4713-9f62-56d18d5e2079","location":"/path/to/component"},{"bom-ref":"b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175","location":"/another/path/to/component"}]}`, string(jsonBytes))
+	})
+
+	t.Run("WithIdentify", func(t *testing.T) {
+		evidence := Evidence{
+			Identity: &[]EvidenceIdentity{
+				{
+					Field:      EvidenceIdentityFieldTypePURL,
+					Confidence: toPointer(t, float32(1)),
+					Methods: &[]EvidenceIdentityMethod{
+						{
+							Technique:  "filename",
+							Confidence: toPointer(t, float32(0.1)),
+							Value:      "findbugs-project-3.0.0.jar",
+						},
+						{
+							Technique:  "ast-fingerprint",
+							Confidence: toPointer(t, float32(0.9)),
+							Value:      "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab",
+						},
+					},
+					Tools: &[]BOMReference{
+						"bom-ref-of-tool-that-performed-analysis",
+					},
+				},
+			},
+		}
+		jsonBytes, err := json.Marshal(evidence)
+		require.NoError(t, err)
+		require.Equal(t, `{"identity":[{"field":"purl","confidence":1,"methods":[{"technique":"filename","confidence":0.1,"value":"findbugs-project-3.0.0.jar"},{"technique":"ast-fingerprint","confidence":0.9,"value":"61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab"}],"tools":["bom-ref-of-tool-that-performed-analysis"]}]}`, string(jsonBytes))
+	})
+}
+
+func TestEvidence_UnmarshalJSON(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		var evidence Evidence
+		err := json.Unmarshal([]byte(`{}`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, Evidence{}, evidence)
+	})
+
+	t.Run("WithOccurrences", func(t *testing.T) {
+		var evidence Evidence
+		err := json.Unmarshal([]byte(`{
+"occurrences": [
+  {
+	"bom-ref": "d6bf237e-4e11-4713-9f62-56d18d5e2079",
+	"location": "/path/to/component"
+  },
+  {
+	"bom-ref": "b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175",
+	"location": "/another/path/to/component"
+  }
+]}`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, &[]EvidenceOccurrence{
+			{
+				BOMRef:   "d6bf237e-4e11-4713-9f62-56d18d5e2079",
+				Location: "/path/to/component",
+			},
+			{
+				BOMRef:   "b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175",
+				Location: "/another/path/to/component",
+			},
+		}, evidence.Occurrences)
+	})
+
+	t.Run("WithIdentityAsStruct", func(t *testing.T) {
+		var evidence Evidence
+		err := json.Unmarshal([]byte(`{
+"identity": {
+  "field": "purl",
+  "confidence": 1,
+  "methods": [
+	{
+	  "technique": "filename",
+	  "confidence": 0.1,
+	  "value": "findbugs-project-3.0.0.jar"
+	},
+	{
+	  "technique": "ast-fingerprint",
+	  "confidence": 0.9,
+	  "value": "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab"
+	}
+  ],
+  "tools": [
+	"bom-ref-of-tool-that-performed-analysis"
+  ]
+}}`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, &[]EvidenceIdentity{
+			{
+				Field:      EvidenceIdentityFieldTypePURL,
+				Confidence: toPointer(t, float32(1)),
+				Methods: &[]EvidenceIdentityMethod{
+					{
+						Technique:  "filename",
+						Confidence: toPointer(t, float32(0.1)),
+						Value:      "findbugs-project-3.0.0.jar",
+					},
+					{
+						Technique:  "ast-fingerprint",
+						Confidence: toPointer(t, float32(0.9)),
+						Value:      "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab",
+					},
+				},
+				Tools: &[]BOMReference{
+					"bom-ref-of-tool-that-performed-analysis",
+				},
+			},
+		}, evidence.Identity)
+	})
+
+	t.Run("WithIdentityAsArray", func(t *testing.T) {
+		var evidence Evidence
+		err := json.Unmarshal([]byte(`{
+"identity": [
+	{
+		"field": "purl",
+		"confidence": 1
+	},
+	{
+		"field": "name",
+		"confidence": 0.1
+	}
+]}`), &evidence)
+		require.NoError(t, err)
+		require.Equal(t, &[]EvidenceIdentity{
+			{
+				Field:      EvidenceIdentityFieldTypePURL,
+				Confidence: toPointer(t, float32(1)),
+			},
+			{
+				Field:      EvidenceIdentityFieldTypeName,
+				Confidence: toPointer(t, float32(0.1)),
+			},
+		}, evidence.Identity)
 	})
 }
