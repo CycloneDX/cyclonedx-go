@@ -210,7 +210,7 @@ const (
 	ComponentTypeMachineLearningModel ComponentType = "machine-learning-model"
 	ComponentTypeOS                   ComponentType = "operating-system"
 	ComponentTypePlatform             ComponentType = "platform"
-	ComponentTypeUnknown		  ComponentType = "unknown"
+	ComponentTypeUnknown              ComponentType = "unknown"
 )
 
 type Commit struct {
