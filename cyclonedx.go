@@ -522,8 +522,13 @@ type SecuredBy struct {
 }
 
 type DataClassification struct {
-	Flow           DataFlow `json:"flow" xml:"flow,attr"`
-	Classification string   `json:"classification" xml:",chardata"`
+	Flow           DataFlow        `json:"flow" xml:"flow,attr"`
+	Classification string          `json:"classification" xml:",chardata"`
+	Name           string          `json:"name,omitempty" xml:"name,omitempty"`
+	Description    string          `json:"description,omitempty" xml:"description,omitempty"`
+	Governance     *DataGovernance `json:"governance,omitempty" xml:"governance,omitempty"`
+	Source         []string        `json:"source,omitempty" xml:"source>url,omitempty"`
+	Destination    []string        `json:"destination,omitempty" xml:"destination>url,omitempty"`
 }
 
 type DataFlow string
