@@ -54,6 +54,7 @@ type Annotation struct {
 	Annotator *Annotator      `json:"annotator,omitempty" xml:"annotator,omitempty"`
 	Timestamp string          `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
 	Text      string          `json:"text,omitempty" xml:"text,omitempty"`
+	Signature *JSFSignature   `json:"signature,omitempty" xml:"-"`
 }
 
 type Annotator struct {
@@ -125,6 +126,7 @@ type BOM struct {
 	Formulation        *[]Formula           `json:"formulation,omitempty" xml:"formulation>formula,omitempty"`
 	Declarations       *Declarations        `json:"declarations,omitempty" xml:"declarations,omitempty"`
 	Definitions        *Definitions         `json:"definitions,omitempty" xml:"definitions,omitempty"`
+	Signature          *JSFSignature        `json:"signature,omitempty" xml:"-"`
 }
 
 func NewBOM() *BOM {
@@ -252,6 +254,8 @@ type Component struct {
 	ModelCard          *MLModelCard             `json:"modelCard,omitempty" xml:"modelCard,omitempty"`
 	Data               *ComponentData           `json:"data,omitempty" xml:"data,omitempty"`
 	CryptoProperties   *CryptoProperties        `json:"cryptoProperties,omitempty" xml:"cryptoProperties,omitempty"`
+	Tags               *[]string                `json:"tags,omitempty" xml:"tags>tag,omitempty"`
+	Signature          *JSFSignature            `json:"signature,omitempty" xml:"-"`
 }
 
 type ComponentData struct {
@@ -303,6 +307,7 @@ type Composition struct {
 	Assemblies      *[]BOMReference      `json:"assemblies,omitempty" xml:"assemblies>assembly,omitempty"`
 	Dependencies    *[]BOMReference      `json:"dependencies,omitempty" xml:"dependencies>dependency,omitempty"`
 	Vulnerabilities *[]BOMReference      `json:"vulnerabilities,omitempty" xml:"vulnerabilities>vulnerability,omitempty"`
+	Signature       *JSFSignature        `json:"signature,omitempty" xml:"-"`
 }
 
 type CompositionAggregate string
@@ -1291,6 +1296,8 @@ type Service struct {
 	Properties           *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
 	Services             *[]Service            `json:"services,omitempty" xml:"services>service,omitempty"`
 	ReleaseNotes         *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
+	Tags                 *[]string             `json:"tags,omitempty" xml:"tags>tag,omitempty"`
+	Signature            *JSFSignature         `json:"signature,omitempty" xml:"-"`
 }
 
 type Severity string
