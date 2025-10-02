@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/terminalstatic/go-xsd-validate v0.1.6
 	github.com/xeipuuv/gojsonschema v1.2.0
 )
