@@ -57,6 +57,12 @@ func (b *BOM) convert(specVersion SpecVersion) {
 		b.Definitions = nil
 	}
 
+	if b.Dependencies != nil && specVersion < SpecVersion1_6 {
+		for i := range *b.Dependencies {
+			(*b.Dependencies)[i].Provides = nil
+		}
+	}
+
 	if b.Metadata != nil {
 		if specVersion < SpecVersion1_3 {
 			b.Metadata.Licenses = nil

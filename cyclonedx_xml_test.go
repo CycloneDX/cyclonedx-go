@@ -707,7 +707,7 @@ func TestEvidence_UnmarshalXML(t *testing.T) {
 	})
 }
 
-func toPointer[V int | float32](t *testing.T, v V) *V {
+func toPointer[T any](t *testing.T, value T) *T {
 	t.Helper()
-	return &v
+	return &value
 }

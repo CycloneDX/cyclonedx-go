@@ -603,6 +603,7 @@ type Signatory struct {
 type Dependency struct {
 	Ref          string    `json:"ref"`
 	Dependencies *[]string `json:"dependsOn,omitempty"`
+	Provides     *[]string `json:"provides,omitempty"`
 }
 
 type Diff struct {
@@ -711,6 +712,8 @@ const (
 	ERTypeDistributionIntake      ExternalReferenceType = "distribution-intake"
 	ERTypeDocumentation           ExternalReferenceType = "documentation"
 	ERTypeDynamicAnalysisReport   ExternalReferenceType = "dynamic-analysis-report"
+	ERTypeDigitalSignature        ExternalReferenceType = "digital-signature"
+	ERTypeElectronicSignature     ExternalReferenceType = "electronic-signature"
 	ERTypeEvidence                ExternalReferenceType = "evidence"
 	ERTypeExploitabilityStatement ExternalReferenceType = "exploitability-statement"
 	ERTypeFormulation             ExternalReferenceType = "formulation"
@@ -722,12 +725,15 @@ const (
 	ERTypeModelCard               ExternalReferenceType = "model-card"
 	ERTypeOther                   ExternalReferenceType = "other"
 	ERTypePentestReport           ExternalReferenceType = "pentest-report"
+	ERTypePOAM                    ExternalReferenceType = "poam"
 	ERTypeQualityMetrics          ExternalReferenceType = "quality-metrics"
 	ERTypeReleaseNotes            ExternalReferenceType = "release-notes"
 	ERTypeRiskAssessment          ExternalReferenceType = "risk-assessment"
+	ERTypeRFC9116                 ExternalReferenceType = "rfc-9116"
 	ERTypeRuntimeAnalysisReport   ExternalReferenceType = "runtime-analysis-report"
 	ERTypeSecurityContact         ExternalReferenceType = "security-contact"
 	ERTypeSocial                  ExternalReferenceType = "social"
+	ERTypeSourceDistribution      ExternalReferenceType = "source-distribution"
 	ERTypeStaticAnalysisReport    ExternalReferenceType = "static-analysis-report"
 	ERTypeSupport                 ExternalReferenceType = "support"
 	ERTypeThreatModel             ExternalReferenceType = "threat-model"
@@ -1297,6 +1303,7 @@ type Service struct {
 	Services             *[]Service            `json:"services,omitempty" xml:"services>service,omitempty"`
 	ReleaseNotes         *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
 	Tags                 *[]string             `json:"tags,omitempty" xml:"tags>tag,omitempty"`
+	TrustZone            string                `json:"trustZone,omitempty" xml:"trustZone,omitempty"`
 	Signature            *JSFSignature         `json:"signature,omitempty" xml:"-"`
 }
 
