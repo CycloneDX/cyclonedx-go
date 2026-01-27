@@ -65,6 +65,39 @@ func TestJsonBOMEncoder_SetPretty(t *testing.T) {
 `, buf.String())
 }
 
+func TestJsonBOMEncoder_SetIndentTab(t *testing.T) {
+	buf := new(bytes.Buffer)
+	encoder := NewBOMEncoder(buf, BOMFileFormatJSON)
+	encoder.SetPretty(true)
+	encoder.SetIndent("\t")
+
+	bom := NewBOM()
+	bom.Metadata = &Metadata{
+		Authors: &[]OrganizationalContact{
+			{
+				Name: "authorName",
+			},
+		},
+	}
+
+	require.NoError(t, encoder.Encode(bom))
+
+	assert.Equal(t, `{
+	"$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+	"bomFormat": "CycloneDX",
+	"specVersion": "1.6",
+	"version": 1,
+	"metadata": {
+		"authors": [
+			{
+				"name": "authorName"
+			}
+		]
+	}
+}
+`, buf.String())
+}
+
 func TestJsonBOMEncoder_SetEscapeHTML_true(t *testing.T) {
 	buf := new(bytes.Buffer)
 	encoder := NewBOMEncoder(buf, BOMFileFormatJSON)
@@ -170,6 +203,49 @@ func TestXmlBOMEncoder_SetPretty(t *testing.T) {
       <property name="Specials">Special chars: &lt; &amp; &gt; &#34;</property>
     </properties>
   </metadata>
+</bom>`, buf.String())
+}
+
+func TestXmlBOMEncoder_SetIndentTab(t *testing.T) {
+	buf := new(bytes.Buffer)
+	encoder := NewBOMEncoder(buf, BOMFileFormatXML)
+	encoder.SetPretty(true)
+	encoder.SetIndent("\t")
+
+	bom := NewBOM()
+	bom.Metadata = &Metadata{
+		Authors: &[]OrganizationalContact{
+			{
+				Name: "authorName",
+			},
+		},
+		Properties: &[]Property{
+			{
+				Name:  "XML",
+				Value: "<xml>in here</xml>",
+			},
+			{
+				Name:  "Specials",
+				Value: "Special chars: < & > \"",
+			},
+		},
+	}
+
+	require.NoError(t, encoder.Encode(bom))
+
+	assert.Equal(t, `<?xml version="1.0" encoding="UTF-8"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.6" version="1">
+	<metadata>
+		<authors>
+			<author>
+				<name>authorName</name>
+			</author>
+		</authors>
+		<properties>
+			<property name="XML">&lt;xml&gt;in here&lt;/xml&gt;</property>
+			<property name="Specials">Special chars: &lt; &amp; &gt; &#34;</property>
+		</properties>
+	</metadata>
 </bom>`, buf.String())
 }
 
