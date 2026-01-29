@@ -245,3 +245,26 @@ func Test_convertAuthors(t *testing.T) {
 		assert.Nil(t, (*bom.Components)[0].Authors)
 	})
 }
+
+func Test_convertTags(t *testing.T) {
+	t.Run("spec 1.5 and lower", func(t *testing.T) {
+		bom := NewBOM()
+		bom.Metadata = &Metadata{
+			Component: &Component{
+				Name: "test",
+				Tags: &[]string{"tag1", "tag2"},
+			},
+		}
+		bom.Components = &[]Component{
+			{
+				Name: "foo",
+				Tags: &[]string{"tag3", "tag4"},
+			},
+		}
+
+		bom.convert(SpecVersion1_5)
+
+		assert.Nil(t, bom.Metadata.Component.Tags)
+		assert.Nil(t, (*bom.Components)[0].Tags)
+	})
+}

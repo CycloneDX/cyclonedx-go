@@ -159,6 +159,7 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 			c.OmniborID = nil
 			c.Manufacturer = nil
 			c.Authors = nil
+			c.Tags = nil
 		}
 
 		if !specVersion.supportsComponentType(c.Type) {
