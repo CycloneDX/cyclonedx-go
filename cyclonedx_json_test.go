@@ -330,3 +330,190 @@ func TestEvidence_UnmarshalJSON(t *testing.T) {
 		}, evidence.Identity)
 	})
 }
+
+func TestService_TrustZone_MarshalJSON(t *testing.T) {
+	t.Run("WithTrustZone", func(t *testing.T) {
+		service := Service{
+			Name:      "Payment API",
+			TrustZone: "trusted",
+		}
+		jsonBytes, err := json.Marshal(service)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"trustZone":"trusted"`)
+		require.Contains(t, string(jsonBytes), `"name":"Payment API"`)
+	})
+
+	t.Run("WithoutTrustZone", func(t *testing.T) {
+		service := Service{
+			Name: "Payment API",
+		}
+		jsonBytes, err := json.Marshal(service)
+		require.NoError(t, err)
+		require.NotContains(t, string(jsonBytes), "trustZone")
+		require.Contains(t, string(jsonBytes), `"name":"Payment API"`)
+	})
+}
+
+func TestService_TrustZone_UnmarshalJSON(t *testing.T) {
+	t.Run("WithTrustZone", func(t *testing.T) {
+		var service Service
+		err := json.Unmarshal([]byte(`{"name":"Payment API","trustZone":"trusted"}`), &service)
+		require.NoError(t, err)
+		require.Equal(t, "Payment API", service.Name)
+		require.Equal(t, "trusted", service.TrustZone)
+	})
+
+	t.Run("WithoutTrustZone", func(t *testing.T) {
+		var service Service
+		err := json.Unmarshal([]byte(`{"name":"Payment API"}`), &service)
+		require.NoError(t, err)
+		require.Equal(t, "Payment API", service.Name)
+		require.Empty(t, service.TrustZone)
+	})
+}
+
+func TestDependency_Provides_MarshalJSON(t *testing.T) {
+	t.Run("WithProvides", func(t *testing.T) {
+		dependency := Dependency{
+			Ref:      "crypto-library",
+			Provides: &[]string{"aes128gcm", "sha256"},
+		}
+		jsonBytes, err := json.Marshal(dependency)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"ref":"crypto-library"`)
+		require.Contains(t, string(jsonBytes), `"provides":["aes128gcm","sha256"]`)
+	})
+
+	t.Run("WithProvidesAndDependsOn", func(t *testing.T) {
+		dependency := Dependency{
+			Ref:          "crypto-library",
+			Dependencies: &[]string{"base-library"},
+			Provides:     &[]string{"aes128gcm"},
+		}
+		jsonBytes, err := json.Marshal(dependency)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"ref":"crypto-library"`)
+		require.Contains(t, string(jsonBytes), `"dependsOn":["base-library"]`)
+		require.Contains(t, string(jsonBytes), `"provides":["aes128gcm"]`)
+	})
+
+	t.Run("WithoutProvides", func(t *testing.T) {
+		dependency := Dependency{
+			Ref:          "app-component",
+			Dependencies: &[]string{"library-a"},
+		}
+		jsonBytes, err := json.Marshal(dependency)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"ref":"app-component"`)
+		require.NotContains(t, string(jsonBytes), "provides")
+	})
+}
+
+func TestDependency_Provides_UnmarshalJSON(t *testing.T) {
+	t.Run("WithProvides", func(t *testing.T) {
+		var dependency Dependency
+		err := json.Unmarshal([]byte(`{"ref":"crypto-library","provides":["aes128gcm","sha256"]}`), &dependency)
+		require.NoError(t, err)
+		require.Equal(t, "crypto-library", dependency.Ref)
+		require.NotNil(t, dependency.Provides)
+		require.Equal(t, 2, len(*dependency.Provides))
+		require.Equal(t, "aes128gcm", (*dependency.Provides)[0])
+		require.Equal(t, "sha256", (*dependency.Provides)[1])
+	})
+
+	t.Run("WithProvidesAndDependsOn", func(t *testing.T) {
+		var dependency Dependency
+		err := json.Unmarshal([]byte(`{"ref":"crypto-library","dependsOn":["base-library"],"provides":["aes128gcm"]}`), &dependency)
+		require.NoError(t, err)
+		require.Equal(t, "crypto-library", dependency.Ref)
+		require.NotNil(t, dependency.Dependencies)
+		require.Equal(t, 1, len(*dependency.Dependencies))
+		require.Equal(t, "base-library", (*dependency.Dependencies)[0])
+		require.NotNil(t, dependency.Provides)
+		require.Equal(t, 1, len(*dependency.Provides))
+		require.Equal(t, "aes128gcm", (*dependency.Provides)[0])
+	})
+
+	t.Run("WithoutProvides", func(t *testing.T) {
+		var dependency Dependency
+		err := json.Unmarshal([]byte(`{"ref":"app-component","dependsOn":["library-a"]}`), &dependency)
+		require.NoError(t, err)
+		require.Equal(t, "app-component", dependency.Ref)
+		require.Nil(t, dependency.Provides)
+	})
+}
+
+func TestExternalReferenceType_NewValues(t *testing.T) {
+	t.Run("DigitalSignature", func(t *testing.T) {
+		extRef := ExternalReference{
+			Type: ERTypeDigitalSignature,
+			URL:  "https://example.com/signature",
+		}
+		jsonBytes, err := json.Marshal(extRef)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"type":"digital-signature"`)
+	})
+
+	t.Run("ElectronicSignature", func(t *testing.T) {
+		extRef := ExternalReference{
+			Type: ERTypeElectronicSignature,
+			URL:  "https://example.com/esignature",
+		}
+		jsonBytes, err := json.Marshal(extRef)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"type":"electronic-signature"`)
+	})
+
+	t.Run("POAM", func(t *testing.T) {
+		extRef := ExternalReference{
+			Type: ERTypePOAM,
+			URL:  "https://example.com/poam",
+		}
+		jsonBytes, err := json.Marshal(extRef)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"type":"poam"`)
+	})
+
+	t.Run("RFC9116", func(t *testing.T) {
+		extRef := ExternalReference{
+			Type: ERTypeRFC9116,
+			URL:  "https://example.com/security.txt",
+		}
+		jsonBytes, err := json.Marshal(extRef)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"type":"rfc-9116"`)
+	})
+
+	t.Run("SourceDistribution", func(t *testing.T) {
+		extRef := ExternalReference{
+			Type: ERTypeSourceDistribution,
+			URL:  "https://example.com/source.tar.gz",
+		}
+		jsonBytes, err := json.Marshal(extRef)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"type":"source-distribution"`)
+	})
+
+	t.Run("UnmarshalNewTypes", func(t *testing.T) {
+		testCases := []struct {
+			name     string
+			json     string
+			expected ExternalReferenceType
+		}{
+			{"digital-signature", `{"type":"digital-signature","url":"https://example.com"}`, ERTypeDigitalSignature},
+			{"electronic-signature", `{"type":"electronic-signature","url":"https://example.com"}`, ERTypeElectronicSignature},
+			{"poam", `{"type":"poam","url":"https://example.com"}`, ERTypePOAM},
+			{"rfc-9116", `{"type":"rfc-9116","url":"https://example.com"}`, ERTypeRFC9116},
+			{"source-distribution", `{"type":"source-distribution","url":"https://example.com"}`, ERTypeSourceDistribution},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				var extRef ExternalReference
+				err := json.Unmarshal([]byte(tc.json), &extRef)
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, extRef.Type)
+			})
+		}
+	})
+}

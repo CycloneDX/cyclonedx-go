@@ -61,6 +61,7 @@ func (c *Copyright) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 type dependencyXML struct {
 	Ref          string           `xml:"ref,attr"`
 	Dependencies *[]dependencyXML `xml:"dependency,omitempty"`
+	Provides     *[]dependencyXML `xml:"provides,omitempty"`
 }
 
 func (d Dependency) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -72,6 +73,14 @@ func (d Dependency) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 			xmlDeps[i] = dependencyXML{Ref: (*d.Dependencies)[i]}
 		}
 		xmlDep.Dependencies = &xmlDeps
+	}
+
+	if d.Provides != nil && len(*d.Provides) > 0 {
+		xmlProvides := make([]dependencyXML, len(*d.Provides))
+		for i := range *d.Provides {
+			xmlProvides[i] = dependencyXML{Ref: (*d.Provides)[i]}
+		}
+		xmlDep.Provides = &xmlProvides
 	}
 
 	return e.EncodeElement(xmlDep, start)
@@ -91,6 +100,14 @@ func (d *Dependency) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) erro
 			deps[i] = (*xmlDep.Dependencies)[i].Ref
 		}
 		dep.Dependencies = &deps
+	}
+
+	if xmlDep.Provides != nil && len(*xmlDep.Provides) > 0 {
+		provides := make([]string, len(*xmlDep.Provides))
+		for i := range *xmlDep.Provides {
+			provides[i] = (*xmlDep.Provides)[i].Ref
+		}
+		dep.Provides = &provides
 	}
 
 	*d = dep

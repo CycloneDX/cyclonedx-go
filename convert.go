@@ -57,6 +57,12 @@ func (b *BOM) convert(specVersion SpecVersion) {
 		b.Definitions = nil
 	}
 
+	if b.Dependencies != nil && specVersion < SpecVersion1_6 {
+		for i := range *b.Dependencies {
+			(*b.Dependencies)[i].Provides = nil
+		}
+	}
+
 	if b.Metadata != nil {
 		if specVersion < SpecVersion1_3 {
 			b.Metadata.Licenses = nil
@@ -454,6 +460,10 @@ func serviceConverter(specVersion SpecVersion) func(*Service) {
 
 		if specVersion < SpecVersion1_4 {
 			s.ReleaseNotes = nil
+		}
+
+		if specVersion < SpecVersion1_5 {
+			s.TrustZone = ""
 		}
 
 		convertOrganizationalEntity(s.Provider, specVersion)
