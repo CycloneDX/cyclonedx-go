@@ -245,3 +245,33 @@ func Test_convertAuthors(t *testing.T) {
 		assert.Nil(t, (*bom.Components)[0].Authors)
 	})
 }
+
+func Test_convertTrustZone(t *testing.T) {
+	t.Run("spec 1.4 and lower", func(t *testing.T) {
+		bom := NewBOM()
+		bom.Services = &[]Service{
+			{
+				Name:      "Payment API",
+				TrustZone: "trusted",
+			},
+		}
+
+		bom.convert(SpecVersion1_4)
+
+		assert.Empty(t, (*bom.Services)[0].TrustZone)
+	})
+
+	t.Run("spec 1.5 and higher", func(t *testing.T) {
+		bom := NewBOM()
+		bom.Services = &[]Service{
+			{
+				Name:      "Payment API",
+				TrustZone: "trusted",
+			},
+		}
+
+		bom.convert(SpecVersion1_5)
+
+		assert.Equal(t, "trusted", (*bom.Services)[0].TrustZone)
+	})
+}

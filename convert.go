@@ -461,6 +461,10 @@ func serviceConverter(specVersion SpecVersion) func(*Service) {
 			s.ReleaseNotes = nil
 		}
 
+		if specVersion < SpecVersion1_5 {
+			s.TrustZone = ""
+		}
+
 		convertOrganizationalEntity(s.Provider, specVersion)
 		convertExternalReferences(s.ExternalReferences, specVersion)
 	}
