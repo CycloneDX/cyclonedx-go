@@ -159,21 +159,22 @@ func (ev *EnvironmentVariables) UnmarshalXML(d *xml.Decoder, _ xml.StartElement)
 
 		switch tokenType := token.(type) {
 		case xml.StartElement:
-			if tokenType.Name.Local == "value" {
+			switch tokenType.Name.Local {
+			case "value":
 				var value string
 				err = d.DecodeElement(&value, &tokenType)
 				if err != nil {
 					return err
 				}
 				envVars = append(envVars, EnvironmentVariableChoice{Value: value})
-			} else if tokenType.Name.Local == "environmentVar" {
+			case "environmentVar":
 				var property Property
 				err = d.DecodeElement(&property, &tokenType)
 				if err != nil {
 					return err
 				}
 				envVars = append(envVars, EnvironmentVariableChoice{Property: &property})
-			} else {
+			default:
 				return fmt.Errorf("unknown element: %s", tokenType.Name.Local)
 			}
 		}
@@ -225,19 +226,20 @@ func (l *Licenses) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 
 		switch tokenType := token.(type) {
 		case xml.StartElement:
-			if tokenType.Name.Local == "expression" {
+			switch tokenType.Name.Local {
+			case "expression":
 				var expression string
 				if err = d.DecodeElement(&expression, &tokenType); err != nil {
 					return err
 				}
 				licenses = append(licenses, LicenseChoice{Expression: expression})
-			} else if tokenType.Name.Local == "license" {
+			case "license":
 				var license License
 				if err = d.DecodeElement(&license, &tokenType); err != nil {
 					return err
 				}
 				licenses = append(licenses, LicenseChoice{License: &license})
-			} else {
+			default:
 				return fmt.Errorf("unknown element: %s", tokenType.Name.Local)
 			}
 		}
@@ -374,13 +376,14 @@ func (tc *ToolsChoice) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 
 		switch tokenType := token.(type) {
 		case xml.StartElement:
-			if tokenType.Name.Local == "tool" {
+			switch tokenType.Name.Local {
+			case "tool":
 				var tool Tool
 				if err = d.DecodeElement(&tool, &tokenType); err != nil {
 					return err
 				}
 				legacyTools = append(legacyTools, tool)
-			} else if tokenType.Name.Local == "components" {
+			case "components":
 				var foo toolsChoiceUnmarshalXML
 				if err = d.DecodeElement(&foo, &tokenType); err != nil {
 					return err
@@ -388,7 +391,7 @@ func (tc *ToolsChoice) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 				if foo.Components != nil {
 					components = *foo.Components
 				}
-			} else if tokenType.Name.Local == "services" {
+			case "services":
 				var foo toolsChoiceUnmarshalXML
 				if err = d.DecodeElement(&foo, &tokenType); err != nil {
 					return err
@@ -396,7 +399,7 @@ func (tc *ToolsChoice) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 				if foo.Services != nil {
 					services = *foo.Services
 				}
-			} else {
+			default:
 				return fmt.Errorf("unknown element: %s", tokenType.Name.Local)
 			}
 		}
@@ -486,13 +489,14 @@ func (ev *Evidence) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 
 		switch tokenType := token.(type) {
 		case xml.StartElement:
-			if tokenType.Name.Local == "identity" {
+			switch tokenType.Name.Local {
+			case "identity":
 				var identity EvidenceIdentity
 				if err = d.DecodeElement(&identity, &tokenType); err != nil {
 					return err
 				}
 				identifies = append(identifies, identity)
-			} else if tokenType.Name.Local == "occurrences" {
+			case "occurrences":
 				var evidenceXml EvidenceUnmarshalXML
 				if err = d.DecodeElement(&evidenceXml, &tokenType); err != nil {
 					return err
@@ -500,7 +504,7 @@ func (ev *Evidence) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 				if evidenceXml.Occurrences != nil {
 					evidence.Occurrences = evidenceXml.Occurrences
 				}
-			} else if tokenType.Name.Local == "callstack" {
+			case "callstack":
 				var cs Callstack
 				if err = d.DecodeElement(&cs, &tokenType); err != nil {
 					return err
@@ -508,7 +512,7 @@ func (ev *Evidence) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 				if cs.Frames != nil {
 					evidence.Callstack = &cs
 				}
-			} else if tokenType.Name.Local == "licenses" {
+			case "licenses":
 				var licenses Licenses
 				if err = d.DecodeElement(&licenses, &tokenType); err != nil {
 					return err
@@ -516,7 +520,7 @@ func (ev *Evidence) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 				if len(licenses) > 0 {
 					evidence.Licenses = &licenses
 				}
-			} else if tokenType.Name.Local == "copyright" {
+			case "copyright":
 				var evidenceXml EvidenceUnmarshalXML
 				if err = d.DecodeElement(&evidenceXml, &tokenType); err != nil {
 					return err
@@ -524,7 +528,7 @@ func (ev *Evidence) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 				if evidenceXml.Copyright != nil {
 					evidence.Copyright = evidenceXml.Copyright
 				}
-			} else {
+			default:
 				return fmt.Errorf("unknown element: %s", tokenType.Name.Local)
 			}
 		}
