@@ -59,7 +59,7 @@ func Test_componentConverter_convertEvidence(t *testing.T) {
 
 	t.Run("spec 1.5 and lower", func(t *testing.T) {
 		convert := componentConverter(SpecVersion1_5)
-		var val int = 42
+		var val = 42
 
 		comp := Component{
 			Evidence: &Evidence{
