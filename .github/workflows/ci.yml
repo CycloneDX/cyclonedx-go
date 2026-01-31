@@ -33,7 +33,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # tag=v6.2.0
       with:
-        go-version: "1.22"
+        go-version: "1.25"
         check-latest: true
         cache: false
     - name: Run golangci-lint
@@ -49,9 +49,9 @@ jobs:
     strategy:
       matrix:
         go:
-        - "1.20"
-        - "1.21"
-        - "1.22"
+        - "1.23"
+        - "1.24"
+        - "1.25"
     steps:
     - name: Setup Go
       uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # tag=v6.2.0

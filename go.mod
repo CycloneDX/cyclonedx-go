@@ -1,6 +1,6 @@
 module github.com/CycloneDX/cyclonedx-go
 
-go 1.20
+go 1.23
 
 require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0
