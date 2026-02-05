@@ -76,7 +76,9 @@
           <authenticated>true</authenticated>
           <x-trust-boundary>true</x-trust-boundary>
           <data>
-            <classification flow="bi-directional">pubic</classification>
+            <dataflow>
+              <classification flow="bi-directional">pubic</classification>
+            </dataflow>
           </data>
         </service>
       </annotator>
