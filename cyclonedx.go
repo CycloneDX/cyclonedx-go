@@ -522,8 +522,13 @@ type SecuredBy struct {
 }
 
 type DataClassification struct {
-	Flow           DataFlow `json:"flow" xml:"flow,attr"`
-	Classification string   `json:"classification" xml:",chardata"`
+	Flow           DataFlow        `json:"flow" xml:"flow,attr"`
+	Classification string          `json:"classification" xml:",chardata"`
+	Name           string          `json:"name,omitempty" xml:"name,attr,omitempty"`
+	Description    string          `json:"description,omitempty" xml:"description,attr,omitempty"`
+	Governance     *DataGovernance `json:"governance,omitempty" xml:"governance,omitempty"`
+	Source         *[]string       `json:"source,omitempty" xml:"source>url,omitempty"`
+	Destination    *[]string       `json:"destination,omitempty" xml:"destination>url,omitempty"`
 }
 
 type DataFlow string
@@ -534,6 +539,182 @@ const (
 	DataFlowOutbound      DataFlow = "outbound"
 	DataFlowUnknown       DataFlow = "unknown"
 )
+
+// MarshalXML implements custom XML marshaling for DataClassification to support the v1.6 dataflow format
+func (dc DataClassification) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name.Local = "dataflow"
+
+	// Add name and description as attributes if present
+	if dc.Name != "" {
+		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "name"}, Value: dc.Name})
+	}
+	if dc.Description != "" {
+		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "description"}, Value: dc.Description})
+	}
+
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Encode classification element with flow attribute and text content
+	if dc.Classification != "" || dc.Flow != "" {
+		classStart := xml.StartElement{Name: xml.Name{Local: "classification"}}
+		if dc.Flow != "" {
+			classStart.Attr = append(classStart.Attr, xml.Attr{Name: xml.Name{Local: "flow"}, Value: string(dc.Flow)})
+		}
+		if err := e.EncodeToken(classStart); err != nil {
+			return err
+		}
+		if dc.Classification != "" {
+			if err := e.EncodeToken(xml.CharData(dc.Classification)); err != nil {
+				return err
+			}
+		}
+		if err := e.EncodeToken(xml.EndElement{Name: classStart.Name}); err != nil {
+			return err
+		}
+	}
+
+	// Encode governance
+	if dc.Governance != nil {
+		govStart := xml.StartElement{Name: xml.Name{Local: "governance"}}
+		if err := e.EncodeElement(dc.Governance, govStart); err != nil {
+			return err
+		}
+	}
+
+	// Encode source URLs
+	if dc.Source != nil && len(*dc.Source) > 0 {
+		sourceStart := xml.StartElement{Name: xml.Name{Local: "source"}}
+		if err := e.EncodeToken(sourceStart); err != nil {
+			return err
+		}
+		for _, url := range *dc.Source {
+			urlStart := xml.StartElement{Name: xml.Name{Local: "url"}}
+			if err := e.EncodeElement(url, urlStart); err != nil {
+				return err
+			}
+		}
+		if err := e.EncodeToken(xml.EndElement{Name: sourceStart.Name}); err != nil {
+			return err
+		}
+	}
+
+	// Encode destination URLs
+	if dc.Destination != nil && len(*dc.Destination) > 0 {
+		destStart := xml.StartElement{Name: xml.Name{Local: "destination"}}
+		if err := e.EncodeToken(destStart); err != nil {
+			return err
+		}
+		for _, url := range *dc.Destination {
+			urlStart := xml.StartElement{Name: xml.Name{Local: "url"}}
+			if err := e.EncodeElement(url, urlStart); err != nil {
+				return err
+			}
+		}
+		if err := e.EncodeToken(xml.EndElement{Name: destStart.Name}); err != nil {
+			return err
+		}
+	}
+
+	return e.EncodeToken(xml.EndElement{Name: start.Name})
+}
+
+// UnmarshalXML implements custom XML unmarshaling for DataClassification to support the v1.6 dataflow format
+func (dc *DataClassification) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	// Parse name and description from attributes
+	for _, attr := range start.Attr {
+		switch attr.Name.Local {
+		case "name":
+			dc.Name = attr.Value
+		case "description":
+			dc.Description = attr.Value
+		}
+	}
+
+	// Parse child elements
+	for {
+		token, err := d.Token()
+		if err != nil {
+			return err
+		}
+
+		switch el := token.(type) {
+		case xml.StartElement:
+			switch el.Name.Local {
+			case "classification":
+				// Parse flow attribute
+				for _, attr := range el.Attr {
+					if attr.Name.Local == "flow" {
+						dc.Flow = DataFlow(attr.Value)
+					}
+				}
+				// Parse classification text
+				var content string
+				if err := d.DecodeElement(&content, &el); err != nil {
+					return err
+				}
+				dc.Classification = content
+
+			case "governance":
+				var gov DataGovernance
+				if err := d.DecodeElement(&gov, &el); err != nil {
+					return err
+				}
+				dc.Governance = &gov
+
+			case "source":
+				var urls []string
+				for {
+					token, err := d.Token()
+					if err != nil {
+						return err
+					}
+					if end, ok := token.(xml.EndElement); ok && end.Name.Local == "source" {
+						break
+					}
+					if urlEl, ok := token.(xml.StartElement); ok && urlEl.Name.Local == "url" {
+						var url string
+						if err := d.DecodeElement(&url, &urlEl); err != nil {
+							return err
+						}
+						urls = append(urls, url)
+					}
+				}
+				if len(urls) > 0 {
+					dc.Source = &urls
+				}
+
+			case "destination":
+				var urls []string
+				for {
+					token, err := d.Token()
+					if err != nil {
+						return err
+					}
+					if end, ok := token.(xml.EndElement); ok && end.Name.Local == "destination" {
+						break
+					}
+					if urlEl, ok := token.(xml.StartElement); ok && urlEl.Name.Local == "url" {
+						var url string
+						if err := d.DecodeElement(&url, &urlEl); err != nil {
+							return err
+						}
+						urls = append(urls, url)
+					}
+				}
+				if len(urls) > 0 {
+					dc.Destination = &urls
+				}
+			}
+
+		case xml.EndElement:
+			if el.Name.Local == "dataflow" {
+				return nil
+			}
+		}
+	}
+}
 
 type DataGovernance struct {
 	Custodians *[]ComponentDataGovernanceResponsibleParty `json:"custodians,omitempty" xml:"custodians>custodian,omitempty"`
@@ -1296,7 +1477,7 @@ type Service struct {
 	Endpoints            *[]string             `json:"endpoints,omitempty" xml:"endpoints>endpoint,omitempty"`
 	Authenticated        *bool                 `json:"authenticated,omitempty" xml:"authenticated,omitempty"`
 	CrossesTrustBoundary *bool                 `json:"x-trust-boundary,omitempty" xml:"x-trust-boundary,omitempty"`
-	Data                 *[]DataClassification `json:"data,omitempty" xml:"data>classification,omitempty"`
+	Data                 *[]DataClassification `json:"data,omitempty" xml:"data>dataflow,omitempty"`
 	Licenses             *Licenses             `json:"licenses,omitempty" xml:"licenses,omitempty"`
 	ExternalReferences   *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 	Properties           *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
