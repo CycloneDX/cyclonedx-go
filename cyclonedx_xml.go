@@ -313,6 +313,8 @@ func (sv *SpecVersion) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		*sv = SpecVersion1_5
 	case SpecVersion1_6.String():
 		*sv = SpecVersion1_6
+	case SpecVersion1_7.String():
+		*sv = SpecVersion1_7
 	default:
 		return ErrInvalidSpecVersion
 	}
@@ -550,4 +552,5 @@ var xmlNamespaces = map[SpecVersion]string{
 	SpecVersion1_4: "http://cyclonedx.org/schema/bom/1.4",
 	SpecVersion1_5: "http://cyclonedx.org/schema/bom/1.5",
 	SpecVersion1_6: "http://cyclonedx.org/schema/bom/1.6",
+	SpecVersion1_7: "http://cyclonedx.org/schema/bom/1.7",
 }

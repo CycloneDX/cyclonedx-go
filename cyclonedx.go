@@ -126,15 +126,16 @@ type BOM struct {
 	Formulation        *[]Formula           `json:"formulation,omitempty" xml:"formulation>formula,omitempty"`
 	Declarations       *Declarations        `json:"declarations,omitempty" xml:"declarations,omitempty"`
 	Definitions        *Definitions         `json:"definitions,omitempty" xml:"definitions,omitempty"`
+	Citations          *[]Citation          `json:"citations,omitempty" xml:"citations>citation,omitempty"`
 	Signature          *JSFSignature        `json:"signature,omitempty" xml:"-"`
 }
 
 func NewBOM() *BOM {
 	return &BOM{
-		JSONSchema:  jsonSchemas[SpecVersion1_6],
-		XMLNS:       xmlNamespaces[SpecVersion1_6],
+		JSONSchema:  jsonSchemas[SpecVersion1_7],
+		XMLNS:       xmlNamespaces[SpecVersion1_7],
 		BOMFormat:   BOMFormat,
-		SpecVersion: SpecVersion1_6,
+		SpecVersion: SpecVersion1_7,
 		Version:     1,
 	}
 }
@@ -168,14 +169,25 @@ type CallstackFrame struct {
 }
 
 type CertificateProperties struct {
-	SubjectName           string       `json:"subjectName,omitempty" xml:"subjectName,omitempty"`
-	IssuerName            string       `json:"issuerName,omitempty" xml:"issuerName,omitempty"`
-	NotValidBefore        string       `json:"notValidBefore,omitempty" xml:"notValidBefore,omitempty"`
-	NotValidAfter         string       `json:"notValidAfter,omitempty" xml:"notValidAfter,omitempty"`
-	SignatureAlgorithmRef BOMReference `json:"signatureAlgorithmRef,omitempty" xml:"signatureAlgorithmRef,omitempty"`
-	SubjectPublicKeyRef   BOMReference `json:"subjectPublicKeyRef,omitempty" xml:"subjectPublicKeyRef,omitempty"`
-	CertificateFormat     string       `json:"certificateFormat,omitempty" xml:"certificateFormat,omitempty"`
-	CertificateExtension  string       `json:"certificateExtension,omitempty" xml:"certificateExtension,omitempty"`
+	SerialNumber              string                           `json:"serialNumber,omitempty" xml:"serialNumber,omitempty"`
+	SubjectName               string                           `json:"subjectName,omitempty" xml:"subjectName,omitempty"`
+	IssuerName                string                           `json:"issuerName,omitempty" xml:"issuerName,omitempty"`
+	NotValidBefore            string                           `json:"notValidBefore,omitempty" xml:"notValidBefore,omitempty"`
+	NotValidAfter             string                           `json:"notValidAfter,omitempty" xml:"notValidAfter,omitempty"`
+	SignatureAlgorithmRef     BOMReference                     `json:"signatureAlgorithmRef,omitempty" xml:"signatureAlgorithmRef,omitempty"` // Deprecated in 1.7: use RelatedCryptographicAssets
+	SubjectPublicKeyRef       BOMReference                     `json:"subjectPublicKeyRef,omitempty" xml:"subjectPublicKeyRef,omitempty"`     // Deprecated in 1.7: use RelatedCryptographicAssets
+	CertificateFormat         string                           `json:"certificateFormat,omitempty" xml:"certificateFormat,omitempty"`
+	CertificateExtension      string                           `json:"certificateExtension,omitempty" xml:"certificateExtension,omitempty"`           // Deprecated in 1.7: use CertificateFileExtension
+	CertificateFileExtension  string                           `json:"certificateFileExtension,omitempty" xml:"certificateFileExtension,omitempty"`   // New in 1.7
+	Fingerprint               *Hash                            `json:"fingerprint,omitempty" xml:"fingerprint,omitempty"`                             // New in 1.7
+	CertificateState          *[]CertificateState              `json:"certificateState,omitempty" xml:"certificateState>state,omitempty"`             // New in 1.7
+	CertificateExtensions     *[]CertificateExtension          `json:"certificateExtensions,omitempty" xml:"certificateExtensions>extension,omitempty"` // New in 1.7
+	RelatedCryptographicAssets *[]RelatedCryptographicAsset    `json:"relatedCryptographicAssets,omitempty" xml:"relatedCryptographicAssets>relatedCryptographicAsset,omitempty"` // New in 1.7
+	CreationDate              string                           `json:"creationDate,omitempty" xml:"creationDate,omitempty"`               // New in 1.7
+	ActivationDate            string                           `json:"activationDate,omitempty" xml:"activationDate,omitempty"`           // New in 1.7
+	DeactivationDate          string                           `json:"deactivationDate,omitempty" xml:"deactivationDate,omitempty"`       // New in 1.7
+	RevocationDate            string                           `json:"revocationDate,omitempty" xml:"revocationDate,omitempty"`           // New in 1.7
+	DestructionDate           string                           `json:"destructionDate,omitempty" xml:"destructionDate,omitempty"`         // New in 1.7
 }
 
 type Claim struct {
@@ -191,9 +203,11 @@ type Claim struct {
 }
 
 type CipherSuite struct {
-	Name        string          `json:"name,omitempty" xml:"name,omitempty"`
-	Algorithms  *[]BOMReference `json:"algorithms,omitempty" xml:"algorithms,omitempty"`
-	Identifiers *[]string       `json:"identifiers,omitempty" xml:"identifiers,omitempty"`
+	Name                 string          `json:"name,omitempty" xml:"name,omitempty"`
+	Algorithms           *[]BOMReference `json:"algorithms,omitempty" xml:"algorithms,omitempty"`
+	Identifiers          *[]string       `json:"identifiers,omitempty" xml:"identifiers,omitempty"`
+	TLSGroups            *[]string       `json:"tlsGroups,omitempty" xml:"tlsGroups>group,omitempty"`
+	TLSSignatureSchemes  *[]string       `json:"tlsSignatureSchemes,omitempty" xml:"tlsSignatureSchemes>scheme,omitempty"`
 }
 
 type ComponentType string
@@ -255,6 +269,9 @@ type Component struct {
 	Data               *[]ComponentData         `json:"data,omitempty" xml:"data,omitempty"`
 	CryptoProperties   *CryptoProperties        `json:"cryptoProperties,omitempty" xml:"cryptoProperties,omitempty"`
 	Tags               *[]string                `json:"tags,omitempty" xml:"tags>tag,omitempty"`
+	IsExternal         *bool                    `json:"isExternal,omitempty" xml:"isExternal,omitempty"`
+	PatentAssertions   *[]PatentAssertion       `json:"patentAssertions,omitempty" xml:"patentAssertions>patentAssertion,omitempty"`
+	VersionRange       string                   `json:"versionRange,omitempty" xml:"versionRange,omitempty"`
 	Signature          *JSFSignature            `json:"signature,omitempty" xml:"-"`
 }
 
@@ -351,7 +368,9 @@ const (
 type CryptoAlgorithmProperties struct {
 	Primitive                CryptoPrimitive             `json:"primitive,omitempty" xml:"primitive,omitempty"`
 	ParameterSetIdentifier   string                      `json:"parameterSetIdentifier,omitempty" xml:"parameterSetIdentifier,omitempty"`
-	Curve                    string                      `json:"curve,omitempty" xml:"curve,omitempty"`
+	AlgorithmFamily          string                      `json:"algorithmFamily,omitempty" xml:"algorithmFamily,omitempty"`
+	Curve                    string                      `json:"curve,omitempty" xml:"curve,omitempty"` // Deprecated in 1.7: use EllipticCurve instead
+	EllipticCurve            string                      `json:"ellipticCurve,omitempty" xml:"ellipticCurve,omitempty"`
 	ExecutionEnvironment     CryptoExecutionEnvironment  `json:"executionEnvironment,omitempty" xml:"executionEnvironment,omitempty"`
 	ImplementationPlatform   ImplementationPlatform      `json:"implementationPlatform,omitempty" xml:"implementationPlatform,omitempty"`
 	CertificationLevel       *[]CryptoCertificationLevel `json:"certificationLevel,omitempty" xml:"certificationLevel,omitempty"`
@@ -487,11 +506,12 @@ type CryptoProperties struct {
 }
 
 type CryptoProtocolProperties struct {
-	Type                CryptoProtocolType   `json:"type,omitempty" xml:"type,omitempty"`
-	Version             string               `json:"version,omitempty" xml:"version,omitempty"`
-	CipherSuites        *[]CipherSuite       `json:"cipherSuites,omitempty" xml:"cipherSuites,omitempty"`
-	IKEv2TransformTypes *IKEv2TransformTypes `json:"ikev2TransformTypes,omitempty" xml:"ikev2TransformTypes,omitempty"`
-	CryptoRefArray      *[]BOMReference      `json:"cryptoRefArray,omitempty" xml:"cryptoRefArray,omitempty"`
+	Type                       CryptoProtocolType            `json:"type,omitempty" xml:"type,omitempty"`
+	Version                    string                        `json:"version,omitempty" xml:"version,omitempty"`
+	CipherSuites               *[]CipherSuite                `json:"cipherSuites,omitempty" xml:"cipherSuites,omitempty"`
+	IKEv2TransformTypes        *IKEv2TransformTypes          `json:"ikev2TransformTypes,omitempty" xml:"ikev2TransformTypes,omitempty"`
+	CryptoRefArray             *[]BOMReference               `json:"cryptoRefArray,omitempty" xml:"cryptoRefArray,omitempty"`
+	RelatedCryptographicAssets *[]RelatedCryptographicAsset  `json:"relatedCryptographicAssets,omitempty" xml:"relatedCryptographicAssets>relatedCryptographicAsset,omitempty"` // New in 1.7
 }
 
 type CryptoProtocolType string
@@ -688,10 +708,11 @@ type EvidenceOccurrence struct {
 }
 
 type ExternalReference struct {
-	URL     string                `json:"url" xml:"url"`
-	Comment string                `json:"comment,omitempty" xml:"comment,omitempty"`
-	Hashes  *[]Hash               `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
-	Type    ExternalReferenceType `json:"type" xml:"type,attr"`
+	URL        string                `json:"url" xml:"url"`
+	Comment    string                `json:"comment,omitempty" xml:"comment,omitempty"`
+	Hashes     *[]Hash               `json:"hashes,omitempty" xml:"hashes>hash,omitempty"`
+	Type       ExternalReferenceType `json:"type" xml:"type,attr"`
+	Properties *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
 type ExternalReferenceType string
@@ -758,18 +779,20 @@ type Hash struct {
 type HashAlgorithm string
 
 const (
-	HashAlgoMD5         HashAlgorithm = "MD5"
-	HashAlgoSHA1        HashAlgorithm = "SHA-1"
-	HashAlgoSHA256      HashAlgorithm = "SHA-256"
-	HashAlgoSHA384      HashAlgorithm = "SHA-384"
-	HashAlgoSHA512      HashAlgorithm = "SHA-512"
-	HashAlgoSHA3_256    HashAlgorithm = "SHA3-256"
-	HashAlgoSHA3_384    HashAlgorithm = "SHA3-384"
-	HashAlgoSHA3_512    HashAlgorithm = "SHA3-512"
-	HashAlgoBlake2b_256 HashAlgorithm = "BLAKE2b-256"
-	HashAlgoBlake2b_384 HashAlgorithm = "BLAKE2b-384"
-	HashAlgoBlake2b_512 HashAlgorithm = "BLAKE2b-512"
-	HashAlgoBlake3      HashAlgorithm = "BLAKE3"
+	HashAlgoMD5           HashAlgorithm = "MD5"
+	HashAlgoSHA1          HashAlgorithm = "SHA-1"
+	HashAlgoSHA256        HashAlgorithm = "SHA-256"
+	HashAlgoSHA384        HashAlgorithm = "SHA-384"
+	HashAlgoSHA512        HashAlgorithm = "SHA-512"
+	HashAlgoSHA3_256      HashAlgorithm = "SHA3-256"
+	HashAlgoSHA3_384      HashAlgorithm = "SHA3-384"
+	HashAlgoSHA3_512      HashAlgorithm = "SHA3-512"
+	HashAlgoBlake2b_256   HashAlgorithm = "BLAKE2b-256"
+	HashAlgoBlake2b_384   HashAlgorithm = "BLAKE2b-384"
+	HashAlgoBlake2b_512   HashAlgorithm = "BLAKE2b-512"
+	HashAlgoBlake3        HashAlgorithm = "BLAKE3"
+	HashAlgoStreebog256   HashAlgorithm = "Streebog-256"
+	HashAlgoStreebog512   HashAlgorithm = "Streebog-512"
 )
 
 type IdentifiableAction struct {
@@ -976,10 +999,11 @@ type Metadata struct {
 	Authors      *[]OrganizationalContact `json:"authors,omitempty" xml:"authors>author,omitempty"`
 	Component    *Component               `json:"component,omitempty" xml:"component,omitempty"`
 	Manufacture  *OrganizationalEntity    `json:"manufacture,omitempty" xml:"manufacture,omitempty"` // Deprecated: Use Component Manufacturer instead.
-	Manufacturer *OrganizationalEntity    `json:"manufacturer,omitempty" xml:"manufacturer,omitempty"`
-	Supplier     *OrganizationalEntity    `json:"supplier,omitempty" xml:"supplier,omitempty"`
-	Licenses     *Licenses                `json:"licenses,omitempty" xml:"licenses,omitempty"`
-	Properties   *[]Property              `json:"properties,omitempty" xml:"properties>property,omitempty"`
+	Manufacturer             *OrganizationalEntity     `json:"manufacturer,omitempty" xml:"manufacturer,omitempty"`
+	Supplier                 *OrganizationalEntity     `json:"supplier,omitempty" xml:"supplier,omitempty"`
+	Licenses                 *Licenses                 `json:"licenses,omitempty" xml:"licenses,omitempty"`
+	Properties               *[]Property               `json:"properties,omitempty" xml:"properties>property,omitempty"`
+	DistributionConstraints  *DistributionConstraints  `json:"distributionConstraints,omitempty" xml:"distributionConstraints,omitempty"`
 }
 
 type MLDatasetChoice struct {
@@ -1209,18 +1233,20 @@ type Property struct {
 }
 
 type RelatedCryptoMaterialProperties struct {
-	Type           RelatedCryptoMaterialType `json:"type,omitempty" xml:"type,omitempty"`
-	ID             string                    `json:"id,omitempty" xml:"id,omitempty"`
-	State          CryptoKeyState            `json:"state,omitempty" xml:"state,omitempty"`
-	AlgorithmRef   BOMReference              `json:"algorithmRef,omitempty" xml:"algorithmRef,omitempty"`
-	CreationDate   string                    `json:"creationDate,omitempty" xml:"creationDate,omitempty"`
-	ActivationDate string                    `json:"activationDate,omitempty" xml:"activationDate,omitempty"`
-	UpdateDate     string                    `json:"updateDate,omitempty" xml:"updateDate,omitempty"`
-	ExpirationDate string                    `json:"expirationDate,omitempty" xml:"expirationDate,omitempty"`
-	Value          string                    `json:"value,omitempty" xml:"value,omitempty"`
-	Size           *int                      `json:"size,omitempty" xml:"size,omitempty"`
-	Format         string                    `json:"format,omitempty" xml:"format,omitempty"`
-	SecuredBy      *SecuredBy                `json:"securedBy,omitempty" xml:"securedBy,omitempty"`
+	Type                       RelatedCryptoMaterialType     `json:"type,omitempty" xml:"type,omitempty"`
+	ID                         string                        `json:"id,omitempty" xml:"id,omitempty"`
+	State                      CryptoKeyState                `json:"state,omitempty" xml:"state,omitempty"`
+	AlgorithmRef               BOMReference                  `json:"algorithmRef,omitempty" xml:"algorithmRef,omitempty"` // Deprecated in 1.7: use RelatedCryptographicAssets
+	CreationDate               string                        `json:"creationDate,omitempty" xml:"creationDate,omitempty"`
+	ActivationDate             string                        `json:"activationDate,omitempty" xml:"activationDate,omitempty"`
+	UpdateDate                 string                        `json:"updateDate,omitempty" xml:"updateDate,omitempty"`
+	ExpirationDate             string                        `json:"expirationDate,omitempty" xml:"expirationDate,omitempty"`
+	Value                      string                        `json:"value,omitempty" xml:"value,omitempty"`
+	Size                       *int                          `json:"size,omitempty" xml:"size,omitempty"`
+	Format                     string                        `json:"format,omitempty" xml:"format,omitempty"`
+	SecuredBy                  *SecuredBy                    `json:"securedBy,omitempty" xml:"securedBy,omitempty"`
+	Fingerprint                *Hash                         `json:"fingerprint,omitempty" xml:"fingerprint,omitempty"`                                                                                 // New in 1.7
+	RelatedCryptographicAssets *[]RelatedCryptographicAsset  `json:"relatedCryptographicAssets,omitempty" xml:"relatedCryptographicAssets>relatedCryptographicAsset,omitempty"` // New in 1.7
 }
 
 type RelatedCryptoMaterialType string
@@ -1304,6 +1330,7 @@ type Service struct {
 	ReleaseNotes         *ReleaseNotes         `json:"releaseNotes,omitempty" xml:"releaseNotes,omitempty"`
 	Tags                 *[]string             `json:"tags,omitempty" xml:"tags>tag,omitempty"`
 	TrustZone            string                `json:"trustZone,omitempty" xml:"trustZone,omitempty"`
+	PatentAssertions     *[]PatentAssertion    `json:"patentAssertions,omitempty" xml:"patentAssertions>patentAssertion,omitempty"`
 	Signature            *JSFSignature         `json:"signature,omitempty" xml:"-"`
 }
 
@@ -1336,6 +1363,7 @@ const (
 	SpecVersion1_4                        // 1.4
 	SpecVersion1_5                        // 1.5
 	SpecVersion1_6                        // 1.6
+	SpecVersion1_7                        // 1.7
 )
 
 type StandardDefinition struct {
@@ -1630,3 +1658,175 @@ type Workflow struct {
 	RuntimeTopology    *[]Dependency              `json:"runtimeTopology,omitempty" xml:"runtimeTopology>dependency,omitempty"`
 	Properties         *[]Property                `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
+
+// CycloneDX 1.7 types and definitions
+
+// Citation represents an attribution of data to a source
+type Citation struct {
+	BOMRef       string                   `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Pointers     *[]string                `json:"pointers,omitempty" xml:"pointers>pointer,omitempty"`
+	Expressions  *[]string                `json:"expressions,omitempty" xml:"expressions>expression,omitempty"`
+	Timestamp    string                   `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
+	AttributedTo *OrganizationalEntity    `json:"attributedTo,omitempty" xml:"attributedTo,omitempty"`
+	Process      string                   `json:"process,omitempty" xml:"process,omitempty"`
+	Note         string                   `json:"note,omitempty" xml:"note,omitempty"`
+	Signature    *JSFSignature            `json:"signature,omitempty" xml:"-"`
+}
+
+// Patent represents patent information
+type Patent struct {
+	BOMRef                string                      `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	PatentNumber          string                      `json:"patentNumber" xml:"patentNumber"`
+	ApplicationNumber     string                      `json:"applicationNumber,omitempty" xml:"applicationNumber,omitempty"`
+	Jurisdiction          string                      `json:"jurisdiction" xml:"jurisdiction"`
+	PriorityApplication   *PriorityApplication        `json:"priorityApplication,omitempty" xml:"priorityApplication,omitempty"`
+	PublicationNumber     string                      `json:"publicationNumber,omitempty" xml:"publicationNumber,omitempty"`
+	Title                 string                      `json:"title,omitempty" xml:"title,omitempty"`
+	Abstract              string                      `json:"abstract,omitempty" xml:"abstract,omitempty"`
+	FilingDate            string                      `json:"filingDate,omitempty" xml:"filingDate,omitempty"`
+	GrantDate             string                      `json:"grantDate,omitempty" xml:"grantDate,omitempty"`
+	PatentExpirationDate  string                      `json:"patentExpirationDate,omitempty" xml:"patentExpirationDate,omitempty"`
+	PatentLegalStatus     string                      `json:"patentLegalStatus" xml:"patentLegalStatus"`
+	PatentAssignee        *[]OrganizationalEntity     `json:"patentAssignee,omitempty" xml:"patentAssignee>assignee,omitempty"`
+	ExternalReferences    *[]ExternalReference        `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+}
+
+// PatentFamily represents a patent family grouping
+type PatentFamily struct {
+	BOMRef              string                `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	FamilyID            string                `json:"familyId" xml:"familyId"`
+	PriorityApplication *PriorityApplication  `json:"priorityApplication,omitempty" xml:"priorityApplication,omitempty"`
+	Members             *[]Patent             `json:"members,omitempty" xml:"members>member,omitempty"`
+	ExternalReferences  *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+}
+
+// PatentAssertion represents a patent assertion on a component or service
+type PatentAssertion struct {
+	BOMRef        string                 `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	PatentRefs    *[]BOMReference        `json:"patentRefs,omitempty" xml:"patentRefs>patentRef,omitempty"`
+	AssertionType PatentAssertionType    `json:"assertionType" xml:"assertionType"`
+	Asserter      *OrganizationalEntity  `json:"asserter" xml:"asserter"`
+	Notes         string                 `json:"notes,omitempty" xml:"notes,omitempty"`
+}
+
+// PatentAssertionType represents the type of patent assertion
+type PatentAssertionType string
+
+const (
+	PatentAssertionTypeOwnership           PatentAssertionType = "ownership"
+	PatentAssertionTypeLicense             PatentAssertionType = "license"
+	PatentAssertionTypeThirdPartyClaim     PatentAssertionType = "third-party-claim"
+	PatentAssertionTypeStandardsInclusion  PatentAssertionType = "standards-inclusion"
+	PatentAssertionTypePriorArt            PatentAssertionType = "prior-art"
+	PatentAssertionTypeExclusiveRights     PatentAssertionType = "exclusive-rights"
+	PatentAssertionTypeNonAssertion        PatentAssertionType = "non-assertion"
+	PatentAssertionTypeResearchOrEvaluation PatentAssertionType = "research-or-evaluation"
+)
+
+// PriorityApplication represents priority application details
+type PriorityApplication struct {
+	ApplicationNumber string `json:"applicationNumber" xml:"applicationNumber"`
+	Jurisdiction      string `json:"jurisdiction" xml:"jurisdiction"`
+	FilingDate        string `json:"filingDate" xml:"filingDate"`
+}
+
+// DistributionConstraints represents distribution constraints for a BOM
+type DistributionConstraints struct {
+	TLP TLPClassification `json:"tlp,omitempty" xml:"tlp,omitempty"`
+}
+
+// TLPClassification represents Traffic Light Protocol classification
+type TLPClassification string
+
+const (
+	TLPClassificationClear           TLPClassification = "CLEAR"
+	TLPClassificationGreen           TLPClassification = "GREEN"
+	TLPClassificationAmber           TLPClassification = "AMBER"
+	TLPClassificationAmberAndStrict  TLPClassification = "AMBER+STRICT"
+	TLPClassificationRed             TLPClassification = "RED"
+)
+
+// IKEv2Auth represents IKEv2 Authentication method
+type IKEv2Auth struct {
+	Name      string `json:"name,omitempty" xml:"name,omitempty"`
+	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+}
+
+// IKEv2Enc represents IKEv2 Encryption algorithm
+type IKEv2Enc struct {
+	Name      string `json:"name,omitempty" xml:"name,omitempty"`
+	KeyLength int    `json:"keyLength,omitempty" xml:"keyLength,omitempty"`
+	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+}
+
+// IKEv2Integ represents IKEv2 Integrity algorithm
+type IKEv2Integ struct {
+	Name      string `json:"name,omitempty" xml:"name,omitempty"`
+	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+}
+
+// IKEv2Ke represents IKEv2 Key Exchange method
+type IKEv2Ke struct {
+	Group     int    `json:"group,omitempty" xml:"group,omitempty"`
+	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+}
+
+// IKEv2Prf represents IKEv2 Pseudorandom Function
+type IKEv2Prf struct {
+	Name      string `json:"name,omitempty" xml:"name,omitempty"`
+	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+}
+
+// RelatedCryptographicAsset represents a related cryptographic asset
+type RelatedCryptographicAsset struct {
+	Type string `json:"type,omitempty" xml:"type,omitempty"`
+	Ref  string `json:"ref,omitempty" xml:"ref,omitempty"`
+}
+
+// CertificateState represents the lifecycle state of a certificate
+type CertificateState struct {
+	// Predefined state fields
+	State  CertificateStateType `json:"state,omitempty" xml:"state,omitempty"`
+	Reason string               `json:"reason,omitempty" xml:"reason,omitempty"`
+	// Custom state fields
+	Name        string `json:"name,omitempty" xml:"name,omitempty"`
+	Description string `json:"description,omitempty" xml:"description,omitempty"`
+}
+
+// CertificateStateType represents predefined certificate lifecycle states
+type CertificateStateType string
+
+const (
+	CertificateStatePreActivation CertificateStateType = "pre-activation"
+	CertificateStateActive        CertificateStateType = "active"
+	CertificateStateSuspended     CertificateStateType = "suspended"
+	CertificateStateDeactivated   CertificateStateType = "deactivated"
+	CertificateStateRevoked       CertificateStateType = "revoked"
+	CertificateStateDestroyed     CertificateStateType = "destroyed"
+)
+
+// CertificateExtension represents a certificate extension field
+type CertificateExtension struct {
+	// Common extension fields
+	CommonExtensionName  CertificateExtensionName `json:"commonExtensionName,omitempty" xml:"commonExtensionName,omitempty"`
+	CommonExtensionValue string                   `json:"commonExtensionValue,omitempty" xml:"commonExtensionValue,omitempty"`
+	// Custom extension fields
+	CustomExtensionName  string `json:"customExtensionName,omitempty" xml:"customExtensionName,omitempty"`
+	CustomExtensionValue string `json:"customExtensionValue,omitempty" xml:"customExtensionValue,omitempty"`
+}
+
+// CertificateExtensionName represents common certificate extension names
+type CertificateExtensionName string
+
+const (
+	CertExtBasicConstraints           CertificateExtensionName = "basicConstraints"
+	CertExtKeyUsage                   CertificateExtensionName = "keyUsage"
+	CertExtExtendedKeyUsage           CertificateExtensionName = "extendedKeyUsage"
+	CertExtSubjectAlternativeName     CertificateExtensionName = "subjectAlternativeName"
+	CertExtAuthorityKeyIdentifier     CertificateExtensionName = "authorityKeyIdentifier"
+	CertExtSubjectKeyIdentifier       CertificateExtensionName = "subjectKeyIdentifier"
+	CertExtAuthorityInformationAccess CertificateExtensionName = "authorityInformationAccess"
+	CertExtCertificatePolicies        CertificateExtensionName = "certificatePolicies"
+	CertExtCRLDistributionPoints      CertificateExtensionName = "crlDistributionPoints"
+	CertExtSignedCertificateTimestamp CertificateExtensionName = "signedCertificateTimestamp"
+)
