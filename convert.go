@@ -56,6 +56,9 @@ func (b *BOM) convert(specVersion SpecVersion) {
 		b.Declarations = nil
 		b.Definitions = nil
 	}
+	if specVersion < SpecVersion1_7 {
+		b.Citations = nil
+	}
 
 	if b.Dependencies != nil && specVersion < SpecVersion1_6 {
 		for i := range *b.Dependencies {
@@ -74,6 +77,10 @@ func (b *BOM) convert(specVersion SpecVersion) {
 
 		if specVersion < SpecVersion1_6 {
 			b.Metadata.Manufacturer = nil
+		}
+
+		if specVersion < SpecVersion1_7 {
+			b.Metadata.DistributionConstraints = nil
 		}
 
 		recurseComponent(b.Metadata.Component, componentConverter(specVersion))
@@ -168,6 +175,12 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 			c.Tags = nil
 		}
 
+		if specVersion < SpecVersion1_7 {
+			c.IsExternal = nil
+			c.PatentAssertions = nil
+			c.VersionRange = ""
+		}
+
 		if !specVersion.supportsComponentType(c.Type) {
 			c.Type = ComponentTypeApplication
 		}
@@ -177,6 +190,7 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 		convertLicenses(c.Licenses, specVersion)
 		convertEvidence(c, specVersion)
 		convertModelCard(c, specVersion)
+		convertCryptoProperties(c.CryptoProperties, specVersion)
 
 		if !specVersion.supportsScope(c.Scope) {
 			c.Scope = ""
@@ -252,6 +266,10 @@ func convertExternalReferences(extRefs *[]ExternalReference, specVersion SpecVer
 
 		if specVersion < SpecVersion1_3 {
 			extRef.Hashes = nil
+		}
+
+		if specVersion < SpecVersion1_7 {
+			extRef.Properties = nil
 		}
 	}
 }
@@ -389,6 +407,58 @@ func convertModelCard(c *Component, specVersion SpecVersion) {
 	}
 }
 
+func convertCryptoProperties(cp *CryptoProperties, specVersion SpecVersion) {
+	if cp == nil {
+		return
+	}
+
+	if cp.AlgorithmProperties != nil {
+		if specVersion < SpecVersion1_7 {
+			cp.AlgorithmProperties.AlgorithmFamily = ""
+			cp.AlgorithmProperties.EllipticCurve = ""
+		}
+	}
+
+	if cp.CertificateProperties != nil {
+		if specVersion < SpecVersion1_7 {
+			cp.CertificateProperties.SerialNumber = ""
+			cp.CertificateProperties.CertificateFileExtension = ""
+			cp.CertificateProperties.Fingerprint = nil
+			cp.CertificateProperties.CertificateState = nil
+			cp.CertificateProperties.CertificateExtensions = nil
+			cp.CertificateProperties.RelatedCryptographicAssets = nil
+			cp.CertificateProperties.CreationDate = ""
+			cp.CertificateProperties.ActivationDate = ""
+			cp.CertificateProperties.DeactivationDate = ""
+			cp.CertificateProperties.RevocationDate = ""
+			cp.CertificateProperties.DestructionDate = ""
+		}
+	}
+
+	if cp.RelatedCryptoMaterialProperties != nil {
+		if specVersion < SpecVersion1_7 {
+			cp.RelatedCryptoMaterialProperties.Fingerprint = nil
+			cp.RelatedCryptoMaterialProperties.RelatedCryptographicAssets = nil
+		}
+	}
+
+	if cp.ProtocolProperties != nil {
+		if specVersion < SpecVersion1_7 {
+			cp.ProtocolProperties.RelatedCryptographicAssets = nil
+		}
+
+		if cp.ProtocolProperties.CipherSuites != nil {
+			for i := range *cp.ProtocolProperties.CipherSuites {
+				cs := &(*cp.ProtocolProperties.CipherSuites)[i]
+				if specVersion < SpecVersion1_7 {
+					cs.TLSGroups = nil
+					cs.TLSSignatureSchemes = nil
+				}
+			}
+		}
+	}
+}
+
 func convertVulnerabilities(vulns *[]Vulnerability, specVersion SpecVersion) {
 	if vulns == nil {
 		return
@@ -464,6 +534,10 @@ func serviceConverter(specVersion SpecVersion) func(*Service) {
 
 		if specVersion < SpecVersion1_5 {
 			s.TrustZone = ""
+		}
+
+		if specVersion < SpecVersion1_7 {
+			s.PatentAssertions = nil
 		}
 
 		convertOrganizationalEntity(s.Provider, specVersion)
@@ -674,6 +748,8 @@ func (sv SpecVersion) supportsHashAlgorithm(algo HashAlgorithm) bool {
 		return sv >= SpecVersion1_0
 	case HashAlgoSHA3_384, HashAlgoBlake2b_256, HashAlgoBlake2b_384, HashAlgoBlake2b_512, HashAlgoBlake3:
 		return sv >= SpecVersion1_2
+	case HashAlgoStreebog256, HashAlgoStreebog512:
+		return sv >= SpecVersion1_7
 	}
 
 	return false

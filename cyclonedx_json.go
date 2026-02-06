@@ -126,6 +126,8 @@ func (sv *SpecVersion) UnmarshalJSON(bytes []byte) error {
 		*sv = SpecVersion1_5
 	case SpecVersion1_6.String():
 		*sv = SpecVersion1_6
+	case SpecVersion1_7.String():
+		*sv = SpecVersion1_7
 	default:
 		return ErrInvalidSpecVersion
 	}
@@ -242,4 +244,5 @@ var jsonSchemas = map[SpecVersion]string{
 	SpecVersion1_4: "http://cyclonedx.org/schema/bom-1.4.schema.json",
 	SpecVersion1_5: "http://cyclonedx.org/schema/bom-1.5.schema.json",
 	SpecVersion1_6: "http://cyclonedx.org/schema/bom-1.6.schema.json",
+	SpecVersion1_7: "http://cyclonedx.org/schema/bom-1.7.schema.json",
 }
