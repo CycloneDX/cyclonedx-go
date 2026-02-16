@@ -237,6 +237,25 @@ func convertCompositions(comps *[]Composition, specVersion SpecVersion) {
 	}
 }
 
+
+// convertDataClassifications modifies a DataClassification slice such that it adheres to a given SpecVersion.
+func convertDataClassifications(dataClassifications *[]DataClassification, specVersion SpecVersion) {
+	if dataClassifications == nil {
+		return
+	}
+
+	// v1.6 introduced Name, Description, Governance, Source, and Destination fields
+	if specVersion < SpecVersion1_6 {
+		for i := range *dataClassifications {
+			(*dataClassifications)[i].Name = ""
+			(*dataClassifications)[i].Description = ""
+			(*dataClassifications)[i].Governance = nil
+			(*dataClassifications)[i].Source = nil
+			(*dataClassifications)[i].Destination = nil
+		}
+	}
+}
+
 // convertExternalReferences modifies an ExternalReference slice such that it adheres to a given SpecVersion.
 func convertExternalReferences(extRefs *[]ExternalReference, specVersion SpecVersion) {
 	if extRefs == nil {
@@ -464,6 +483,10 @@ func serviceConverter(specVersion SpecVersion) func(*Service) {
 
 		if specVersion < SpecVersion1_5 {
 			s.TrustZone = ""
+		}
+
+		if specVersion < SpecVersion1_6 {
+			convertDataClassifications(s.Data, specVersion)
 		}
 
 		convertOrganizationalEntity(s.Provider, specVersion)
