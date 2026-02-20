@@ -237,7 +237,6 @@ func convertCompositions(comps *[]Composition, specVersion SpecVersion) {
 	}
 }
 
-
 // convertDataClassifications modifies a DataClassification slice such that it adheres to a given SpecVersion.
 func convertDataClassifications(dataClassifications *[]DataClassification, specVersion SpecVersion) {
 	if dataClassifications == nil {
