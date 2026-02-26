@@ -642,10 +642,11 @@ type Evidence struct {
 }
 
 type EvidenceIdentity struct {
-	Field      EvidenceIdentityFieldType `json:"field,omitempty" xml:"field,omitempty"`
-	Confidence *float32                  `json:"confidence,omitempty" xml:"confidence,omitempty"`
-	Methods    *[]EvidenceIdentityMethod `json:"methods,omitempty" xml:"methods>method,omitempty"`
-	Tools      *[]BOMReference           `json:"tools,omitempty" xml:"tools>tool,omitempty"`
+	Field          EvidenceIdentityFieldType `json:"field,omitempty" xml:"field,omitempty"`
+	Confidence     *float32                  `json:"confidence,omitempty" xml:"confidence,omitempty"`
+	ConcludedValue string                    `json:"concludedValue,omitempty" xml:"concludedValue,omitempty"`
+	Methods        *[]EvidenceIdentityMethod `json:"methods,omitempty" xml:"methods>method,omitempty"`
+	Tools          *[]BOMReference           `json:"tools,omitempty" xml:"tools>tool,omitempty"`
 }
 
 type EvidenceIdentityFieldType string

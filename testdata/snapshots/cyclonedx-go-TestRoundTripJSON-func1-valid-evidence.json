@@ -23,6 +23,7 @@
           {
             "field": "purl",
             "confidence": 1,
+            "concludedValue": "pkg:maven/com.google.code.findbugs/findbugs-project@3.0.0",
             "methods": [
               {
                 "technique": "filename",

@@ -198,8 +198,9 @@ func TestEvidence_MarshalJSON(t *testing.T) {
 		evidence := Evidence{
 			Identity: &[]EvidenceIdentity{
 				{
-					Field:      EvidenceIdentityFieldTypePURL,
-					Confidence: toPointer(t, float32(1)),
+					Field:          EvidenceIdentityFieldTypePURL,
+					Confidence:     toPointer(t, float32(1)),
+					ConcludedValue: "pkg:maven/com.google.code.findbugs/findbugs-project@3.0.0",
 					Methods: &[]EvidenceIdentityMethod{
 						{
 							Technique:  "filename",
@@ -220,7 +221,7 @@ func TestEvidence_MarshalJSON(t *testing.T) {
 		}
 		jsonBytes, err := json.Marshal(evidence)
 		require.NoError(t, err)
-		require.Equal(t, `{"identity":[{"field":"purl","confidence":1,"methods":[{"technique":"filename","confidence":0.1,"value":"findbugs-project-3.0.0.jar"},{"technique":"ast-fingerprint","confidence":0.9,"value":"61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab"}],"tools":["bom-ref-of-tool-that-performed-analysis"]}]}`, string(jsonBytes))
+		require.Equal(t, `{"identity":[{"field":"purl","confidence":1,"concludedValue":"pkg:maven/com.google.code.findbugs/findbugs-project@3.0.0","methods":[{"technique":"filename","confidence":0.1,"value":"findbugs-project-3.0.0.jar"},{"technique":"ast-fingerprint","confidence":0.9,"value":"61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab"}],"tools":["bom-ref-of-tool-that-performed-analysis"]}]}`, string(jsonBytes))
 	})
 }
 

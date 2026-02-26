@@ -16,6 +16,7 @@
                 <identity>
                     <field>purl</field>
                     <confidence>1</confidence>
+                    <concludedValue>pkg:maven/com.google.code.findbugs/findbugs-project@3.0.0</concludedValue>
                     <methods>
                         <method>
                             <technique>filename</technique>
