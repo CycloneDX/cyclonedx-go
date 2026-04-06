@@ -1,0 +1,66 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "services": [
+    {
+      "bom-ref": "api-service",
+      "name": "Payment API",
+      "version": "1.0.0",
+      "description": "Payment processing service",
+      "data": [
+        {
+          "flow": "inbound",
+          "classification": "PII",
+          "name": "Customer Payment Data",
+          "description": "Credit card and billing information from customers",
+          "governance": {
+            "custodians": [
+              {
+                "organization": {
+                  "name": "Security Team",
+                  "url": [
+                    "https://security.example.com"
+                  ]
+                }
+              }
+            ],
+            "stewards": [
+              {
+                "organization": {
+                  "name": "Data Governance"
+                }
+              }
+            ]
+          },
+          "source": [
+            "https://frontend.example.com",
+            "urn:cdx:f08a6ccd-4dce-4759-bd84-c626675d60a7/1#web-app"
+          ],
+          "destination": [
+            "https://payment-processor.example.com"
+          ]
+        },
+        {
+          "flow": "outbound",
+          "classification": "public",
+          "name": "Transaction Receipt",
+          "description": "Receipt data sent to customers",
+          "source": [
+            "https://payment-processor.example.com"
+          ],
+          "destination": [
+            "https://email-service.example.com",
+            "https://frontend.example.com"
+          ]
+        },
+        {
+          "flow": "bi-directional",
+          "classification": "confidential"
+        }
+      ]
+    }
+  ]
+}
+

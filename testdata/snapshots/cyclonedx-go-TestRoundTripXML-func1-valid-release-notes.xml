@@ -77,10 +77,18 @@
       <authenticated>true</authenticated>
       <x-trust-boundary>true</x-trust-boundary>
       <data>
-        <classification flow="inbound">PII</classification>
-        <classification flow="outbound">PIFI</classification>
-        <classification flow="bi-directional">pubic</classification>
-        <classification flow="unknown">partner-data</classification>
+        <dataflow>
+          <classification flow="inbound">PII</classification>
+        </dataflow>
+        <dataflow>
+          <classification flow="outbound">PIFI</classification>
+        </dataflow>
+        <dataflow>
+          <classification flow="bi-directional">pubic</classification>
+        </dataflow>
+        <dataflow>
+          <classification flow="unknown">partner-data</classification>
+        </dataflow>
       </data>
       <licenses>
         <license>
