@@ -948,7 +948,10 @@ type LicenseChoice struct {
 	License           *License                   `json:"license,omitempty" xml:"-"`
 	Expression        string                     `json:"expression,omitempty" xml:"-"`
 	ExpressionDetails *[]LicenseExpressionDetail `json:"expressionDetails,omitempty" xml:"-"`
-	Acknowledgement   LicenseAcknowledgement     `json:"acknowledgement,omitempty" xml:"-"`
+	Acknowledgement   *LicenseAcknowledgement    `json:"acknowledgement,omitempty" xml:"-"`
+	BOMRef            string                     `json:"bom-ref,omitempty" xml:"-"`
+	Licensing         *Licensing                 `json:"licensing,omitempty" xml:"-"`
+	Properties        *[]Property                `json:"properties,omitempty" xml:"properties>property,omitempty"`
 }
 
 // LicenseExpressionDetail provides details for individual license identifiers within an SPDX expression.

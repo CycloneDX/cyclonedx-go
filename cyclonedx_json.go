@@ -236,6 +236,17 @@ func (ev *Evidence) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
+func (l License) MarshalJSON() ([]byte, error) {
+	if l.ID != "" && l.Name != "" {
+		return nil, fmt.Errorf("license must have either id or name, not both")
+	}
+	if l.ID == "" && l.Name == "" {
+		return nil, fmt.Errorf("license must have either id or name")
+	}
+	type Alias License
+	return json.Marshal(Alias(l))
+}
+
 func (pc PatentChoice) MarshalJSON() ([]byte, error) {
 	if pc.Patent != nil {
 		return json.Marshal(pc.Patent)

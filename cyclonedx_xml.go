@@ -184,6 +184,17 @@ func (ev *EnvironmentVariables) UnmarshalXML(d *xml.Decoder, _ xml.StartElement)
 	return nil
 }
 
+func (l License) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if l.ID != "" && l.Name != "" {
+		return fmt.Errorf("license must have either id or name, not both")
+	}
+	if l.ID == "" && l.Name == "" {
+		return fmt.Errorf("license must have either id or name")
+	}
+	type Alias License
+	return e.EncodeElement(Alias(l), start)
+}
+
 // licenseExpressionXML is used for marshaling/unmarshaling the simple <expression> XML element
 // which carries the expression text as character data and acknowledgement/bom-ref as attributes.
 type licenseExpressionXML struct {
@@ -225,11 +236,16 @@ func (l Licenses) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 				return err
 			}
 		} else if choice.Expression != "" {
+			var ackStr string
+			if choice.Acknowledgement != nil {
+				ackStr = string(*choice.Acknowledgement)
+			}
 			if choice.ExpressionDetails != nil {
 				// Use expression-detailed element when expressionDetails are present
 				detailed := licenseExpressionDetailedXML{
 					Expression:      choice.Expression,
-					Acknowledgement: string(choice.Acknowledgement),
+					Acknowledgement: ackStr,
+					BOMRef:          choice.BOMRef,
 				}
 				for _, d := range *choice.ExpressionDetails {
 					detailed.Details = append(detailed.Details, licenseExpressionDetailXML{
@@ -244,7 +260,8 @@ func (l Licenses) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 			} else {
 				exprXML := licenseExpressionXML{
 					Expression:      choice.Expression,
-					Acknowledgement: string(choice.Acknowledgement),
+					Acknowledgement: ackStr,
+					BOMRef:          choice.BOMRef,
 				}
 				if err := e.EncodeElement(exprXML, xml.StartElement{Name: xml.Name{Local: "expression"}}); err != nil {
 					return err
@@ -276,18 +293,27 @@ func (l *Licenses) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 				if err = d.DecodeElement(&exprXML, &tokenType); err != nil {
 					return err
 				}
-				licenses = append(licenses, LicenseChoice{
-					Expression:      exprXML.Expression,
-					Acknowledgement: LicenseAcknowledgement(exprXML.Acknowledgement),
-				})
+				choice := LicenseChoice{
+					Expression: exprXML.Expression,
+					BOMRef:     exprXML.BOMRef,
+				}
+				if exprXML.Acknowledgement != "" {
+					ack := LicenseAcknowledgement(exprXML.Acknowledgement)
+					choice.Acknowledgement = &ack
+				}
+				licenses = append(licenses, choice)
 			case "expression-detailed":
 				var detailed licenseExpressionDetailedXML
 				if err = d.DecodeElement(&detailed, &tokenType); err != nil {
 					return err
 				}
 				choice := LicenseChoice{
-					Expression:      detailed.Expression,
-					Acknowledgement: LicenseAcknowledgement(detailed.Acknowledgement),
+					Expression: detailed.Expression,
+					BOMRef:     detailed.BOMRef,
+				}
+				if detailed.Acknowledgement != "" {
+					ack := LicenseAcknowledgement(detailed.Acknowledgement)
+					choice.Acknowledgement = &ack
 				}
 				if len(detailed.Details) > 0 {
 					details := make([]LicenseExpressionDetail, len(detailed.Details))
