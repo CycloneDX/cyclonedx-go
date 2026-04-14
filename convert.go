@@ -558,9 +558,9 @@ func serviceConverter(specVersion SpecVersion) func(*Service) {
 			convertDataClassifications(s.Data, specVersion)
 		}
 
-    if specVersion < SpecVersion1_7 {
+		if specVersion < SpecVersion1_7 {
 			s.PatentAssertions = nil
-    }
+		}
 
 		convertOrganizationalEntity(s.Provider, specVersion)
 		convertExternalReferences(s.ExternalReferences, specVersion)
