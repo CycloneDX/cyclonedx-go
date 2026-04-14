@@ -184,6 +184,28 @@ func (ev *EnvironmentVariables) UnmarshalXML(d *xml.Decoder, _ xml.StartElement)
 	return nil
 }
 
+// licenseExpressionXML is used for marshaling/unmarshaling the simple <expression> XML element
+// which carries the expression text as character data and acknowledgement/bom-ref as attributes.
+type licenseExpressionXML struct {
+	Expression      string `xml:",chardata"`
+	Acknowledgement string `xml:"acknowledgement,attr,omitempty"`
+	BOMRef          string `xml:"bom-ref,attr,omitempty"`
+}
+
+// licenseExpressionDetailedXML is used for marshaling/unmarshaling the <expression-detailed> element.
+type licenseExpressionDetailedXML struct {
+	Expression      string                       `xml:"expression,attr"`
+	Acknowledgement string                       `xml:"acknowledgement,attr,omitempty"`
+	BOMRef          string                       `xml:"bom-ref,attr,omitempty"`
+	Details         []licenseExpressionDetailXML `xml:"details"`
+}
+
+type licenseExpressionDetailXML struct {
+	LicenseIdentifier string        `xml:"license-identifier,attr"`
+	Text              *AttachedText `xml:"text,omitempty"`
+	URL               string        `xml:"url,omitempty"`
+}
+
 func (l Licenses) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if len(l) == 0 {
 		return nil
@@ -203,8 +225,30 @@ func (l Licenses) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 				return err
 			}
 		} else if choice.Expression != "" {
-			if err := e.EncodeElement(choice.Expression, xml.StartElement{Name: xml.Name{Local: "expression"}}); err != nil {
-				return err
+			if choice.ExpressionDetails != nil {
+				// Use expression-detailed element when expressionDetails are present
+				detailed := licenseExpressionDetailedXML{
+					Expression:      choice.Expression,
+					Acknowledgement: string(choice.Acknowledgement),
+				}
+				for _, d := range *choice.ExpressionDetails {
+					detailed.Details = append(detailed.Details, licenseExpressionDetailXML{
+						LicenseIdentifier: d.LicenseIdentifier,
+						Text:              d.Text,
+						URL:               d.URL,
+					})
+				}
+				if err := e.EncodeElement(detailed, xml.StartElement{Name: xml.Name{Local: "expression-detailed"}}); err != nil {
+					return err
+				}
+			} else {
+				exprXML := licenseExpressionXML{
+					Expression:      choice.Expression,
+					Acknowledgement: string(choice.Acknowledgement),
+				}
+				if err := e.EncodeElement(exprXML, xml.StartElement{Name: xml.Name{Local: "expression"}}); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -228,11 +272,35 @@ func (l *Licenses) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 		case xml.StartElement:
 			switch tokenType.Name.Local {
 			case "expression":
-				var expression string
-				if err = d.DecodeElement(&expression, &tokenType); err != nil {
+				var exprXML licenseExpressionXML
+				if err = d.DecodeElement(&exprXML, &tokenType); err != nil {
 					return err
 				}
-				licenses = append(licenses, LicenseChoice{Expression: expression})
+				licenses = append(licenses, LicenseChoice{
+					Expression:      exprXML.Expression,
+					Acknowledgement: LicenseAcknowledgement(exprXML.Acknowledgement),
+				})
+			case "expression-detailed":
+				var detailed licenseExpressionDetailedXML
+				if err = d.DecodeElement(&detailed, &tokenType); err != nil {
+					return err
+				}
+				choice := LicenseChoice{
+					Expression:      detailed.Expression,
+					Acknowledgement: LicenseAcknowledgement(detailed.Acknowledgement),
+				}
+				if len(detailed.Details) > 0 {
+					details := make([]LicenseExpressionDetail, len(detailed.Details))
+					for i, det := range detailed.Details {
+						details[i] = LicenseExpressionDetail{
+							LicenseIdentifier: det.LicenseIdentifier,
+							Text:              det.Text,
+							URL:               det.URL,
+						}
+					}
+					choice.ExpressionDetails = &details
+				}
+				licenses = append(licenses, choice)
 			case "license":
 				var license License
 				if err = d.DecodeElement(&license, &tokenType); err != nil {
@@ -541,6 +609,136 @@ func (ev *Evidence) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 	}
 
 	*ev = evidence
+	return nil
+}
+
+func (d Definitions) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if d.Standards != nil {
+		standardsStart := xml.StartElement{Name: xml.Name{Local: "standards"}}
+		if err := e.EncodeToken(standardsStart); err != nil {
+			return err
+		}
+		for _, s := range *d.Standards {
+			if err := e.EncodeElement(s, xml.StartElement{Name: xml.Name{Local: "standard"}}); err != nil {
+				return err
+			}
+		}
+		if err := e.EncodeToken(standardsStart.End()); err != nil {
+			return err
+		}
+	}
+
+	if d.Patents != nil {
+		patentsStart := xml.StartElement{Name: xml.Name{Local: "patents"}}
+		if err := e.EncodeToken(patentsStart); err != nil {
+			return err
+		}
+		for _, choice := range *d.Patents {
+			if choice.Patent != nil {
+				if err := e.EncodeElement(choice.Patent, xml.StartElement{Name: xml.Name{Local: "patent"}}); err != nil {
+					return err
+				}
+			} else if choice.PatentFamily != nil {
+				if err := e.EncodeElement(choice.PatentFamily, xml.StartElement{Name: xml.Name{Local: "patentFamily"}}); err != nil {
+					return err
+				}
+			}
+		}
+		if err := e.EncodeToken(patentsStart.End()); err != nil {
+			return err
+		}
+	}
+
+	return e.EncodeToken(start.End())
+}
+
+func (d *Definitions) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
+	for {
+		token, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t := token.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "standards":
+				var standards []StandardDefinition
+				for {
+					innerToken, err := dec.Token()
+					if err != nil {
+						if errors.Is(err, io.EOF) {
+							break
+						}
+						return err
+					}
+					switch it := innerToken.(type) {
+					case xml.StartElement:
+						if it.Name.Local == "standard" {
+							var s StandardDefinition
+							if err = dec.DecodeElement(&s, &it); err != nil {
+								return err
+							}
+							standards = append(standards, s)
+						}
+					case xml.EndElement:
+						goto doneStandards
+					}
+				}
+			doneStandards:
+				if len(standards) > 0 {
+					d.Standards = &standards
+				}
+			case "patents":
+				var choices []PatentChoice
+				for {
+					innerToken, err := dec.Token()
+					if err != nil {
+						if errors.Is(err, io.EOF) {
+							break
+						}
+						return err
+					}
+					switch it := innerToken.(type) {
+					case xml.StartElement:
+						switch it.Name.Local {
+						case "patent":
+							var p Patent
+							if err = dec.DecodeElement(&p, &it); err != nil {
+								return err
+							}
+							choices = append(choices, PatentChoice{Patent: &p})
+						case "patentFamily":
+							var pf PatentFamily
+							if err = dec.DecodeElement(&pf, &it); err != nil {
+								return err
+							}
+							choices = append(choices, PatentChoice{PatentFamily: &pf})
+						}
+					case xml.EndElement:
+						goto donePatents
+					}
+				}
+			donePatents:
+				if len(choices) > 0 {
+					d.Patents = &choices
+				}
+			default:
+				if err = dec.Skip(); err != nil {
+					return err
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
 	return nil
 }
 

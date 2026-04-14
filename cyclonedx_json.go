@@ -236,6 +236,43 @@ func (ev *Evidence) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
+func (pc PatentChoice) MarshalJSON() ([]byte, error) {
+	if pc.Patent != nil {
+		return json.Marshal(pc.Patent)
+	} else if pc.PatentFamily != nil {
+		return json.Marshal(pc.PatentFamily)
+	}
+
+	return []byte("{}"), nil
+}
+
+func (pc *PatentChoice) UnmarshalJSON(data []byte) error {
+	// Distinguish patent from patentFamily by checking for the familyId field,
+	// which is the required field unique to patentFamily.
+	var peek struct {
+		FamilyID string `json:"familyId"`
+	}
+	if err := json.Unmarshal(data, &peek); err != nil {
+		return err
+	}
+
+	if peek.FamilyID != "" {
+		var pf PatentFamily
+		if err := json.Unmarshal(data, &pf); err != nil {
+			return err
+		}
+		pc.PatentFamily = &pf
+		return nil
+	}
+
+	var p Patent
+	if err := json.Unmarshal(data, &p); err != nil {
+		return err
+	}
+	pc.Patent = &p
+	return nil
+}
+
 var jsonSchemas = map[SpecVersion]string{
 	SpecVersion1_0: "",
 	SpecVersion1_1: "",

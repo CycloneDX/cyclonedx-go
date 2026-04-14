@@ -492,6 +492,7 @@ const (
 	CryptoPrimitiveKEM          CryptoPrimitive = "kem"
 	CryptoPrimitiveAE           CryptoPrimitive = "ae"
 	CryptoPrimitiveCombiner     CryptoPrimitive = "combiner"
+	CryptoPrimitiveKeyWrap      CryptoPrimitive = "key-wrap"
 	CryptoPrimitiveOther        CryptoPrimitive = "other"
 	CryptoPrimitiveUnknown      CryptoPrimitive = "unknown"
 )
@@ -517,23 +518,29 @@ type CryptoProtocolProperties struct {
 type CryptoProtocolType string
 
 const (
-	CryptoProtocolTypeTLS     CryptoProtocolType = "tls"
-	CryptoProtocolTypeSSH     CryptoProtocolType = "ssh"
-	CryptoProtocolTypeIPSec   CryptoProtocolType = "ipsec"
-	CryptoProtocolTypeIKE     CryptoProtocolType = "ike"
-	CryptoProtocolTypeSSTP    CryptoProtocolType = "sstp"
-	CryptoProtocolTypeWPA     CryptoProtocolType = "wpa"
-	CryptoProtocolTypeOther   CryptoProtocolType = "other"
-	CryptoProtocolTypeUnknown CryptoProtocolType = "unknown"
+	CryptoProtocolTypeTLS         CryptoProtocolType = "tls"
+	CryptoProtocolTypeSSH         CryptoProtocolType = "ssh"
+	CryptoProtocolTypeIPSec       CryptoProtocolType = "ipsec"
+	CryptoProtocolTypeIKE         CryptoProtocolType = "ike"
+	CryptoProtocolTypeSSTP        CryptoProtocolType = "sstp"
+	CryptoProtocolTypeWPA         CryptoProtocolType = "wpa"
+	CryptoProtocolTypeDTLS        CryptoProtocolType = "dtls"
+	CryptoProtocolTypeQUIC        CryptoProtocolType = "quic"
+	CryptoProtocolTypeEAPAKA      CryptoProtocolType = "eap-aka"
+	CryptoProtocolTypeEAPAKAPrime CryptoProtocolType = "eap-aka-prime"
+	CryptoProtocolTypePRINS       CryptoProtocolType = "prins"
+	CryptoProtocolType5GAKA       CryptoProtocolType = "5g-aka"
+	CryptoProtocolTypeOther       CryptoProtocolType = "other"
+	CryptoProtocolTypeUnknown     CryptoProtocolType = "unknown"
 )
 
 type IKEv2TransformTypes struct {
-	Encr  *[]BOMReference `json:"encr,omitempty" xml:"encr,omitempty"`
-	PRF   *[]BOMReference `json:"prf,omitempty" xml:"prf,omitempty"`
-	Integ *[]BOMReference `json:"integ,omitempty" xml:"integ,omitempty"`
-	KE    *[]BOMReference `json:"ke,omitempty" xml:"ke,omitempty"`
-	ESN   bool            `json:"esn" xml:"esn"`
-	Auth  *[]BOMReference `json:"auth,omitempty" xml:"auth,omitempty"`
+	Encr  *[]IKEv2Enc   `json:"encr,omitempty" xml:"encr,omitempty"`
+	PRF   *[]IKEv2Prf   `json:"prf,omitempty" xml:"prf,omitempty"`
+	Integ *[]IKEv2Integ `json:"integ,omitempty" xml:"integ,omitempty"`
+	KE    *[]IKEv2Ke    `json:"ke,omitempty" xml:"ke,omitempty"`
+	ESN   bool          `json:"esn" xml:"esn"`
+	Auth  *[]IKEv2Auth  `json:"auth,omitempty" xml:"auth,omitempty"`
 }
 
 type SecuredBy struct {
@@ -585,6 +592,15 @@ type DeclarationEvidence struct {
 
 type Definitions struct {
 	Standards *[]StandardDefinition `json:"standards,omitempty" xml:"standards>standard,omitempty"`
+	Patents   *[]PatentChoice       `json:"patents,omitempty" xml:"-"`
+}
+
+// PatentChoice represents either a Patent or a PatentFamily in a definitions patents list.
+// In JSON, the patents array is anyOf[patent, patentFamily]. In XML, the patents element
+// contains a choice sequence of <patent> and <patentFamily> elements.
+type PatentChoice struct {
+	Patent       *Patent       `json:"-" xml:"-"`
+	PatentFamily *PatentFamily `json:"-" xml:"-"`
 }
 
 type EvidenceData struct {
@@ -761,6 +777,10 @@ const (
 	ERTypeVCS                     ExternalReferenceType = "vcs"
 	ERTypeVulnerabilityAssertion  ExternalReferenceType = "vulnerability-assertion"
 	ERTypeWebsite                 ExternalReferenceType = "website"
+	ERTypePatent                  ExternalReferenceType = "patent"
+	ERTypePatentFamily            ExternalReferenceType = "patent-family"
+	ERTypePatentAssertion         ExternalReferenceType = "patent-assertion"
+	ERTypeCitation                ExternalReferenceType = "citation"
 )
 
 type Formula struct {
@@ -920,8 +940,18 @@ const (
 type Licenses []LicenseChoice
 
 type LicenseChoice struct {
-	License    *License `json:"license,omitempty" xml:"-"`
-	Expression string   `json:"expression,omitempty" xml:"-"`
+	License           *License                   `json:"license,omitempty" xml:"-"`
+	Expression        string                     `json:"expression,omitempty" xml:"-"`
+	ExpressionDetails *[]LicenseExpressionDetail `json:"expressionDetails,omitempty" xml:"-"`
+	Acknowledgement   LicenseAcknowledgement     `json:"acknowledgement,omitempty" xml:"-"`
+}
+
+// LicenseExpressionDetail provides details for individual license identifiers within an SPDX expression.
+type LicenseExpressionDetail struct {
+	LicenseIdentifier string        `json:"licenseIdentifier" xml:"-"`
+	BOMRef            string        `json:"bom-ref,omitempty" xml:"-"`
+	Text              *AttachedText `json:"text,omitempty" xml:"-"`
+	URL               string        `json:"url,omitempty" xml:"-"`
 }
 
 type LicenseType string
@@ -1673,6 +1703,25 @@ type Citation struct {
 	Signature    *JSFSignature         `json:"signature,omitempty" xml:"-"`
 }
 
+// PatentLegalStatus represents the legal status of a patent per WIPO ST.27.
+type PatentLegalStatus string
+
+const (
+	PatentLegalStatusPending     PatentLegalStatus = "pending"
+	PatentLegalStatusGranted     PatentLegalStatus = "granted"
+	PatentLegalStatusRevoked     PatentLegalStatus = "revoked"
+	PatentLegalStatusExpired     PatentLegalStatus = "expired"
+	PatentLegalStatusLapsed      PatentLegalStatus = "lapsed"
+	PatentLegalStatusWithdrawn   PatentLegalStatus = "withdrawn"
+	PatentLegalStatusAbandoned   PatentLegalStatus = "abandoned"
+	PatentLegalStatusSuspended   PatentLegalStatus = "suspended"
+	PatentLegalStatusReinstated  PatentLegalStatus = "reinstated"
+	PatentLegalStatusOpposed     PatentLegalStatus = "opposed"
+	PatentLegalStatusTerminated  PatentLegalStatus = "terminated"
+	PatentLegalStatusInvalidated PatentLegalStatus = "invalidated"
+	PatentLegalStatusInForce     PatentLegalStatus = "in-force"
+)
+
 // Patent represents patent information
 type Patent struct {
 	BOMRef               string                  `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
@@ -1686,7 +1735,7 @@ type Patent struct {
 	FilingDate           string                  `json:"filingDate,omitempty" xml:"filingDate,omitempty"`
 	GrantDate            string                  `json:"grantDate,omitempty" xml:"grantDate,omitempty"`
 	PatentExpirationDate string                  `json:"patentExpirationDate,omitempty" xml:"patentExpirationDate,omitempty"`
-	PatentLegalStatus    string                  `json:"patentLegalStatus" xml:"patentLegalStatus"`
+	PatentLegalStatus    PatentLegalStatus       `json:"patentLegalStatus" xml:"patentLegalStatus"`
 	PatentAssignee       *[]OrganizationalEntity `json:"patentAssignee,omitempty" xml:"patentAssignee>assignee,omitempty"`
 	ExternalReferences   *[]ExternalReference    `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 }
@@ -1742,7 +1791,7 @@ const (
 	TLPClassificationClear          TLPClassification = "CLEAR"
 	TLPClassificationGreen          TLPClassification = "GREEN"
 	TLPClassificationAmber          TLPClassification = "AMBER"
-	TLPClassificationAmberAndStrict TLPClassification = "AMBER+STRICT"
+	TLPClassificationAmberAndStrict TLPClassification = "AMBER_AND_STRICT"
 	TLPClassificationRed            TLPClassification = "RED"
 )
 
@@ -1755,7 +1804,7 @@ type IKEv2Auth struct {
 // IKEv2Enc represents IKEv2 Encryption algorithm
 type IKEv2Enc struct {
 	Name      string `json:"name,omitempty" xml:"name,omitempty"`
-	KeyLength int    `json:"keyLength,omitempty" xml:"keyLength,omitempty"`
+	KeyLength *int   `json:"keyLength,omitempty" xml:"keyLength,omitempty"`
 	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
 }
 
@@ -1767,7 +1816,7 @@ type IKEv2Integ struct {
 
 // IKEv2Ke represents IKEv2 Key Exchange method
 type IKEv2Ke struct {
-	Group     int    `json:"group,omitempty" xml:"group,omitempty"`
+	Group     *int   `json:"group,omitempty" xml:"group,omitempty"`
 	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
 }
 
