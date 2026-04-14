@@ -549,8 +549,13 @@ type SecuredBy struct {
 }
 
 type DataClassification struct {
-	Flow           DataFlow `json:"flow" xml:"flow,attr"`
-	Classification string   `json:"classification" xml:",chardata"`
+	Flow           DataFlow        `json:"flow" xml:"flow,attr"`
+	Classification string          `json:"classification" xml:",chardata"`
+	Name           string          `json:"name,omitempty" xml:"name,attr,omitempty"`
+	Description    string          `json:"description,omitempty" xml:"description,attr,omitempty"`
+	Governance     *DataGovernance `json:"governance,omitempty" xml:"governance,omitempty"`
+	Source         *[]string       `json:"source,omitempty" xml:"source>url,omitempty"`
+	Destination    *[]string       `json:"destination,omitempty" xml:"destination>url,omitempty"`
 }
 
 type DataFlow string
@@ -1352,7 +1357,7 @@ type Service struct {
 	Endpoints            *[]string             `json:"endpoints,omitempty" xml:"endpoints>endpoint,omitempty"`
 	Authenticated        *bool                 `json:"authenticated,omitempty" xml:"authenticated,omitempty"`
 	CrossesTrustBoundary *bool                 `json:"x-trust-boundary,omitempty" xml:"x-trust-boundary,omitempty"`
-	Data                 *[]DataClassification `json:"data,omitempty" xml:"data>classification,omitempty"`
+	Data                 *[]DataClassification `json:"data,omitempty" xml:"data>dataflow,omitempty"`
 	Licenses             *Licenses             `json:"licenses,omitempty" xml:"licenses,omitempty"`
 	ExternalReferences   *[]ExternalReference  `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 	Properties           *[]Property           `json:"properties,omitempty" xml:"properties>property,omitempty"`

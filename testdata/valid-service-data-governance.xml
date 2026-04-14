@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<bom serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1" xmlns="http://cyclonedx.org/schema/bom/1.6">
+    <services>
+        <service bom-ref="api-service">
+            <name>Payment API</name>
+            <version>1.0.0</version>
+            <description>Payment processing service</description>
+            <data>
+                <dataflow name="Customer Payment Data" description="Credit card and billing information from customers">
+                    <classification flow="inbound">PII</classification>
+                    <governance>
+                        <custodians>
+                            <custodian>
+                                <organization>
+                                    <name>Security Team</name>
+                                    <url>https://security.example.com</url>
+                                </organization>
+                            </custodian>
+                        </custodians>
+                        <stewards>
+                            <steward>
+                                <organization>
+                                    <name>Data Governance</name>
+                                </organization>
+                            </steward>
+                        </stewards>
+                    </governance>
+                    <source>
+                        <url>https://frontend.example.com</url>
+                        <url>urn:cdx:f08a6ccd-4dce-4759-bd84-c626675d60a7/1#web-app</url>
+                    </source>
+                    <destination>
+                        <url>https://payment-processor.example.com</url>
+                    </destination>
+                </dataflow>
+                <dataflow name="Transaction Receipt" description="Receipt data sent to customers">
+                    <classification flow="outbound">public</classification>
+                    <source>
+                        <url>https://payment-processor.example.com</url>
+                    </source>
+                    <destination>
+                        <url>https://email-service.example.com</url>
+                        <url>https://frontend.example.com</url>
+                    </destination>
+                </dataflow>
+                <dataflow>
+                    <classification flow="bi-directional">confidential</classification>
+                </dataflow>
+            </data>
+        </service>
+    </services>
+</bom>
