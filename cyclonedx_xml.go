@@ -416,6 +416,115 @@ func (sv *SpecVersion) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	return nil
 }
 
+type predefinedCertificateStateXML struct {
+	State  CertificateStateType `xml:"state"`
+	Reason string               `xml:"reason,omitempty"`
+}
+
+type customCertificateStateXML struct {
+	Name        string `xml:"name"`
+	Description string `xml:"description,omitempty"`
+	Reason      string `xml:"reason,omitempty"`
+}
+
+func (cs CertificateState) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if cs.Predefined != nil && cs.Custom != nil {
+		return fmt.Errorf("either a predefined or custom certificate state can be used, but not both")
+	}
+	if cs.Predefined != nil {
+		return e.EncodeElement(predefinedCertificateStateXML{
+			State:  cs.Predefined.State,
+			Reason: cs.Predefined.Reason,
+		}, start)
+	}
+	if cs.Custom != nil {
+		return e.EncodeElement(customCertificateStateXML{
+			Name:        cs.Custom.Name,
+			Description: cs.Custom.Description,
+			Reason:      cs.Custom.Reason,
+		}, start)
+	}
+	return nil
+}
+
+func (cs *CertificateState) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var raw struct {
+		State       string `xml:"state"`
+		Name        string `xml:"name"`
+		Description string `xml:"description"`
+		Reason      string `xml:"reason"`
+	}
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return err
+	}
+	if raw.State != "" {
+		cs.Predefined = &PredefinedCertificateState{
+			State:  CertificateStateType(raw.State),
+			Reason: raw.Reason,
+		}
+	} else {
+		cs.Custom = &CustomCertificateState{
+			Name:        raw.Name,
+			Description: raw.Description,
+			Reason:      raw.Reason,
+		}
+	}
+	return nil
+}
+
+type commonCertificateExtensionXML struct {
+	Name  CertificateExtensionName `xml:"commonExtensionName"`
+	Value string                   `xml:"commonExtensionValue,omitempty"`
+}
+
+type customCertificateExtensionXML struct {
+	Name  string `xml:"customExtensionName"`
+	Value string `xml:"customExtensionValue,omitempty"`
+}
+
+func (ce CertificateExtension) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if ce.Common != nil && ce.Custom != nil {
+		return fmt.Errorf("either a common or custom certificate extension can be used, but not both")
+	}
+	if ce.Common != nil {
+		return e.EncodeElement(commonCertificateExtensionXML{
+			Name:  ce.Common.Name,
+			Value: ce.Common.Value,
+		}, start)
+	}
+	if ce.Custom != nil {
+		return e.EncodeElement(customCertificateExtensionXML{
+			Name:  ce.Custom.Name,
+			Value: ce.Custom.Value,
+		}, start)
+	}
+	return nil
+}
+
+func (ce *CertificateExtension) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var raw struct {
+		CommonExtensionName  string `xml:"commonExtensionName"`
+		CommonExtensionValue string `xml:"commonExtensionValue"`
+		CustomExtensionName  string `xml:"customExtensionName"`
+		CustomExtensionValue string `xml:"customExtensionValue"`
+	}
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return err
+	}
+	if raw.CommonExtensionName != "" {
+		ce.Common = &CommonCertificateExtension{
+			Name:  CertificateExtensionName(raw.CommonExtensionName),
+			Value: raw.CommonExtensionValue,
+		}
+	} else {
+		ce.Custom = &CustomCertificateExtension{
+			Name:  raw.CustomExtensionName,
+			Value: raw.CustomExtensionValue,
+		}
+	}
+	return nil
+}
+
 // toolsChoiceMarshalXML is a helper struct for marshalling ToolsChoice.
 type toolsChoiceMarshalXML struct {
 	LegacyTools *[]Tool      `json:"-" xml:"tool,omitempty"`

@@ -1840,14 +1840,25 @@ type RelatedCryptographicAsset struct {
 	Ref  string `json:"ref,omitempty" xml:"ref,omitempty"`
 }
 
-// CertificateState represents the lifecycle state of a certificate
+// CertificateState represents the lifecycle state of a certificate.
+// It is a oneOf of either a PredefinedCertificateState or a CustomCertificateState.
+// Encoding or decoding a CertificateState with both options present will raise an error.
 type CertificateState struct {
-	// Predefined state fields
-	State  CertificateStateType `json:"state,omitempty" xml:"state,omitempty"`
+	Predefined *PredefinedCertificateState `json:"-" xml:"-"`
+	Custom     *CustomCertificateState     `json:"-" xml:"-"`
+}
+
+// PredefinedCertificateState represents a certificate state using a predefined enum value.
+type PredefinedCertificateState struct {
+	State  CertificateStateType `json:"state" xml:"state"`
 	Reason string               `json:"reason,omitempty" xml:"reason,omitempty"`
-	// Custom state fields
-	Name        string `json:"name,omitempty" xml:"name,omitempty"`
+}
+
+// CustomCertificateState represents a certificate state using a custom name and description.
+type CustomCertificateState struct {
+	Name        string `json:"name" xml:"name"`
 	Description string `json:"description,omitempty" xml:"description,omitempty"`
+	Reason      string `json:"reason,omitempty" xml:"reason,omitempty"`
 }
 
 // CertificateStateType represents predefined certificate lifecycle states
@@ -1862,14 +1873,24 @@ const (
 	CertificateStateDestroyed     CertificateStateType = "destroyed"
 )
 
-// CertificateExtension represents a certificate extension field
+// CertificateExtension represents a certificate extension field.
+// It is a oneOf of either a CommonCertificateExtension or a CustomCertificateExtension.
+// Encoding or decoding a CertificateExtension with both options present will raise an error.
 type CertificateExtension struct {
-	// Common extension fields
-	CommonExtensionName  CertificateExtensionName `json:"commonExtensionName,omitempty" xml:"commonExtensionName,omitempty"`
-	CommonExtensionValue string                   `json:"commonExtensionValue,omitempty" xml:"commonExtensionValue,omitempty"`
-	// Custom extension fields
-	CustomExtensionName  string `json:"customExtensionName,omitempty" xml:"customExtensionName,omitempty"`
-	CustomExtensionValue string `json:"customExtensionValue,omitempty" xml:"customExtensionValue,omitempty"`
+	Common *CommonCertificateExtension `json:"-" xml:"-"`
+	Custom *CustomCertificateExtension `json:"-" xml:"-"`
+}
+
+// CommonCertificateExtension represents a certificate extension using a predefined name.
+type CommonCertificateExtension struct {
+	Name  CertificateExtensionName `json:"commonExtensionName" xml:"commonExtensionName"`
+	Value string                   `json:"commonExtensionValue,omitempty" xml:"commonExtensionValue,omitempty"`
+}
+
+// CustomCertificateExtension represents a certificate extension using a custom name.
+type CustomCertificateExtension struct {
+	Name  string `json:"customExtensionName" xml:"customExtensionName"`
+	Value string `json:"customExtensionValue,omitempty" xml:"customExtensionValue,omitempty"`
 }
 
 // CertificateExtensionName represents common certificate extension names

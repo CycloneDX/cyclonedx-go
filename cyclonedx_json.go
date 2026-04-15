@@ -247,6 +247,76 @@ func (l License) MarshalJSON() ([]byte, error) {
 	return json.Marshal(Alias(l))
 }
 
+func (cs CertificateState) MarshalJSON() ([]byte, error) {
+	if cs.Predefined != nil && cs.Custom != nil {
+		return nil, fmt.Errorf("either a predefined or custom certificate state can be used, but not both")
+	}
+	if cs.Predefined != nil {
+		return json.Marshal(cs.Predefined)
+	} else if cs.Custom != nil {
+		return json.Marshal(cs.Custom)
+	}
+	return []byte("{}"), nil
+}
+
+func (cs *CertificateState) UnmarshalJSON(data []byte) error {
+	var peek struct {
+		State string `json:"state"`
+	}
+	if err := json.Unmarshal(data, &peek); err != nil {
+		return err
+	}
+	if peek.State != "" {
+		var p PredefinedCertificateState
+		if err := json.Unmarshal(data, &p); err != nil {
+			return err
+		}
+		cs.Predefined = &p
+		return nil
+	}
+	var c CustomCertificateState
+	if err := json.Unmarshal(data, &c); err != nil {
+		return err
+	}
+	cs.Custom = &c
+	return nil
+}
+
+func (ce CertificateExtension) MarshalJSON() ([]byte, error) {
+	if ce.Common != nil && ce.Custom != nil {
+		return nil, fmt.Errorf("either a common or custom certificate extension can be used, but not both")
+	}
+	if ce.Common != nil {
+		return json.Marshal(ce.Common)
+	} else if ce.Custom != nil {
+		return json.Marshal(ce.Custom)
+	}
+	return []byte("{}"), nil
+}
+
+func (ce *CertificateExtension) UnmarshalJSON(data []byte) error {
+	var peek struct {
+		CommonExtensionName string `json:"commonExtensionName"`
+	}
+	if err := json.Unmarshal(data, &peek); err != nil {
+		return err
+	}
+	if peek.CommonExtensionName != "" {
+		var c CommonCertificateExtension
+		if err := json.Unmarshal(data, &c); err != nil {
+			return err
+		}
+		ce.Common = &c
+		return nil
+	}
+	var c CustomCertificateExtension
+	if err := json.Unmarshal(data, &c); err != nil {
+		return err
+	}
+	ce.Custom = &c
+	return nil
+}
+
 func (pc PatentChoice) MarshalJSON() ([]byte, error) {
 	if pc.Patent != nil {
 		return json.Marshal(pc.Patent)
