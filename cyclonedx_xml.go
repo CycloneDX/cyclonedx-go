@@ -652,7 +652,11 @@ func (ev Evidence) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	evidenceXML := EvidenceMarshalXML{}
 	empty := true
 	if ev.Identity != nil {
-		evidenceXML.Identity = ev.Identity
+		if ev.Identity.Identities != nil {
+			evidenceXML.Identity = ev.Identity.Identities
+		} else if ev.Identity.Identity != nil {
+			evidenceXML.Identity = &[]EvidenceIdentity{*ev.Identity.Identity}
+		}
 		empty = false
 	}
 	if ev.Occurrences != nil {
@@ -740,7 +744,7 @@ func (ev *Evidence) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 	}
 
 	if len(identifies) > 0 {
-		evidence.Identity = &identifies
+		evidence.Identity = &EvidenceIdentityChoice{Identities: &identifies}
 	}
 
 	*ev = evidence

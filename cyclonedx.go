@@ -670,18 +670,27 @@ type Event struct {
 }
 
 type Evidence struct {
-	Identity    *[]EvidenceIdentity   `json:"identity,omitempty" xml:"-"`
-	Occurrences *[]EvidenceOccurrence `json:"occurrences,omitempty" xml:"-"`
-	Callstack   *Callstack            `json:"callstack,omitempty" xml:"-"`
-	Licenses    *Licenses             `json:"licenses,omitempty" xml:"-"`
-	Copyright   *[]Copyright          `json:"copyright,omitempty" xml:"-"`
+	Identity    *EvidenceIdentityChoice `json:"identity,omitempty" xml:"-"`
+	Occurrences *[]EvidenceOccurrence   `json:"occurrences,omitempty" xml:"-"`
+	Callstack   *Callstack              `json:"callstack,omitempty" xml:"-"`
+	Licenses    *Licenses               `json:"licenses,omitempty" xml:"-"`
+	Copyright   *[]Copyright            `json:"copyright,omitempty" xml:"-"`
+}
+
+// EvidenceIdentityChoice represents the oneOf identity field in component evidence.
+// In 1.7, identity can be either an array of EvidenceIdentity objects or a single
+// EvidenceIdentity object (deprecated). Encoding or decoding with both set will raise an error.
+type EvidenceIdentityChoice struct {
+	Identity   *EvidenceIdentity   `json:"-" xml:"-"` // Deprecated: Use Identities
+	Identities *[]EvidenceIdentity `json:"-" xml:"-"`
 }
 
 type EvidenceIdentity struct {
-	Field      EvidenceIdentityFieldType `json:"field,omitempty" xml:"field,omitempty"`
-	Confidence *float32                  `json:"confidence,omitempty" xml:"confidence,omitempty"`
-	Methods    *[]EvidenceIdentityMethod `json:"methods,omitempty" xml:"methods>method,omitempty"`
-	Tools      *[]BOMReference           `json:"tools,omitempty" xml:"tools>tool,omitempty"`
+	Field          EvidenceIdentityFieldType `json:"field,omitempty" xml:"field,omitempty"`
+	Confidence     *float32                  `json:"confidence,omitempty" xml:"confidence,omitempty"`
+	ConcludedValue string                    `json:"concludedValue,omitempty" xml:"concludedValue,omitempty"`
+	Methods        *[]EvidenceIdentityMethod `json:"methods,omitempty" xml:"methods>method,omitempty"`
+	Tools          *[]BOMReference           `json:"tools,omitempty" xml:"tools>tool,omitempty"`
 }
 
 type EvidenceIdentityFieldType string

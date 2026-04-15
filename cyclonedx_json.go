@@ -189,50 +189,33 @@ func (tc *ToolsChoice) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
-func (ev *Evidence) UnmarshalJSON(bytes []byte) error {
-	type Alias Evidence
-	var aux = &struct {
-		Identity json.RawMessage `json:"identity"`
-		*Alias
-	}{
-		Alias: (*Alias)(ev),
+func (eic EvidenceIdentityChoice) MarshalJSON() ([]byte, error) {
+	if eic.Identity != nil && eic.Identities != nil {
+		return nil, fmt.Errorf("either a single identity or an array of identities can be used, but not both")
 	}
+	if eic.Identity != nil {
+		return json.Marshal(eic.Identity)
+	} else if eic.Identities != nil {
+		return json.Marshal(eic.Identities)
+	}
+	return []byte("null"), nil
+}
 
-	if err := json.Unmarshal(bytes, &aux); err != nil {
+func (eic *EvidenceIdentityChoice) UnmarshalJSON(data []byte) error {
+	// Discriminate based on whether data is an array or a single object.
+	if len(data) > 0 && data[0] == '[' {
+		var identities []EvidenceIdentity
+		if err := json.Unmarshal(data, &identities); err != nil {
+			return err
+		}
+		eic.Identities = &identities
+		return nil
+	}
+	var identity EvidenceIdentity
+	if err := json.Unmarshal(data, &identity); err != nil {
 		return err
 	}
-
-	// Try to unmarshal Identity field as struct
-	if aux.Identity != nil {
-		var identity EvidenceIdentity
-		err := json.Unmarshal(aux.Identity, &identity)
-		if err != nil {
-			var typeErr *json.UnmarshalTypeError
-			if !errors.As(err, &typeErr) || typeErr.Value != "array" {
-				return err
-			}
-
-			// Try to unmarshal Identity field as array
-			var identities []EvidenceIdentity
-			err = json.Unmarshal(aux.Identity, &identities)
-			if err != nil {
-				return err
-			}
-
-			if len(identities) > 0 {
-				ev.Identity = &identities
-			}
-			return nil
-		}
-
-		// The field is required, so we can check for emptiness using this field.
-		// cf. https://cyclonedx.org/docs/1.6/json/#metadata_component_evidence_identity_oneOf_i0_items_field
-		if identity.Field != "" {
-			ev.Identity = &[]EvidenceIdentity{
-				identity,
-			}
-		}
-	}
+	eic.Identity = &identity
 	return nil
 }
 
