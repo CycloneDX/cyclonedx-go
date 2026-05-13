@@ -300,6 +300,118 @@ func (ce *CertificateExtension) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (ac AsserterChoice) MarshalJSON() ([]byte, error) {
+	if ac.Organization != nil {
+		return json.Marshal(struct {
+			Organization *OrganizationalEntity `json:"organization"`
+		}{Organization: ac.Organization})
+	} else if ac.Individual != nil {
+		return json.Marshal(struct {
+			Individual *OrganizationalContact `json:"individual"`
+		}{Individual: ac.Individual})
+	} else if ac.BOMRef != nil {
+		return json.Marshal(struct {
+			BOMRef *BOMReference `json:"ref"`
+		}{BOMRef: ac.BOMRef})
+	}
+	return []byte("{}"), nil
+}
+
+func (ac *AsserterChoice) UnmarshalJSON(data []byte) error {
+	var peek struct {
+		Organization *json.RawMessage `json:"organization"`
+		Individual   *json.RawMessage `json:"individual"`
+		BOMRef       *json.RawMessage `json:"ref"`
+	}
+	if err := json.Unmarshal(data, &peek); err != nil {
+		return err
+	}
+	if peek.Organization != nil {
+		var org OrganizationalEntity
+		if err := json.Unmarshal(*peek.Organization, &org); err != nil {
+			return err
+		}
+		ac.Organization = &org
+	} else if peek.Individual != nil {
+		var contact OrganizationalContact
+		if err := json.Unmarshal(*peek.Individual, &contact); err != nil {
+			return err
+		}
+		ac.Individual = &contact
+	} else if peek.BOMRef != nil {
+		var ref BOMReference
+		if err := json.Unmarshal(*peek.BOMRef, &ref); err != nil {
+			return err
+		}
+		ac.BOMRef = &ref
+	}
+	return nil
+}
+
+func ikev2MarshalJSON(bomRef BOMReference, structured interface{}) ([]byte, error) {
+	if bomRef != "" {
+		return json.Marshal(string(bomRef))
+	}
+	return json.Marshal(structured)
+}
+
+func ikev2UnmarshalJSON(data []byte, bomRef *BOMReference, structured interface{}) error {
+	if len(data) > 0 && data[0] == '"' {
+		return json.Unmarshal(data, bomRef)
+	}
+	return json.Unmarshal(data, structured)
+}
+
+func (v IKEv2Auth) MarshalJSON() ([]byte, error) {
+	type alias IKEv2Auth
+	return ikev2MarshalJSON(v.BOMRef, alias(v))
+}
+
+func (v *IKEv2Auth) UnmarshalJSON(data []byte) error {
+	type alias IKEv2Auth
+	return ikev2UnmarshalJSON(data, &v.BOMRef, (*alias)(v))
+}
+
+func (v IKEv2Enc) MarshalJSON() ([]byte, error) {
+	type alias IKEv2Enc
+	return ikev2MarshalJSON(v.BOMRef, alias(v))
+}
+
+func (v *IKEv2Enc) UnmarshalJSON(data []byte) error {
+	type alias IKEv2Enc
+	return ikev2UnmarshalJSON(data, &v.BOMRef, (*alias)(v))
+}
+
+func (v IKEv2Integ) MarshalJSON() ([]byte, error) {
+	type alias IKEv2Integ
+	return ikev2MarshalJSON(v.BOMRef, alias(v))
+}
+
+func (v *IKEv2Integ) UnmarshalJSON(data []byte) error {
+	type alias IKEv2Integ
+	return ikev2UnmarshalJSON(data, &v.BOMRef, (*alias)(v))
+}
+
+func (v IKEv2Ke) MarshalJSON() ([]byte, error) {
+	type alias IKEv2Ke
+	return ikev2MarshalJSON(v.BOMRef, alias(v))
+}
+
+func (v *IKEv2Ke) UnmarshalJSON(data []byte) error {
+	type alias IKEv2Ke
+	return ikev2UnmarshalJSON(data, &v.BOMRef, (*alias)(v))
+}
+
+func (v IKEv2Prf) MarshalJSON() ([]byte, error) {
+	type alias IKEv2Prf
+	return ikev2MarshalJSON(v.BOMRef, alias(v))
+}
+
+func (v *IKEv2Prf) UnmarshalJSON(data []byte) error {
+	type alias IKEv2Prf
+	return ikev2UnmarshalJSON(data, &v.BOMRef, (*alias)(v))
+}
+
 func (pc PatentChoice) MarshalJSON() ([]byte, error) {
 	if pc.Patent != nil {
 		return json.Marshal(pc.Patent)

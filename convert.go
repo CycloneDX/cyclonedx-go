@@ -58,6 +58,9 @@ func (b *BOM) convert(specVersion SpecVersion) {
 	}
 	if specVersion < SpecVersion1_7 {
 		b.Citations = nil
+		if b.Definitions != nil {
+			b.Definitions.Patents = nil
+		}
 	}
 
 	if b.Dependencies != nil && specVersion < SpecVersion1_6 {
@@ -223,6 +226,11 @@ func convertEvidence(c *Component, specVersion SpecVersion) {
 			ids = ids[:1]
 			c.Evidence.Identity = &EvidenceIdentityChoice{Identities: &ids}
 		}
+		if c.Evidence.Identity != nil && c.Evidence.Identity.Identities != nil {
+			for i := range *c.Evidence.Identity.Identities {
+				(*c.Evidence.Identity.Identities)[i].ConcludedValue = ""
+			}
+		}
 		if c.Evidence.Occurrences != nil {
 			for i := range *c.Evidence.Occurrences {
 				occ := &(*c.Evidence.Occurrences)[i]
@@ -381,6 +389,15 @@ func convertLicenses(licenses *Licenses, specVersion SpecVersion) {
 			}
 		}
 	}
+
+	if specVersion < SpecVersion1_7 {
+		for i := range *licenses {
+			choice := &(*licenses)[i]
+			choice.ExpressionDetails = nil
+			choice.Licensing = nil
+			choice.Properties = nil
+		}
+	}
 }
 
 func convertOrganizationalEntity(org *OrganizationalEntity, specVersion SpecVersion) {
@@ -435,6 +452,13 @@ func convertCryptoProperties(cp *CryptoProperties, specVersion SpecVersion) {
 			cp.AlgorithmProperties.AlgorithmFamily = ""
 			cp.AlgorithmProperties.EllipticCurve = ""
 		}
+		if !specVersion.supportsCryptoPrimitive(cp.AlgorithmProperties.Primitive) {
+			cp.AlgorithmProperties.Primitive = ""
+		}
+	}
+
+	if cp.ProtocolProperties != nil && !specVersion.supportsCryptoProtocolType(cp.ProtocolProperties.Type) {
+		cp.ProtocolProperties.Type = ""
 	}
 
 	if cp.CertificateProperties != nil {
@@ -759,9 +783,29 @@ func (sv SpecVersion) supportsExternalReferenceType(ert ExternalReferenceType) b
 		ERTypeThreatModel,
 		ERTypeVulnerabilityAssertion:
 		return sv >= SpecVersion1_5
+	case ERTypePatent, ERTypePatentFamily, ERTypePatentAssertion, ERTypeCitation:
+		return sv >= SpecVersion1_7
 	}
 
 	return sv >= SpecVersion1_1
+}
+
+func (sv SpecVersion) supportsCryptoPrimitive(primitive CryptoPrimitive) bool {
+	switch primitive {
+	case CryptoPrimitiveKeyWrap:
+		return sv >= SpecVersion1_7
+	}
+	return sv >= SpecVersion1_6
+}
+
+func (sv SpecVersion) supportsCryptoProtocolType(pt CryptoProtocolType) bool {
+	switch pt {
+	case CryptoProtocolTypeDTLS, CryptoProtocolTypeQUIC,
+		CryptoProtocolTypeEAPAKA, CryptoProtocolTypeEAPAKAPrime,
+		CryptoProtocolTypePRINS, CryptoProtocolType5GAKA:
+		return sv >= SpecVersion1_7
+	}
+	return sv >= SpecVersion1_6
 }
 
 func (sv SpecVersion) supportsHashAlgorithm(algo HashAlgorithm) bool {

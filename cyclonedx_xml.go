@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 )
 
 // bomReferenceXML is temporarily used for marshalling and unmarshalling
@@ -521,6 +522,205 @@ func (ce *CertificateExtension) UnmarshalXML(d *xml.Decoder, start xml.StartElem
 			Name:  raw.CustomExtensionName,
 			Value: raw.CustomExtensionValue,
 		}
+	}
+	return nil
+}
+
+func (ac AsserterChoice) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if ac.Organization != nil && ac.Individual != nil {
+		return fmt.Errorf("asserter can only be one of organization, individual, or ref")
+	}
+	if ac.Organization != nil {
+		return e.EncodeElement(struct {
+			Organization *OrganizationalEntity `xml:"organization"`
+		}{Organization: ac.Organization}, start)
+	}
+	if ac.Individual != nil {
+		return e.EncodeElement(struct {
+			Individual *OrganizationalContact `xml:"contact"`
+		}{Individual: ac.Individual}, start)
+	}
+	if ac.BOMRef != nil {
+		return e.EncodeElement(struct {
+			BOMRef *BOMReference `xml:"ref"`
+		}{BOMRef: ac.BOMRef}, start)
+	}
+	return nil
+}
+
+func (ac *AsserterChoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var raw struct {
+		Organization *OrganizationalEntity  `xml:"organization"`
+		Individual   *OrganizationalContact `xml:"contact"`
+		BOMRef       *BOMReference          `xml:"ref"`
+	}
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return err
+	}
+	ac.Organization = raw.Organization
+	ac.Individual = raw.Individual
+	ac.BOMRef = raw.BOMRef
+	return nil
+}
+
+func (v IKEv2Auth) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	type alias IKEv2Auth
+	if v.BOMRef != "" {
+		if err := e.EncodeToken(start); err != nil {
+			return err
+		}
+		if err := e.EncodeToken(xml.CharData(string(v.BOMRef))); err != nil {
+			return err
+		}
+		return e.EncodeToken(start.End())
+	}
+	return e.EncodeElement(alias(v), start)
+}
+
+func (v *IKEv2Auth) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var raw struct {
+		Content   string `xml:",chardata"`
+		Name      string `xml:"name"`
+		Algorithm string `xml:"algorithm"`
+	}
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return err
+	}
+	if content := strings.TrimSpace(raw.Content); content != "" && raw.Name == "" && raw.Algorithm == "" {
+		v.BOMRef = BOMReference(content)
+	} else {
+		v.Name = raw.Name
+		v.Algorithm = raw.Algorithm
+	}
+	return nil
+}
+
+func (v IKEv2Enc) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	type alias IKEv2Enc
+	if v.BOMRef != "" {
+		if err := e.EncodeToken(start); err != nil {
+			return err
+		}
+		if err := e.EncodeToken(xml.CharData(string(v.BOMRef))); err != nil {
+			return err
+		}
+		return e.EncodeToken(start.End())
+	}
+	return e.EncodeElement(alias(v), start)
+}
+
+func (v *IKEv2Enc) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var raw struct {
+		Content   string `xml:",chardata"`
+		Name      string `xml:"name"`
+		KeyLength *int   `xml:"keyLength"`
+		Algorithm string `xml:"algorithm"`
+	}
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return err
+	}
+	if content := strings.TrimSpace(raw.Content); content != "" && raw.Name == "" && raw.Algorithm == "" && raw.KeyLength == nil {
+		v.BOMRef = BOMReference(content)
+	} else {
+		v.Name = raw.Name
+		v.KeyLength = raw.KeyLength
+		v.Algorithm = raw.Algorithm
+	}
+	return nil
+}
+
+func (v IKEv2Integ) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	type alias IKEv2Integ
+	if v.BOMRef != "" {
+		if err := e.EncodeToken(start); err != nil {
+			return err
+		}
+		if err := e.EncodeToken(xml.CharData(string(v.BOMRef))); err != nil {
+			return err
+		}
+		return e.EncodeToken(start.End())
+	}
+	return e.EncodeElement(alias(v), start)
+}
+
+func (v *IKEv2Integ) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var raw struct {
+		Content   string `xml:",chardata"`
+		Name      string `xml:"name"`
+		Algorithm string `xml:"algorithm"`
+	}
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return err
+	}
+	if content := strings.TrimSpace(raw.Content); content != "" && raw.Name == "" && raw.Algorithm == "" {
+		v.BOMRef = BOMReference(content)
+	} else {
+		v.Name = raw.Name
+		v.Algorithm = raw.Algorithm
+	}
+	return nil
+}
+
+func (v IKEv2Ke) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	type alias IKEv2Ke
+	if v.BOMRef != "" {
+		if err := e.EncodeToken(start); err != nil {
+			return err
+		}
+		if err := e.EncodeToken(xml.CharData(string(v.BOMRef))); err != nil {
+			return err
+		}
+		return e.EncodeToken(start.End())
+	}
+	return e.EncodeElement(alias(v), start)
+}
+
+func (v *IKEv2Ke) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var raw struct {
+		Content   string `xml:",chardata"`
+		Group     *int   `xml:"group"`
+		Algorithm string `xml:"algorithm"`
+	}
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return err
+	}
+	if content := strings.TrimSpace(raw.Content); content != "" && raw.Algorithm == "" && raw.Group == nil {
+		v.BOMRef = BOMReference(content)
+	} else {
+		v.Group = raw.Group
+		v.Algorithm = raw.Algorithm
+	}
+	return nil
+}
+
+func (v IKEv2Prf) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	type alias IKEv2Prf
+	if v.BOMRef != "" {
+		if err := e.EncodeToken(start); err != nil {
+			return err
+		}
+		if err := e.EncodeToken(xml.CharData(string(v.BOMRef))); err != nil {
+			return err
+		}
+		return e.EncodeToken(start.End())
+	}
+	return e.EncodeElement(alias(v), start)
+}
+
+func (v *IKEv2Prf) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var raw struct {
+		Content   string `xml:",chardata"`
+		Name      string `xml:"name"`
+		Algorithm string `xml:"algorithm"`
+	}
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return err
+	}
+	if content := strings.TrimSpace(raw.Content); content != "" && raw.Name == "" && raw.Algorithm == "" {
+		v.BOMRef = BOMReference(content)
+	} else {
+		v.Name = raw.Name
+		v.Algorithm = raw.Algorithm
 	}
 	return nil
 }

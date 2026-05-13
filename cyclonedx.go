@@ -180,8 +180,8 @@ type CertificateProperties struct {
 	CertificateExtension       string                       `json:"certificateExtension,omitempty" xml:"certificateExtension,omitempty"`                                       // Deprecated in 1.7: use CertificateFileExtension
 	CertificateFileExtension   string                       `json:"certificateFileExtension,omitempty" xml:"certificateFileExtension,omitempty"`                               // New in 1.7
 	Fingerprint                *Hash                        `json:"fingerprint,omitempty" xml:"fingerprint,omitempty"`                                                         // New in 1.7
-	CertificateState           *[]CertificateState          `json:"certificateState,omitempty" xml:"certificateState>state,omitempty"`                                         // New in 1.7
-	CertificateExtensions      *[]CertificateExtension      `json:"certificateExtensions,omitempty" xml:"certificateExtensions>extension,omitempty"`                           // New in 1.7
+	CertificateState           *[]CertificateState          `json:"certificateState,omitempty" xml:"certificateState,omitempty"`                                               // New in 1.7
+	CertificateExtensions      *[]CertificateExtension      `json:"certificateExtensions,omitempty" xml:"certificateExtensions>certificateExtension,omitempty"`                // New in 1.7
 	RelatedCryptographicAssets *[]RelatedCryptographicAsset `json:"relatedCryptographicAssets,omitempty" xml:"relatedCryptographicAssets>relatedCryptographicAsset,omitempty"` // New in 1.7
 	CreationDate               string                       `json:"creationDate,omitempty" xml:"creationDate,omitempty"`                                                       // New in 1.7
 	ActivationDate             string                       `json:"activationDate,omitempty" xml:"activationDate,omitempty"`                                                   // New in 1.7
@@ -207,7 +207,7 @@ type CipherSuite struct {
 	Algorithms          *[]BOMReference `json:"algorithms,omitempty" xml:"algorithms,omitempty"`
 	Identifiers         *[]string       `json:"identifiers,omitempty" xml:"identifiers,omitempty"`
 	TLSGroups           *[]string       `json:"tlsGroups,omitempty" xml:"tlsGroups>group,omitempty"`
-	TLSSignatureSchemes *[]string       `json:"tlsSignatureSchemes,omitempty" xml:"tlsSignatureSchemes>scheme,omitempty"`
+	TLSSignatureSchemes *[]string       `json:"tlsSignatureSchemes,omitempty" xml:"tlsSignatureSchemes>signatureScheme,omitempty"`
 }
 
 type ComponentType string
@@ -1714,7 +1714,7 @@ type Citation struct {
 	Pointers     *[]string             `json:"pointers,omitempty" xml:"pointers>pointer,omitempty"`
 	Expressions  *[]string             `json:"expressions,omitempty" xml:"expressions>expression,omitempty"`
 	Timestamp    string                `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
-	AttributedTo *OrganizationalEntity `json:"attributedTo,omitempty" xml:"attributedTo,omitempty"`
+	AttributedTo *BOMReference         `json:"attributedTo,omitempty" xml:"attributedTo,omitempty"`
 	Process      string                `json:"process,omitempty" xml:"process,omitempty"`
 	Note         string                `json:"note,omitempty" xml:"note,omitempty"`
 	Signature    *JSFSignature         `json:"signature,omitempty" xml:"-"`
@@ -1753,7 +1753,7 @@ type Patent struct {
 	GrantDate            string                  `json:"grantDate,omitempty" xml:"grantDate,omitempty"`
 	PatentExpirationDate string                  `json:"patentExpirationDate,omitempty" xml:"patentExpirationDate,omitempty"`
 	PatentLegalStatus    PatentLegalStatus       `json:"patentLegalStatus" xml:"patentLegalStatus"`
-	PatentAssignee       *[]OrganizationalEntity `json:"patentAssignee,omitempty" xml:"patentAssignee>assignee,omitempty"`
+	PatentAssignee       *[]OrganizationalEntityOrContact `json:"patentAssignee,omitempty" xml:"patentAssignee,omitempty"`
 	ExternalReferences   *[]ExternalReference    `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 }
 
@@ -1762,17 +1762,26 @@ type PatentFamily struct {
 	BOMRef              string               `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
 	FamilyID            string               `json:"familyId" xml:"familyId"`
 	PriorityApplication *PriorityApplication `json:"priorityApplication,omitempty" xml:"priorityApplication,omitempty"`
-	Members             *[]Patent            `json:"members,omitempty" xml:"members>member,omitempty"`
+	Members             *[]BOMReference      `json:"members,omitempty" xml:"members>ref,omitempty"`
 	ExternalReferences  *[]ExternalReference `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+}
+
+// AsserterChoice represents the asserter of a patent assertion.
+// It is a oneOf of OrganizationalEntity, OrganizationalContact, or a BOM reference.
+// Encoding or decoding with more than one option set will raise an error.
+type AsserterChoice struct {
+	Organization *OrganizationalEntity  `json:"organization,omitempty" xml:"organization,omitempty"`
+	Individual   *OrganizationalContact `json:"individual,omitempty" xml:"contact,omitempty"`
+	BOMRef       *BOMReference          `json:"ref,omitempty" xml:"ref,omitempty"`
 }
 
 // PatentAssertion represents a patent assertion on a component or service
 type PatentAssertion struct {
-	BOMRef        string                `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
-	PatentRefs    *[]BOMReference       `json:"patentRefs,omitempty" xml:"patentRefs>patentRef,omitempty"`
-	AssertionType PatentAssertionType   `json:"assertionType" xml:"assertionType"`
-	Asserter      *OrganizationalEntity `json:"asserter" xml:"asserter"`
-	Notes         string                `json:"notes,omitempty" xml:"notes,omitempty"`
+	BOMRef        string              `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	PatentRefs    *[]BOMReference     `json:"patentRefs,omitempty" xml:"patentRefs>bom-ref,omitempty"`
+	AssertionType PatentAssertionType `json:"assertionType" xml:"assertionType"`
+	Asserter      *AsserterChoice     `json:"asserter" xml:"asserter"`
+	Notes         string              `json:"notes,omitempty" xml:"notes,omitempty"`
 }
 
 // PatentAssertionType represents the type of patent assertion
@@ -1812,35 +1821,45 @@ const (
 	TLPClassificationRed            TLPClassification = "RED"
 )
 
-// IKEv2Auth represents IKEv2 Authentication method
+// IKEv2Auth represents IKEv2 Authentication method.
+// BOMRef holds the deprecated 1.6 bom-ref string form; Name/Algorithm are the 1.7 structured form.
 type IKEv2Auth struct {
-	Name      string `json:"name,omitempty" xml:"name,omitempty"`
-	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+	BOMRef    BOMReference `json:"-" xml:"-"`
+	Name      string       `json:"name,omitempty" xml:"name,omitempty"`
+	Algorithm string       `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
 }
 
-// IKEv2Enc represents IKEv2 Encryption algorithm
+// IKEv2Enc represents IKEv2 Encryption algorithm.
+// BOMRef holds the deprecated 1.6 bom-ref string form; Name/KeyLength/Algorithm are the 1.7 structured form.
 type IKEv2Enc struct {
-	Name      string `json:"name,omitempty" xml:"name,omitempty"`
-	KeyLength *int   `json:"keyLength,omitempty" xml:"keyLength,omitempty"`
-	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+	BOMRef    BOMReference `json:"-" xml:"-"`
+	Name      string       `json:"name,omitempty" xml:"name,omitempty"`
+	KeyLength *int         `json:"keyLength,omitempty" xml:"keyLength,omitempty"`
+	Algorithm string       `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
 }
 
-// IKEv2Integ represents IKEv2 Integrity algorithm
+// IKEv2Integ represents IKEv2 Integrity algorithm.
+// BOMRef holds the deprecated 1.6 bom-ref string form; Name/Algorithm are the 1.7 structured form.
 type IKEv2Integ struct {
-	Name      string `json:"name,omitempty" xml:"name,omitempty"`
-	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+	BOMRef    BOMReference `json:"-" xml:"-"`
+	Name      string       `json:"name,omitempty" xml:"name,omitempty"`
+	Algorithm string       `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
 }
 
-// IKEv2Ke represents IKEv2 Key Exchange method
+// IKEv2Ke represents IKEv2 Key Exchange method.
+// BOMRef holds the deprecated 1.6 bom-ref string form; Group/Algorithm are the 1.7 structured form.
 type IKEv2Ke struct {
-	Group     *int   `json:"group,omitempty" xml:"group,omitempty"`
-	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+	BOMRef    BOMReference `json:"-" xml:"-"`
+	Group     *int         `json:"group,omitempty" xml:"group,omitempty"`
+	Algorithm string       `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
 }
 
-// IKEv2Prf represents IKEv2 Pseudorandom Function
+// IKEv2Prf represents IKEv2 Pseudorandom Function.
+// BOMRef holds the deprecated 1.6 bom-ref string form; Name/Algorithm are the 1.7 structured form.
 type IKEv2Prf struct {
-	Name      string `json:"name,omitempty" xml:"name,omitempty"`
-	Algorithm string `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
+	BOMRef    BOMReference `json:"-" xml:"-"`
+	Name      string       `json:"name,omitempty" xml:"name,omitempty"`
+	Algorithm string       `json:"algorithm,omitempty" xml:"algorithm,omitempty"`
 }
 
 // RelatedCryptographicAsset represents a related cryptographic asset
