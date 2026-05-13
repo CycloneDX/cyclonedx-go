@@ -1710,14 +1710,14 @@ type Workflow struct {
 
 // Citation represents an attribution of data to a source
 type Citation struct {
-	BOMRef       string                `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
-	Pointers     *[]string             `json:"pointers,omitempty" xml:"pointers>pointer,omitempty"`
-	Expressions  *[]string             `json:"expressions,omitempty" xml:"expressions>expression,omitempty"`
-	Timestamp    string                `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
-	AttributedTo *BOMReference         `json:"attributedTo,omitempty" xml:"attributedTo,omitempty"`
-	Process      string                `json:"process,omitempty" xml:"process,omitempty"`
-	Note         string                `json:"note,omitempty" xml:"note,omitempty"`
-	Signature    *JSFSignature         `json:"signature,omitempty" xml:"-"`
+	BOMRef       string        `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	Pointers     *[]string     `json:"pointers,omitempty" xml:"pointers>pointer,omitempty"`
+	Expressions  *[]string     `json:"expressions,omitempty" xml:"expressions>expression,omitempty"`
+	Timestamp    string        `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
+	AttributedTo *BOMReference `json:"attributedTo,omitempty" xml:"attributedTo,omitempty"`
+	Process      string        `json:"process,omitempty" xml:"process,omitempty"`
+	Note         string        `json:"note,omitempty" xml:"note,omitempty"`
+	Signature    *JSFSignature `json:"signature,omitempty" xml:"-"`
 }
 
 // PatentLegalStatus represents the legal status of a patent per WIPO ST.27.
@@ -1741,20 +1741,20 @@ const (
 
 // Patent represents patent information
 type Patent struct {
-	BOMRef               string                  `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
-	PatentNumber         string                  `json:"patentNumber" xml:"patentNumber"`
-	ApplicationNumber    string                  `json:"applicationNumber,omitempty" xml:"applicationNumber,omitempty"`
-	Jurisdiction         string                  `json:"jurisdiction" xml:"jurisdiction"`
-	PriorityApplication  *PriorityApplication    `json:"priorityApplication,omitempty" xml:"priorityApplication,omitempty"`
-	PublicationNumber    string                  `json:"publicationNumber,omitempty" xml:"publicationNumber,omitempty"`
-	Title                string                  `json:"title,omitempty" xml:"title,omitempty"`
-	Abstract             string                  `json:"abstract,omitempty" xml:"abstract,omitempty"`
-	FilingDate           string                  `json:"filingDate,omitempty" xml:"filingDate,omitempty"`
-	GrantDate            string                  `json:"grantDate,omitempty" xml:"grantDate,omitempty"`
-	PatentExpirationDate string                  `json:"patentExpirationDate,omitempty" xml:"patentExpirationDate,omitempty"`
-	PatentLegalStatus    PatentLegalStatus       `json:"patentLegalStatus" xml:"patentLegalStatus"`
+	BOMRef               string                           `json:"bom-ref,omitempty" xml:"bom-ref,attr,omitempty"`
+	PatentNumber         string                           `json:"patentNumber" xml:"patentNumber"`
+	ApplicationNumber    string                           `json:"applicationNumber,omitempty" xml:"applicationNumber,omitempty"`
+	Jurisdiction         string                           `json:"jurisdiction" xml:"jurisdiction"`
+	PriorityApplication  *PriorityApplication             `json:"priorityApplication,omitempty" xml:"priorityApplication,omitempty"`
+	PublicationNumber    string                           `json:"publicationNumber,omitempty" xml:"publicationNumber,omitempty"`
+	Title                string                           `json:"title,omitempty" xml:"title,omitempty"`
+	Abstract             string                           `json:"abstract,omitempty" xml:"abstract,omitempty"`
+	FilingDate           string                           `json:"filingDate,omitempty" xml:"filingDate,omitempty"`
+	GrantDate            string                           `json:"grantDate,omitempty" xml:"grantDate,omitempty"`
+	PatentExpirationDate string                           `json:"patentExpirationDate,omitempty" xml:"patentExpirationDate,omitempty"`
+	PatentLegalStatus    PatentLegalStatus                `json:"patentLegalStatus" xml:"patentLegalStatus"`
 	PatentAssignee       *[]OrganizationalEntityOrContact `json:"patentAssignee,omitempty" xml:"patentAssignee,omitempty"`
-	ExternalReferences   *[]ExternalReference    `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
+	ExternalReferences   *[]ExternalReference             `json:"externalReferences,omitempty" xml:"externalReferences>reference,omitempty"`
 }
 
 // PatentFamily represents a patent family grouping
