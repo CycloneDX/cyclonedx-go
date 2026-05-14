@@ -465,24 +465,26 @@ func TestEvidence_MarshalXML(t *testing.T) {
 
 	t.Run("WithIdentify", func(t *testing.T) {
 		evidence := Evidence{
-			Identity: &[]EvidenceIdentity{
-				{
-					Field:      EvidenceIdentityFieldTypePURL,
-					Confidence: toPointer(t, float32(1)),
-					Methods: &[]EvidenceIdentityMethod{
-						{
-							Technique:  "filename",
-							Confidence: toPointer(t, float32(0.1)),
-							Value:      "findbugs-project-3.0.0.jar",
+			Identity: &EvidenceIdentityChoice{
+				Identities: &[]EvidenceIdentity{
+					{
+						Field:      EvidenceIdentityFieldTypePURL,
+						Confidence: toPointer(t, float32(1)),
+						Methods: &[]EvidenceIdentityMethod{
+							{
+								Technique:  "filename",
+								Confidence: toPointer(t, float32(0.1)),
+								Value:      "findbugs-project-3.0.0.jar",
+							},
+							{
+								Technique:  "ast-fingerprint",
+								Confidence: toPointer(t, float32(0.9)),
+								Value:      "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab",
+							},
 						},
-						{
-							Technique:  "ast-fingerprint",
-							Confidence: toPointer(t, float32(0.9)),
-							Value:      "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab",
+						Tools: &[]BOMReference{
+							"bom-ref-of-tool-that-performed-analysis",
 						},
-					},
-					Tools: &[]BOMReference{
-						"bom-ref-of-tool-that-performed-analysis",
 					},
 				},
 			},
@@ -657,24 +659,26 @@ func TestEvidence_UnmarshalXML(t *testing.T) {
 	</identity>
 </evidence>`), &evidence)
 		require.NoError(t, err)
-		require.Equal(t, &[]EvidenceIdentity{
-			{
-				Field:      EvidenceIdentityFieldTypePURL,
-				Confidence: toPointer(t, float32(1)),
-				Methods: &[]EvidenceIdentityMethod{
-					{
-						Technique:  "filename",
-						Confidence: toPointer(t, float32(0.1)),
-						Value:      "findbugs-project-3.0.0.jar",
+		require.Equal(t, &EvidenceIdentityChoice{
+			Identities: &[]EvidenceIdentity{
+				{
+					Field:      EvidenceIdentityFieldTypePURL,
+					Confidence: toPointer(t, float32(1)),
+					Methods: &[]EvidenceIdentityMethod{
+						{
+							Technique:  "filename",
+							Confidence: toPointer(t, float32(0.1)),
+							Value:      "findbugs-project-3.0.0.jar",
+						},
+						{
+							Technique:  "ast-fingerprint",
+							Confidence: toPointer(t, float32(0.9)),
+							Value:      "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab",
+						},
 					},
-					{
-						Technique:  "ast-fingerprint",
-						Confidence: toPointer(t, float32(0.9)),
-						Value:      "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab",
+					Tools: &[]BOMReference{
+						"bom-ref-of-tool-that-performed-analysis",
 					},
-				},
-				Tools: &[]BOMReference{
-					"bom-ref-of-tool-that-performed-analysis",
 				},
 			},
 		}, evidence.Identity)
@@ -694,14 +698,16 @@ func TestEvidence_UnmarshalXML(t *testing.T) {
 	</identity>
 </evidence>`), &evidence)
 		require.NoError(t, err)
-		require.Equal(t, &[]EvidenceIdentity{
-			{
-				Field:      EvidenceIdentityFieldTypePURL,
-				Confidence: toPointer(t, float32(1)),
-			},
-			{
-				Field:      EvidenceIdentityFieldTypeName,
-				Confidence: toPointer(t, float32(0.1)),
+		require.Equal(t, &EvidenceIdentityChoice{
+			Identities: &[]EvidenceIdentity{
+				{
+					Field:      EvidenceIdentityFieldTypePURL,
+					Confidence: toPointer(t, float32(1)),
+				},
+				{
+					Field:      EvidenceIdentityFieldTypeName,
+					Confidence: toPointer(t, float32(0.1)),
+				},
 			},
 		}, evidence.Identity)
 	})
