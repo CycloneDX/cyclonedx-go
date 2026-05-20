@@ -38,19 +38,23 @@ type BOMEncoder interface {
 
 	// SetEscapeHTML toggles escaped HTML output.
 	SetEscapeHTML(escapeHTML bool) BOMEncoder
+
+	// SetIndent sets the indent string for pretty printing.
+	SetIndent(indent string) BOMEncoder
 }
 
 func NewBOMEncoder(writer io.Writer, format BOMFileFormat) BOMEncoder {
 	if format == BOMFileFormatJSON {
-		return &jsonBOMEncoder{writer: writer, escapeHTML: true}
+		return &jsonBOMEncoder{writer: writer, escapeHTML: true, indent: "  "}
 	}
-	return &xmlBOMEncoder{writer: writer}
+	return &xmlBOMEncoder{writer: writer, indent: "  "}
 }
 
 type jsonBOMEncoder struct {
 	writer     io.Writer
 	pretty     bool
 	escapeHTML bool
+	indent     string
 }
 
 // Encode implements the BOMEncoder interface.
@@ -62,7 +66,7 @@ func (j jsonBOMEncoder) Encode(bom *BOM) error {
 	encoder := json.NewEncoder(j.writer)
 	encoder.SetEscapeHTML(j.escapeHTML)
 	if j.pretty {
-		encoder.SetIndent("", "  ")
+		encoder.SetIndent("", j.indent)
 	}
 
 	return encoder.Encode(bom)
@@ -76,6 +80,12 @@ func (j jsonBOMEncoder) EncodeVersion(bom *BOM, specVersion SpecVersion) (err er
 	}
 
 	return j.Encode(bom)
+}
+
+// SetIndent implements the BOMEncoder interface.
+func (j *jsonBOMEncoder) SetIndent(indent string) BOMEncoder {
+	j.indent = indent
+	return j
 }
 
 // SetPretty implements the BOMEncoder interface.
@@ -93,6 +103,7 @@ func (j *jsonBOMEncoder) SetEscapeHTML(escapeHTML bool) BOMEncoder {
 type xmlBOMEncoder struct {
 	writer io.Writer
 	pretty bool
+	indent string
 }
 
 // Encode implements the BOMEncoder interface.
@@ -103,7 +114,7 @@ func (x xmlBOMEncoder) Encode(bom *BOM) error {
 
 	encoder := xml.NewEncoder(x.writer)
 	if x.pretty {
-		encoder.Indent("", "  ")
+		encoder.Indent("", x.indent)
 	}
 
 	return encoder.Encode(bom)
@@ -129,4 +140,10 @@ func (x *xmlBOMEncoder) SetPretty(pretty bool) BOMEncoder {
 func (j *xmlBOMEncoder) SetEscapeHTML(escapeHTML bool) BOMEncoder {
 	// NOOP -- XML always needs to escape HTML
 	return j
+}
+
+// SetIndent implements the BOMEncoder interface.
+func (x *xmlBOMEncoder) SetIndent(indent string) BOMEncoder {
+	x.indent = indent
+	return x
 }
