@@ -244,6 +244,42 @@ func Test_convertAuthors(t *testing.T) {
 
 		assert.Nil(t, (*bom.Components)[0].Authors)
 	})
+
+	t.Run("collapse into deprecated author below 1.6", func(t *testing.T) {
+		bom := NewBOM()
+		bom.Components = &[]Component{
+			{
+				Name: "foo",
+				Authors: &[]OrganizationalContact{
+					{Name: "Jane Doe"},
+					{Name: "John Doe"},
+				},
+			},
+		}
+
+		bom.convert(SpecVersion1_5)
+
+		assert.Nil(t, (*bom.Components)[0].Authors)
+		assert.Equal(t, "Jane Doe", (*bom.Components)[0].Author)
+	})
+
+	t.Run("keep existing author when both set below 1.6", func(t *testing.T) {
+		bom := NewBOM()
+		bom.Components = &[]Component{
+			{
+				Name:   "foo",
+				Author: "Existing Author",
+				Authors: &[]OrganizationalContact{
+					{Name: "Jane Doe"},
+				},
+			},
+		}
+
+		bom.convert(SpecVersion1_5)
+
+		assert.Nil(t, (*bom.Components)[0].Authors)
+		assert.Equal(t, "Existing Author", (*bom.Components)[0].Author)
+	})
 }
 
 func Test_convertTrustZone(t *testing.T) {

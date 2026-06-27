@@ -174,6 +174,9 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 			c.SWHID = nil
 			c.OmniborID = nil
 			c.Manufacturer = nil
+			if c.Author == "" && c.Authors != nil && len(*c.Authors) > 0 {
+				c.Author = (*c.Authors)[0].Name
+			}
 			c.Authors = nil
 			c.Tags = nil
 		}
