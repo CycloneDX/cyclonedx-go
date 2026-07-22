@@ -18,6 +18,8 @@
 package cyclonedx
 
 import (
+	"bytes"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -294,5 +296,67 @@ func Test_convertTags(t *testing.T) {
 
 		assert.Nil(t, bom.Metadata.Component.Tags)
 		assert.Nil(t, (*bom.Components)[0].Tags)
+	})
+}
+
+func Test_convert_stripsFieldsNewerThanTargetSpec(t *testing.T) {
+	// Downgrading a BOM must not leave behind fields that were only introduced
+	// in a later spec version - the resulting document has to validate against
+	// the target version's schema. These cases each reproduce a field that was
+	// carried over unchanged and rejected by the older schema.
+
+	decode := func(t *testing.T, path string) BOM {
+		f, err := os.Open(path)
+		require.NoError(t, err)
+		defer f.Close()
+		var bom BOM
+		require.NoError(t, NewBOMDecoder(f, BOMFileFormatJSON).Decode(&bom))
+		return bom
+	}
+
+	encodeVersion := func(t *testing.T, bom *BOM, version SpecVersion) []byte {
+		var buf bytes.Buffer
+		require.NoError(t, NewBOMEncoder(&buf, BOMFileFormatJSON).EncodeVersion(bom, version))
+		return buf.Bytes()
+	}
+
+	t.Run("cryptoProperties removed below 1.6", func(t *testing.T) {
+		bom := decode(t, "./testdata/valid-cryptographic-asset.json")
+		out := encodeVersion(t, &bom, SpecVersion1_5)
+		assertValidBOM(t, out, BOMFileFormatJSON, SpecVersion1_5)
+
+		bom = decode(t, "./testdata/valid-cryptographic-asset.json")
+		bom.convert(SpecVersion1_5)
+		for _, c := range *bom.Components {
+			assert.Nil(t, c.CryptoProperties)
+		}
+	})
+
+	t.Run("composition bom-ref and vulnerabilities removed below 1.5", func(t *testing.T) {
+		bom := decode(t, "./testdata/valid-compositions.json")
+		out := encodeVersion(t, &bom, SpecVersion1_4)
+		assertValidBOM(t, out, BOMFileFormatJSON, SpecVersion1_4)
+
+		bom = decode(t, "./testdata/valid-compositions.json")
+		bom.convert(SpecVersion1_4)
+		for _, comp := range *bom.Compositions {
+			assert.Empty(t, comp.BOMRef)
+			assert.Nil(t, comp.Vulnerabilities)
+		}
+	})
+
+	t.Run("vulnerability analysis firstIssued and lastUpdated removed below 1.5", func(t *testing.T) {
+		bom := decode(t, "./testdata/valid-vulnerability.json")
+		out := encodeVersion(t, &bom, SpecVersion1_4)
+		assertValidBOM(t, out, BOMFileFormatJSON, SpecVersion1_4)
+
+		bom = decode(t, "./testdata/valid-vulnerability.json")
+		bom.convert(SpecVersion1_4)
+		for _, vuln := range *bom.Vulnerabilities {
+			if vuln.Analysis != nil {
+				assert.Empty(t, vuln.Analysis.FirstIssued)
+				assert.Empty(t, vuln.Analysis.LastUpdated)
+			}
+		}
 	})
 }

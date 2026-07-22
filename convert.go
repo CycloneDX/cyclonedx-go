@@ -176,6 +176,7 @@ func componentConverter(specVersion SpecVersion) func(*Component) {
 			c.Manufacturer = nil
 			c.Authors = nil
 			c.Tags = nil
+			c.CryptoProperties = nil
 		}
 
 		if specVersion < SpecVersion1_7 {
@@ -253,6 +254,10 @@ func convertCompositions(comps *[]Composition, specVersion SpecVersion) {
 
 	for i := range *comps {
 		comp := &(*comps)[i]
+		if specVersion < SpecVersion1_5 {
+			comp.BOMRef = ""
+			comp.Vulnerabilities = nil
+		}
 		if !specVersion.supportsCompositionAggregate(comp.Aggregate) {
 			comp.Aggregate = CompositionAggregateUnknown
 		}
@@ -515,6 +520,10 @@ func convertVulnerabilities(vulns *[]Vulnerability, specVersion SpecVersion) {
 			vuln.ProofOfConcept = nil
 			vuln.Rejected = ""
 			vuln.Workaround = ""
+			if vuln.Analysis != nil {
+				vuln.Analysis.FirstIssued = ""
+				vuln.Analysis.LastUpdated = ""
+			}
 		}
 
 		if specVersion < SpecVersion1_6 {
