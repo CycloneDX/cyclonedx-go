@@ -65,7 +65,8 @@ func Test_componentConverter_convertEvidence(t *testing.T) {
 			Evidence: &Evidence{
 				Identity: &EvidenceIdentityChoice{Identities: &[]EvidenceIdentity{
 					{
-						Field: EvidenceIdentityFieldTypePURL,
+						Field:          EvidenceIdentityFieldTypePURL,
+						ConcludedValue: "pkg:generic/acme@1.0.0",
 					},
 					{
 						Field: EvidenceIdentityFieldTypeName,
@@ -86,7 +87,14 @@ func Test_componentConverter_convertEvidence(t *testing.T) {
 
 		convert(&comp)
 
-		require.Len(t, *comp.Evidence.Identity.Identities, 1)
+		// 1.5 defines identity as a single object, so the array must collapse to
+		// the first entry stored as a single Identity (not Identities); otherwise
+		// the encoded document fails the 1.5 schema (identity must be an object).
+		require.NotNil(t, comp.Evidence.Identity.Identity)
+		require.Nil(t, comp.Evidence.Identity.Identities)
+		assert.Equal(t, EvidenceIdentityFieldTypePURL, comp.Evidence.Identity.Identity.Field)
+		// concludedValue was introduced in 1.6 and must be dropped.
+		assert.Zero(t, comp.Evidence.Identity.Identity.ConcludedValue)
 		require.Len(t, *comp.Evidence.Occurrences, 1)
 		occ := (*comp.Evidence.Occurrences)[0]
 		assert.Nil(t, occ.Line)
