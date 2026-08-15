@@ -219,17 +219,20 @@ func convertEvidence(c *Component, specVersion SpecVersion) {
 	}
 
 	if specVersion < SpecVersion1_6 {
-		// Spec version 1.5 uses only one Identity.
+		// Spec version 1.5 defines identity as a single object, not an array.
 		// cf. https://cyclonedx.org/docs/1.5/json/#components_items_evidence_identity
 		if c.Evidence.Identity != nil && c.Evidence.Identity.Identities != nil {
 			ids := *c.Evidence.Identity.Identities
-			ids = ids[:1]
-			c.Evidence.Identity = &EvidenceIdentityChoice{Identities: &ids}
-		}
-		if c.Evidence.Identity != nil && c.Evidence.Identity.Identities != nil {
-			for i := range *c.Evidence.Identity.Identities {
-				(*c.Evidence.Identity.Identities)[i].ConcludedValue = ""
+			if len(ids) > 0 {
+				first := ids[0]
+				c.Evidence.Identity = &EvidenceIdentityChoice{Identity: &first}
+			} else {
+				c.Evidence.Identity = nil
 			}
+		}
+		if c.Evidence.Identity != nil && c.Evidence.Identity.Identity != nil {
+			// concludedValue was introduced in 1.6.
+			c.Evidence.Identity.Identity.ConcludedValue = ""
 		}
 		if c.Evidence.Occurrences != nil {
 			for i := range *c.Evidence.Occurrences {
