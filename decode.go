@@ -58,6 +58,12 @@ func (x xmlBOMDecoder) Decode(bom *BOM) error {
 		return err
 	}
 
+	// BOMFormat is not represented in XML (it is a JSON-only field), so it is
+	// never populated by the unmarshaller. Set it explicitly so that a BOM
+	// decoded from XML and then re-encoded to JSON carries the required
+	// "bomFormat": "CycloneDX" value instead of an empty string.
+	bom.BOMFormat = BOMFormat
+
 	for specVersion, xmlNs := range xmlNamespaces {
 		if xmlNs == bom.XMLNS {
 			bom.SpecVersion = specVersion
