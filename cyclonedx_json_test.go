@@ -521,3 +521,58 @@ func TestExternalReferenceType_NewValues(t *testing.T) {
 		}
 	})
 }
+
+func TestJSFSignature_UnmarshalJSON(t *testing.T) {
+	t.Run("InlineSigner", func(t *testing.T) {
+		var sig JSFSignature
+		err := json.Unmarshal([]byte(`{"algorithm":"RS512","value":"abc"}`), &sig)
+		require.NoError(t, err)
+		require.NotNil(t, sig.JSFSigner)
+		require.Equal(t, "RS512", sig.Algorithm)
+		require.Equal(t, "abc", sig.Value)
+		require.Nil(t, sig.Signers)
+		require.Nil(t, sig.Chain)
+	})
+
+	t.Run("Signers", func(t *testing.T) {
+		var sig JSFSignature
+		err := json.Unmarshal([]byte(`{"signers":[{"algorithm":"RS512","value":"abc"}]}`), &sig)
+		require.NoError(t, err)
+		require.Nil(t, sig.JSFSigner)
+		require.NotNil(t, sig.Signers)
+		require.Len(t, *sig.Signers, 1)
+		require.Equal(t, "RS512", (*sig.Signers)[0].Algorithm)
+	})
+}
+
+func TestJSFSignature_MarshalJSON(t *testing.T) {
+	t.Run("InlineSigner", func(t *testing.T) {
+		sig := JSFSignature{JSFSigner: &JSFSigner{Algorithm: "RS512", Value: "abc"}}
+		jsonBytes, err := json.Marshal(sig)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"algorithm":"RS512"`)
+		require.Contains(t, string(jsonBytes), `"value":"abc"`)
+		require.NotContains(t, string(jsonBytes), `"signers"`)
+	})
+
+	t.Run("RoundTripInlineSignerKeepsData", func(t *testing.T) {
+		const doc = `{"algorithm":"RS512","value":"abc"}`
+		var sig JSFSignature
+		require.NoError(t, json.Unmarshal([]byte(doc), &sig))
+		jsonBytes, err := json.Marshal(sig)
+		require.NoError(t, err)
+
+		var round JSFSignature
+		require.NoError(t, json.Unmarshal(jsonBytes, &round))
+		require.NotNil(t, round.JSFSigner)
+		require.Equal(t, "RS512", round.Algorithm)
+		require.Equal(t, "abc", round.Value)
+	})
+
+	t.Run("Signers", func(t *testing.T) {
+		sig := JSFSignature{Signers: &[]JSFSigner{{Algorithm: "RS512", Value: "abc"}}}
+		jsonBytes, err := json.Marshal(sig)
+		require.NoError(t, err)
+		require.Contains(t, string(jsonBytes), `"signers"`)
+	})
+}
