@@ -449,6 +449,80 @@ func (pc *PatentChoice) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// jsfSignatureJSON mirrors the on-the-wire shape of JSFSignature: either a
+// single signer's fields inlined directly into the object (algorithm, keyId,
+// publicKey, certificatePath, excludes, value), or a "signers"/"chain" array
+// of such objects, per the CycloneDX JSF signature spec. JSFSignature models
+// the single-signer case as an anonymous *JSFSigner tagged `json:"-"` (so it
+// does not collide with the Signers/Chain fields), which means it is invisible
+// to encoding/json's reflection-based (Un)marshal and needs these explicit
+// methods to be populated at all.
+type jsfSignatureJSON struct {
+	Algorithm       string        `json:"algorithm,omitempty"`
+	KeyID           string        `json:"keyId,omitempty"`
+	PublicKey       *JSFPublicKey `json:"publicKey,omitempty"`
+	CertificatePath *[]string     `json:"certificatePath,omitempty"`
+	Excludes        *[]string     `json:"excludes,omitempty"`
+	Value           string        `json:"value,omitempty"`
+
+	Signers *[]JSFSigner `json:"signers,omitempty"`
+	Chain   *[]JSFSigner `json:"chain,omitempty"`
+}
+
+func (s JSFSignature) MarshalJSON() ([]byte, error) {
+	out := jsfSignatureJSON{
+		Signers: s.Signers,
+		Chain:   s.Chain,
+	}
+	if s.JSFSigner != nil {
+		out.Algorithm = s.JSFSigner.Algorithm
+		out.KeyID = s.JSFSigner.KeyID
+		// PublicKey is a plain (non-pointer) struct on JSFSigner, so
+		// omitempty on jsfSignatureJSON.PublicKey only has an effect if we
+		// keep it a pointer here and leave it nil for the (common) case
+		// where no public key was set -- a zero-value struct field is never
+		// considered "empty" by encoding/json's omitempty.
+		if s.JSFSigner.PublicKey != (JSFPublicKey{}) {
+			publicKey := s.JSFSigner.PublicKey
+			out.PublicKey = &publicKey
+		}
+		out.CertificatePath = s.JSFSigner.CertificatePath
+		out.Excludes = s.JSFSigner.Excludes
+		out.Value = s.JSFSigner.Value
+	}
+	return json.Marshal(out)
+}
+
+func (s *JSFSignature) UnmarshalJSON(data []byte) error {
+	var raw jsfSignatureJSON
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	s.Signers = raw.Signers
+	s.Chain = raw.Chain
+
+	// A single-signer signature always carries a non-empty "value" (the
+	// signature bytes); use that, rather than "algorithm" alone, as the
+	// discriminator so that an object made up only of "signers"/"chain"
+	// (no inline signer) does not spuriously produce an empty JSFSigner.
+	if raw.Value != "" {
+		signer := JSFSigner{
+			Algorithm:       raw.Algorithm,
+			KeyID:           raw.KeyID,
+			CertificatePath: raw.CertificatePath,
+			Excludes:        raw.Excludes,
+			Value:           raw.Value,
+		}
+		if raw.PublicKey != nil {
+			signer.PublicKey = *raw.PublicKey
+		}
+		s.JSFSigner = &signer
+	}
+
+	return nil
+}
+
 var jsonSchemas = map[SpecVersion]string{
 	SpecVersion1_0: "",
 	SpecVersion1_1: "",

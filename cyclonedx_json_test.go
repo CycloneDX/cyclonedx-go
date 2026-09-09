@@ -521,3 +521,117 @@ func TestExternalReferenceType_NewValues(t *testing.T) {
 		}
 	})
 }
+
+func TestJSFSignature_UnmarshalJSON(t *testing.T) {
+	t.Run("SingleSigner", func(t *testing.T) {
+		var sig JSFSignature
+		err := json.Unmarshal([]byte(`{"algorithm":"RS512","value":"abc"}`), &sig)
+		require.NoError(t, err)
+		require.NotNil(t, sig.JSFSigner)
+		require.Equal(t, "RS512", sig.Algorithm)
+		require.Equal(t, "abc", sig.Value)
+		require.Nil(t, sig.Signers)
+		require.Nil(t, sig.Chain)
+	})
+
+	t.Run("SingleSignerWithPublicKey", func(t *testing.T) {
+		var sig JSFSignature
+		err := json.Unmarshal([]byte(`{"algorithm":"ES256","value":"abc","publicKey":{"kty":"EC","crv":"P-256","x":"x","y":"y"}}`), &sig)
+		require.NoError(t, err)
+		require.NotNil(t, sig.JSFSigner)
+		require.Equal(t, JSFPublicKey{KTY: "EC", CRV: "P-256", X: "x", Y: "y"}, sig.PublicKey)
+	})
+
+	t.Run("Signers", func(t *testing.T) {
+		var sig JSFSignature
+		err := json.Unmarshal([]byte(`{"signers":[{"algorithm":"RS512","value":"abc"},{"algorithm":"ES256","value":"def"}]}`), &sig)
+		require.NoError(t, err)
+		require.Nil(t, sig.JSFSigner)
+		require.NotNil(t, sig.Signers)
+		require.Len(t, *sig.Signers, 2)
+		require.Equal(t, "RS512", (*sig.Signers)[0].Algorithm)
+		require.Equal(t, "ES256", (*sig.Signers)[1].Algorithm)
+	})
+
+	t.Run("Chain", func(t *testing.T) {
+		var sig JSFSignature
+		err := json.Unmarshal([]byte(`{"chain":[{"algorithm":"RS512","value":"abc"}]}`), &sig)
+		require.NoError(t, err)
+		require.Nil(t, sig.JSFSigner)
+		require.NotNil(t, sig.Chain)
+		require.Len(t, *sig.Chain, 1)
+	})
+
+	t.Run("Empty", func(t *testing.T) {
+		var sig JSFSignature
+		err := json.Unmarshal([]byte(`{}`), &sig)
+		require.NoError(t, err)
+		require.Nil(t, sig.JSFSigner)
+		require.Nil(t, sig.Signers)
+		require.Nil(t, sig.Chain)
+	})
+}
+
+func TestJSFSignature_MarshalJSON(t *testing.T) {
+	t.Run("SingleSigner", func(t *testing.T) {
+		sig := JSFSignature{
+			JSFSigner: &JSFSigner{Algorithm: "RS512", Value: "abc"},
+		}
+		jsonBytes, err := json.Marshal(sig)
+		require.NoError(t, err)
+		require.JSONEq(t, `{"algorithm":"RS512","value":"abc"}`, string(jsonBytes))
+	})
+
+	t.Run("SingleSignerWithPublicKey", func(t *testing.T) {
+		sig := JSFSignature{
+			JSFSigner: &JSFSigner{
+				Algorithm: "ES256",
+				Value:     "abc",
+				PublicKey: JSFPublicKey{KTY: "EC", CRV: "P-256", X: "x", Y: "y"},
+			},
+		}
+		jsonBytes, err := json.Marshal(sig)
+		require.NoError(t, err)
+		require.JSONEq(t, `{"algorithm":"ES256","value":"abc","publicKey":{"kty":"EC","crv":"P-256","x":"x","y":"y"}}`, string(jsonBytes))
+	})
+
+	t.Run("Signers", func(t *testing.T) {
+		signers := []JSFSigner{{Algorithm: "RS512", Value: "abc"}}
+		sig := JSFSignature{Signers: &signers}
+		jsonBytes, err := json.Marshal(sig)
+		require.NoError(t, err)
+		require.JSONEq(t, `{"signers":[{"algorithm":"RS512","value":"abc","publicKey":{}}]}`, string(jsonBytes))
+	})
+
+	t.Run("Empty", func(t *testing.T) {
+		sig := JSFSignature{}
+		jsonBytes, err := json.Marshal(sig)
+		require.NoError(t, err)
+		require.JSONEq(t, `{}`, string(jsonBytes))
+	})
+}
+
+// TestBOM_Signature_Issue280 is a regression test for
+// https://github.com/CycloneDX/cyclonedx-go/issues/280: decoding a BOM whose
+// top-level "signature" is a single inline JSF signer used to silently leave
+// bom.Signature.JSFSigner nil, because JSFSignature embeds *JSFSigner
+// anonymously with a `json:"-"` tag -- which encoding/json's reflection-based
+// (Un)marshal treats as "ignore this field entirely" rather than "flatten its
+// fields". Any code then accessing the promoted fields (e.g.
+// bom.Signature.Algorithm) panicked with a nil pointer dereference.
+func TestBOM_Signature_Issue280(t *testing.T) {
+	const doc = `{"bomFormat":"CycloneDX","specVersion":"1.6","version":1,` +
+		`"signature":{"algorithm":"RS512","value":"abc"}}`
+
+	var bom BOM
+	require.NoError(t, json.Unmarshal([]byte(doc), &bom))
+
+	require.NotNil(t, bom.Signature)
+	require.NotNil(t, bom.Signature.JSFSigner)
+	require.Equal(t, "RS512", bom.Signature.Algorithm)
+	require.Equal(t, "abc", bom.Signature.Value)
+
+	out, err := json.Marshal(&bom)
+	require.NoError(t, err)
+	require.JSONEq(t, doc, string(out))
+}
