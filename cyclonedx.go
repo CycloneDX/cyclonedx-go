@@ -131,11 +131,15 @@ type BOM struct {
 }
 
 func NewBOM() *BOM {
+	return NewBOMWithSpecVersion(SpecVersion1_7)
+}
+
+func NewBOMWithSpecVersion(specVersion SpecVersion) *BOM {
 	return &BOM{
-		JSONSchema:  jsonSchemas[SpecVersion1_7],
-		XMLNS:       xmlNamespaces[SpecVersion1_7],
+		JSONSchema:  jsonSchemas[specVersion],
+		XMLNS:       xmlNamespaces[specVersion],
 		BOMFormat:   BOMFormat,
-		SpecVersion: SpecVersion1_7,
+		SpecVersion: specVersion,
 		Version:     1,
 	}
 }
