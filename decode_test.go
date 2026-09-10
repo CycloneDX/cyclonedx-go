@@ -18,6 +18,7 @@
 package cyclonedx
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
@@ -82,5 +83,29 @@ func TestXmlBOMDecoder_Decode(t *testing.T) {
 				require.Equal(t, tc.specVersion, bom.SpecVersion)
 			})
 		}
+	})
+
+	// BOMFormat is a JSON-only field that is never present in XML input. The XML
+	// decoder must set it so a BOM decoded from XML and re-encoded to JSON keeps
+	// the required "bomFormat": "CycloneDX" value. See issue #245.
+	t.Run("ShouldSetBOMFormat", func(t *testing.T) {
+		bomContent := `<?xml version="1.0" encoding="UTF-8"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.6"
+    serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+    version="1">
+</bom>`
+
+		var bom BOM
+		err := NewBOMDecoder(strings.NewReader(bomContent), BOMFileFormatXML).Decode(&bom)
+		require.NoError(t, err)
+		require.Equal(t, BOMFormat, bom.BOMFormat)
+
+		// Re-encoding the XML-decoded BOM to JSON must emit a valid bomFormat,
+		// not an empty string.
+		buf := bytes.Buffer{}
+		err = NewBOMEncoder(&buf, BOMFileFormatJSON).SetPretty(true).Encode(&bom)
+		require.NoError(t, err)
+		assert.Contains(t, buf.String(), `"bomFormat": "CycloneDX"`)
+		assert.NotContains(t, buf.String(), `"bomFormat": ""`)
 	})
 }
