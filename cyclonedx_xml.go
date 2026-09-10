@@ -1120,7 +1120,7 @@ func (dc *DataClassification) UnmarshalXML(d *xml.Decoder, start xml.StartElemen
 			}
 
 		case xml.EndElement:
-			if el.Name.Local == "dataflow" {
+			if el.Name == start.Name {
 				return nil
 			}
 		}

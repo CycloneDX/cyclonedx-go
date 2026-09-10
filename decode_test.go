@@ -84,3 +84,38 @@ func TestXmlBOMDecoder_Decode(t *testing.T) {
 		}
 	})
 }
+
+func TestXmlBOMDecoder_Decode_DataClassificationEndTag(t *testing.T) {
+	// DataClassification is bound both to <dataflow> and, via
+	// EvidenceData.Classification (xml:"data>classification"), to
+	// <classification>. Its custom UnmarshalXML must terminate on its own end
+	// tag rather than a hardcoded </dataflow>; otherwise decoding a
+	// <classification> element reads past the element and consumes the rest of
+	// the document, dropping anything that follows.
+	input := `<?xml version="1.0" encoding="UTF-8"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.6" version="1">
+  <declarations>
+    <evidence>
+      <evidence>
+        <data>
+          <data>
+            <classification>Public</classification>
+          </data>
+        </data>
+      </evidence>
+    </evidence>
+  </declarations>
+  <components>
+    <component type="library">
+      <name>acme-lib</name>
+    </component>
+  </components>
+</bom>`
+
+	var bom BOM
+	err := NewBOMDecoder(strings.NewReader(input), BOMFileFormatXML).Decode(&bom)
+	require.NoError(t, err)
+	require.NotNil(t, bom.Components)
+	require.Len(t, *bom.Components, 1)
+	assert.Equal(t, "acme-lib", (*bom.Components)[0].Name)
+}
