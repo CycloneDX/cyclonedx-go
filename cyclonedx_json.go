@@ -23,6 +23,96 @@ import (
 	"fmt"
 )
 
+type jsfSignatureJSON struct {
+	Algorithm       string        `json:"algorithm,omitempty"`
+	KeyID           string        `json:"keyId,omitempty"`
+	PublicKey       *JSFPublicKey `json:"publicKey,omitempty"`
+	CertificatePath *[]string     `json:"certificatePath,omitempty"`
+	Excludes        *[]string     `json:"excludes,omitempty"`
+	Value           string        `json:"value,omitempty"`
+	Signers         *[]JSFSigner  `json:"signers,omitempty"`
+	Chain           *[]JSFSigner  `json:"chain,omitempty"`
+}
+
+type jsfSignerJSON struct {
+	Algorithm       string        `json:"algorithm"`
+	KeyID           string        `json:"keyId,omitempty"`
+	PublicKey       *JSFPublicKey `json:"publicKey,omitempty"`
+	CertificatePath *[]string     `json:"certificatePath,omitempty"`
+	Excludes        *[]string     `json:"excludes,omitempty"`
+	Value           string        `json:"value"`
+}
+
+type jsfSignatureMarshalJSON struct {
+	Algorithm       *string       `json:"algorithm,omitempty"`
+	KeyID           string        `json:"keyId,omitempty"`
+	PublicKey       *JSFPublicKey `json:"publicKey,omitempty"`
+	CertificatePath *[]string     `json:"certificatePath,omitempty"`
+	Excludes        *[]string     `json:"excludes,omitempty"`
+	Value           *string       `json:"value,omitempty"`
+	Signers         *[]JSFSigner  `json:"signers,omitempty"`
+	Chain           *[]JSFSigner  `json:"chain,omitempty"`
+}
+
+func (signer JSFSigner) MarshalJSON() ([]byte, error) {
+	encoded := jsfSignerJSON{
+		Algorithm:       signer.Algorithm,
+		KeyID:           signer.KeyID,
+		CertificatePath: signer.CertificatePath,
+		Excludes:        signer.Excludes,
+		Value:           signer.Value,
+	}
+	if signer.PublicKey != (JSFPublicKey{}) {
+		encoded.PublicKey = &signer.PublicKey
+	}
+
+	return json.Marshal(encoded)
+}
+
+func (signature JSFSignature) MarshalJSON() ([]byte, error) {
+	encoded := jsfSignatureMarshalJSON{
+		Signers: signature.Signers,
+		Chain:   signature.Chain,
+	}
+	if signature.JSFSigner != nil && signature.Signers == nil && signature.Chain == nil {
+		encoded.Algorithm = &signature.Algorithm
+		encoded.KeyID = signature.KeyID
+		encoded.CertificatePath = signature.CertificatePath
+		encoded.Excludes = signature.Excludes
+		encoded.Value = &signature.Value
+		if signature.PublicKey != (JSFPublicKey{}) {
+			encoded.PublicKey = &signature.PublicKey
+		}
+	}
+
+	return json.Marshal(encoded)
+}
+
+func (signature *JSFSignature) UnmarshalJSON(data []byte) error {
+	var decoded jsfSignatureJSON
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		return err
+	}
+
+	signer := &JSFSigner{
+		Algorithm:       decoded.Algorithm,
+		KeyID:           decoded.KeyID,
+		CertificatePath: decoded.CertificatePath,
+		Excludes:        decoded.Excludes,
+		Value:           decoded.Value,
+	}
+	if decoded.PublicKey != nil {
+		signer.PublicKey = *decoded.PublicKey
+	}
+
+	*signature = JSFSignature{
+		JSFSigner: signer,
+		Signers:   decoded.Signers,
+		Chain:     decoded.Chain,
+	}
+	return nil
+}
+
 func (ev EnvironmentVariableChoice) MarshalJSON() ([]byte, error) {
 	if ev.Property != nil && *ev.Property != (Property{}) {
 		return json.Marshal(ev.Property)
