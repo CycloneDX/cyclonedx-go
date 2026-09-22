@@ -1,0 +1,95 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:85992d24-4f1d-41cd-a357-e498f4daeb46",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-07-22T12:49:10Z",
+    "lifecycles": [],
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "authors": [],
+          "group": "CycloneDX",
+          "name": "cyclonedx-cocoapods",
+          "version": "2.0.1",
+          "hashes": [],
+          "omniborId": [],
+          "swhid": [],
+          "externalReferences": [],
+          "properties": [],
+          "components": [],
+          "data": [],
+          "tags": []
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:cocoapods/Adjust@5.1.1",
+      "type": "library",
+      "author": "Adjust \u003csdk@adjust.com\u003e",
+      "authors": [],
+      "publisher": "Adjust \u003csdk@adjust.com\u003e",
+      "name": "Adjust",
+      "version": "5.1.1",
+      "description": "This is the iOS SDK of Adjust. You can read more about it at https://adjust.com.",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "5f5e998cf1446d44d93f91ec8b7b7dd40eaa922d"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "properties": []
+          }
+        }
+      ],
+      "purl": "pkg:cocoapods/Adjust@5.1.1",
+      "omniborId": [],
+      "swhid": [],
+      "externalReferences": [
+        {
+          "url": "https://github.com/adjust/ios_sdk",
+          "hashes": [],
+          "type": "website"
+        }
+      ],
+      "evidence": {
+        "identity": {
+          "field": "purl",
+          "confidence": 0.6,
+          "methods": [
+            {
+              "technique": "manifest-analysis",
+              "confidence": 0.6,
+              "value": "ios/Podfile.lock"
+            }
+          ]
+        },
+        "occurrences": []
+      },
+      "data": [],
+      "tags": []
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:cocoapods/Adjust@5.1.1",
+      "dependsOn": [
+        "pkg:cocoapods/Adjust@5.1.1#Adjust"
+      ],
+      "provides": []
+    }
+  ],
+  "properties": [],
+  "vulnerabilities": [],
+  "annotations": [],
+  "formulation": []
+}
+
