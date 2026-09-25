@@ -449,6 +449,40 @@ func (pc *PatentChoice) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (s JSFSignature) MarshalJSON() ([]byte, error) {
+	if s.Signers != nil || s.Chain != nil {
+		return json.Marshal(jsfSignatureJSON{Signers: s.Signers, Chain: s.Chain})
+	}
+	if s.JSFSigner != nil {
+		return json.Marshal(s.JSFSigner)
+	}
+	return []byte("{}"), nil
+}
+
+func (s *JSFSignature) UnmarshalJSON(data []byte) error {
+	var wrapper jsfSignatureJSON
+	if err := json.Unmarshal(data, &wrapper); err != nil {
+		return err
+	}
+	if wrapper.Signers != nil || wrapper.Chain != nil {
+		s.Signers = wrapper.Signers
+		s.Chain = wrapper.Chain
+		return nil
+	}
+
+	var signer JSFSigner
+	if err := json.Unmarshal(data, &signer); err != nil {
+		return err
+	}
+	s.JSFSigner = &signer
+	return nil
+}
+
+type jsfSignatureJSON struct {
+	Signers *[]JSFSigner `json:"signers,omitempty"`
+	Chain   *[]JSFSigner `json:"chain,omitempty"`
+}
+
 var jsonSchemas = map[SpecVersion]string{
 	SpecVersion1_0: "",
 	SpecVersion1_1: "",
