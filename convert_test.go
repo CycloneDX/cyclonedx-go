@@ -284,6 +284,30 @@ func Test_convertTrustZone(t *testing.T) {
 	})
 }
 
+func TestCryptographicAssetKeptOnSpec16(t *testing.T) {
+	bom := NewBOM()
+	bom.Components = &[]Component{{
+		BOMRef: "alg-aes",
+		Type:   ComponentTypeCryptographicAsset,
+		Name:   "AES-256-GCM",
+	}}
+
+	encode := func(version SpecVersion) BOM {
+		t.Helper()
+		var buf bytes.Buffer
+		require.NoError(t, NewBOMEncoder(&buf, BOMFileFormatJSON).EncodeVersion(bom, version))
+		var got BOM
+		require.NoError(t, NewBOMDecoder(&buf, BOMFileFormatJSON).Decode(&got))
+		return got
+	}
+
+	kept := encode(SpecVersion1_6)
+	assert.Equal(t, ComponentTypeCryptographicAsset, (*kept.Components)[0].Type)
+
+	downgraded := encode(SpecVersion1_5)
+	assert.Equal(t, ComponentTypeApplication, (*downgraded.Components)[0].Type)
+}
+
 func Test_convertTags(t *testing.T) {
 	t.Run("spec 1.5 and lower", func(t *testing.T) {
 		bom := NewBOM()
