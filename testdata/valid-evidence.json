@@ -48,7 +48,11 @@
         "occurrences": [
           {
             "bom-ref": "d6bf237e-4e11-4713-9f62-56d18d5e2079",
-            "location": "/path/to/component"
+            "location": "/path/to/component",
+            "line": 42,
+            "offset": 1337,
+            "symbol": "someSymbol",
+            "additionalContext": "some context"
           },
           {
             "bom-ref": "b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175",
