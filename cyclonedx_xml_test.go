@@ -382,8 +382,12 @@ func TestEvidence_MarshalXML(t *testing.T) {
 		evidence := Evidence{
 			Occurrences: &[]EvidenceOccurrence{
 				{
-					BOMRef:   "d6bf237e-4e11-4713-9f62-56d18d5e2079",
-					Location: "/path/to/component",
+					BOMRef:            "d6bf237e-4e11-4713-9f62-56d18d5e2079",
+					Location:          "/path/to/component",
+					Line:              toPointer(t, 42),
+					Offset:            toPointer(t, 1337),
+					Symbol:            "someSymbol",
+					AdditionalContext: "some context",
 				},
 				{
 					BOMRef:   "b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175",
@@ -393,7 +397,7 @@ func TestEvidence_MarshalXML(t *testing.T) {
 		}
 		xmlBytes, err := xml.Marshal(evidence)
 		require.NoError(t, err)
-		require.Equal(t, `<Evidence><occurrences><occurrence bom-ref="d6bf237e-4e11-4713-9f62-56d18d5e2079"><location>/path/to/component</location></occurrence><occurrence bom-ref="b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175"><location>/another/path/to/component</location></occurrence></occurrences></Evidence>`, string(xmlBytes))
+		require.Equal(t, `<Evidence><occurrences><occurrence bom-ref="d6bf237e-4e11-4713-9f62-56d18d5e2079"><location>/path/to/component</location><line>42</line><offset>1337</offset><symbol>someSymbol</symbol><additionalContext>some context</additionalContext></occurrence><occurrence bom-ref="b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175"><location>/another/path/to/component</location></occurrence></occurrences></Evidence>`, string(xmlBytes))
 	})
 
 	t.Run("WithCallstack", func(t *testing.T) {
@@ -510,6 +514,10 @@ func TestEvidence_UnmarshalXML(t *testing.T) {
 	<occurrences>
 		<occurrence bom-ref="d6bf237e-4e11-4713-9f62-56d18d5e2079">
 			<location>/path/to/component</location>
+			<line>42</line>
+			<offset>1337</offset>
+			<symbol>someSymbol</symbol>
+			<additionalContext>some context</additionalContext>
 		</occurrence>
 		<occurrence bom-ref="b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175">
 			<location>/another/path/to/component</location>
@@ -519,8 +527,12 @@ func TestEvidence_UnmarshalXML(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, &[]EvidenceOccurrence{
 			{
-				BOMRef:   "d6bf237e-4e11-4713-9f62-56d18d5e2079",
-				Location: "/path/to/component",
+				BOMRef:            "d6bf237e-4e11-4713-9f62-56d18d5e2079",
+				Location:          "/path/to/component",
+				Line:              toPointer(t, 42),
+				Offset:            toPointer(t, 1337),
+				Symbol:            "someSymbol",
+				AdditionalContext: "some context",
 			},
 			{
 				BOMRef:   "b574d5d1-e3cf-4dcd-9ba5-f3507eb1b175",
