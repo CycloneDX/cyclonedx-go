@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	"reflect"
 )
 
 // copy creates a deep copy of the BOM in a given destination.
@@ -39,5 +40,45 @@ func (b BOM) copy(dst *BOM) error {
 		return fmt.Errorf("failed to decode bom: %w", err)
 	}
 
+	restoreZeroScores(reflect.ValueOf(b), reflect.ValueOf(dst))
+
 	return nil
+}
+
+// restoreZeroScores preserves non-nil pointers to zero-valued scores.
+// gob omits zero-valued scalar fields, which otherwise turns these pointers into nil.
+func restoreZeroScores(src, dst reflect.Value) {
+	if !src.IsValid() || !dst.IsValid() {
+		return
+	}
+
+	switch src.Kind() {
+	case reflect.Ptr:
+		if src.IsNil() || dst.IsNil() {
+			return
+		}
+		restoreZeroScores(src.Elem(), dst.Elem())
+	case reflect.Struct:
+		for i := 0; i < src.NumField(); i++ {
+			srcField := src.Field(i)
+			dstField := dst.Field(i)
+			if src.Type().Field(i).Name == "Score" &&
+				srcField.Kind() == reflect.Ptr &&
+				srcField.Type().Elem().Kind() == reflect.Float64 &&
+				!srcField.IsNil() &&
+				dstField.IsNil() &&
+				dstField.CanSet() {
+				dstField.Set(reflect.New(srcField.Type().Elem()))
+				dstField.Elem().Set(srcField.Elem())
+				continue
+			}
+			if src.Type().Field(i).PkgPath == "" {
+				restoreZeroScores(srcField, dstField)
+			}
+		}
+	case reflect.Slice, reflect.Array:
+		for i := 0; i < src.Len() && i < dst.Len(); i++ {
+			restoreZeroScores(src.Index(i), dst.Index(i))
+		}
+	}
 }
