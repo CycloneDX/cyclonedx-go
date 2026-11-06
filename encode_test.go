@@ -244,3 +244,29 @@ func TestXmlBOMEncoder_EncodeVersion(t *testing.T) {
 		})
 	}
 }
+
+
+func TestJsonBOMEncoder_EncodeVersionPreservesZeroVulnerabilityScore(t *testing.T) {
+	score := 0.0
+	bom := NewBOM()
+	bom.Vulnerabilities = &[]Vulnerability{{
+		ID: "CVE-0000-0000",
+		Ratings: &[]VulnerabilityRating{{
+			Score:  &score,
+			Method: ScoringMethodCVSSv3,
+		}},
+	}}
+
+	buf := new(bytes.Buffer)
+	err := NewBOMEncoder(buf, BOMFileFormatJSON).EncodeVersion(bom, SpecVersion1_7)
+	require.NoError(t, err)
+	assert.JSONEq(t, `{
+			"vulnerabilities": [{
+			"id": "CVE-0000-0000",
+			"ratings": [{
+				"score": 0,
+				"method": "CVSSv3"
+			}]
+		}]
+	}`, buf.String())
+}
