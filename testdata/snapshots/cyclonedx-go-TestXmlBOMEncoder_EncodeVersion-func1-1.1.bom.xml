@@ -75,6 +75,7 @@
       <copyright>Copyright Example Inc. All rights reserved.</copyright>
       <cpe>cpe:/a:example:myapplication:1.0.0</cpe>
       <purl>pkg:maven/com.example/myapplication@1.0.0?packaging=war</purl>
+      <modified>false</modified>
       <externalReferences>
         <reference type="documentation">
           <url>http://example.org/docs</url>
@@ -103,6 +104,7 @@
         </license>
       </licenses>
       <purl>pkg:maven/com.example/myframework@1.0.0?packaging=war</purl>
+      <modified>false</modified>
       <externalReferences>
         <reference type="website">
           <url>http://example.com/myframework</url>
