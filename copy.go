@@ -40,7 +40,7 @@ func (b BOM) copy(dst *BOM) error {
 		return fmt.Errorf("failed to decode bom: %w", err)
 	}
 
-	restoreZeroScores(reflect.ValueOf(b), reflect.ValueOf(dst))
+	restoreZeroScores(reflect.ValueOf(b), reflect.ValueOf(dst).Elem())
 
 	return nil
 }
