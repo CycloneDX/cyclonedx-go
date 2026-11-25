@@ -18,6 +18,7 @@
 package cyclonedx
 
 import (
+	"bytes"
 	"encoding/json"
 	"testing"
 
@@ -520,4 +521,14 @@ func TestExternalReferenceType_NewValues(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestToolsChoice_Empty_MarshalJSON(t *testing.T) {
+	bom := NewBOM()
+	bom.Metadata = &Metadata{Tools: &ToolsChoice{}}
+	bom.Vulnerabilities = &[]Vulnerability{{ID: "some-vuln", Tools: &ToolsChoice{}}}
+
+	var buf bytes.Buffer
+	require.NoError(t, NewBOMEncoder(&buf, BOMFileFormatJSON).Encode(bom))
+	require.NotContains(t, buf.String(), "tools")
 }

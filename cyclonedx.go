@@ -1042,7 +1042,7 @@ func (mt MediaType) WithVersion(specVersion SpecVersion) (string, error) {
 type Metadata struct {
 	Timestamp               string                   `json:"timestamp,omitempty" xml:"timestamp,omitempty"`
 	Lifecycles              *[]Lifecycle             `json:"lifecycles,omitempty" xml:"lifecycles>lifecycle,omitempty"`
-	Tools                   *ToolsChoice             `json:"tools,omitempty" xml:"tools,omitempty"`
+	Tools                   *ToolsChoice             `json:"tools,omitempty,omitzero" xml:"tools,omitempty"`
 	Authors                 *[]OrganizationalContact `json:"authors,omitempty" xml:"authors>author,omitempty"`
 	Component               *Component               `json:"component,omitempty" xml:"component,omitempty"`
 	Manufacture             *OrganizationalEntity    `json:"manufacture,omitempty" xml:"manufacture,omitempty"` // Deprecated: Use Component Manufacturer instead.
@@ -1613,6 +1613,12 @@ type ToolsChoice struct {
 	Services   *[]Service   `json:"-" xml:"-"`
 }
 
+// IsZero reports whether the ToolsChoice holds neither Tools, nor Components or Services.
+// It lets encoding/json omit an empty ToolsChoice instead of failing on it.
+func (tc ToolsChoice) IsZero() bool {
+	return tc.Tools == nil && tc.Components == nil && tc.Services == nil
+}
+
 type Volume struct {
 	UID           string      `json:"uid,omitempty" xml:"uid,omitempty"`
 	Name          string      `json:"name,omitempty" xml:"name,omitempty"`
@@ -1649,7 +1655,7 @@ type Vulnerability struct {
 	Updated        string                    `json:"updated,omitempty" xml:"updated,omitempty"`
 	Rejected       string                    `json:"rejected,omitempty" xml:"rejected,omitempty"`
 	Credits        *Credits                  `json:"credits,omitempty" xml:"credits,omitempty"`
-	Tools          *ToolsChoice              `json:"tools,omitempty" xml:"tools,omitempty"`
+	Tools          *ToolsChoice              `json:"tools,omitempty,omitzero" xml:"tools,omitempty"`
 	Analysis       *VulnerabilityAnalysis    `json:"analysis,omitempty" xml:"analysis,omitempty"`
 	Affects        *[]Affects                `json:"affects,omitempty" xml:"affects>target,omitempty"`
 	Properties     *[]Property               `json:"properties,omitempty" xml:"properties>property,omitempty"`
