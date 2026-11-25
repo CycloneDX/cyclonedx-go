@@ -1067,6 +1067,7 @@ type MLModelCard struct {
 	ModelParameters      *MLModelParameters         `json:"modelParameters,omitempty" xml:"modelParameters,omitempty"`
 	QuantitativeAnalysis *MLQuantitativeAnalysis    `json:"quantitativeAnalysis,omitempty" xml:"quantitativeAnalysis,omitempty"`
 	Considerations       *MLModelCardConsiderations `json:"considerations,omitempty" xml:"considerations,omitempty"`
+	Properties           *[]Property                `json:"properties,omitempty" xml:"-"` // The XSD's modelCardType has no properties element.
 }
 
 type MLModelCardConsiderations struct {
