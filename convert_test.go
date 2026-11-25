@@ -368,3 +368,65 @@ func Test_convert_stripsFieldsNewerThanTargetSpec(t *testing.T) {
 		}
 	})
 }
+
+func Test_convert_stripsFieldsNewerThanTargetSpecOutsideMainTree(t *testing.T) {
+	// Components and services can also sit in tools, formulation, declaration
+	// targets and annotators. A downgrade has to convert those too.
+	newerComponent := func() Component {
+		return Component{Type: ComponentTypeLibrary, Name: "acme", IsExternal: Bool(true), VersionRange: "vers:npm/>=1.0.0"}
+	}
+	ref := BOMReference("acme-org")
+	newerService := func() Service {
+		return Service{Name: "acme-api", PatentAssertions: &[]PatentAssertion{
+			{AssertionType: PatentAssertionTypeOwnership, Asserter: &AsserterChoice{BOMRef: &ref}},
+		}}
+	}
+	tools := func() *ToolsChoice {
+		return &ToolsChoice{Components: &[]Component{newerComponent()}, Services: &[]Service{newerService()}}
+	}
+
+	bom := NewBOM()
+	bom.Metadata = &Metadata{Tools: tools()}
+	bom.Vulnerabilities = &[]Vulnerability{{ID: "some-vuln", Tools: tools()}}
+	bom.Formulation = &[]Formula{{
+		Components: &[]Component{newerComponent()},
+		Services:   &[]Service{newerService()},
+	}}
+	bom.Declarations = &Declarations{Targets: &Targets{
+		Components: &[]Component{newerComponent()},
+		Services:   &[]Service{newerService()},
+	}}
+	annotatorComponent := newerComponent()
+	annotatorService := newerService()
+	bom.Annotations = &[]Annotation{
+		{Subjects: &[]BOMReference{"acme"}, Annotator: &Annotator{Component: &annotatorComponent}, Timestamp: "2026-01-01T00:00:00Z", Text: "x"},
+		{Subjects: &[]BOMReference{"acme"}, Annotator: &Annotator{Service: &annotatorService}, Timestamp: "2026-01-01T00:00:00Z", Text: "x"},
+	}
+
+	var buf bytes.Buffer
+	require.NoError(t, NewBOMEncoder(&buf, BOMFileFormatJSON).EncodeVersion(bom, SpecVersion1_6))
+	assertValidBOM(t, buf.Bytes(), BOMFileFormatJSON, SpecVersion1_6)
+
+	bom.convert(SpecVersion1_6)
+	components := []Component{
+		(*bom.Metadata.Tools.Components)[0],
+		(*(*bom.Vulnerabilities)[0].Tools.Components)[0],
+		(*(*bom.Formulation)[0].Components)[0],
+		(*bom.Declarations.Targets.Components)[0],
+		*(*bom.Annotations)[0].Annotator.Component,
+	}
+	for _, c := range components {
+		assert.Nil(t, c.IsExternal)
+		assert.Empty(t, c.VersionRange)
+	}
+	services := []Service{
+		(*bom.Metadata.Tools.Services)[0],
+		(*(*bom.Vulnerabilities)[0].Tools.Services)[0],
+		(*(*bom.Formulation)[0].Services)[0],
+		(*bom.Declarations.Targets.Services)[0],
+		*(*bom.Annotations)[1].Annotator.Service,
+	}
+	for _, s := range services {
+		assert.Nil(t, s.PatentAssertions)
+	}
+}

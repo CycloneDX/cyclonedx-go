@@ -99,16 +99,17 @@ func (b *BOM) convert(specVersion SpecVersion) {
 		}
 	}
 
-	if b.Components != nil {
-		for i := range *b.Components {
-			recurseComponent(&(*b.Components)[i], componentConverter(specVersion))
+	convertComponentsAndServices(b.Components, b.Services, specVersion)
+
+	if b.Formulation != nil {
+		for i := range *b.Formulation {
+			formula := &(*b.Formulation)[i]
+			convertComponentsAndServices(formula.Components, formula.Services, specVersion)
 		}
 	}
 
-	if b.Services != nil {
-		for i := range *b.Services {
-			recurseService(&(*b.Services)[i], serviceConverter(specVersion))
-		}
+	if b.Declarations != nil && b.Declarations.Targets != nil {
+		convertComponentsAndServices(b.Declarations.Targets.Components, b.Declarations.Targets.Services, specVersion)
 	}
 
 	if b.Vulnerabilities != nil {
@@ -561,17 +562,16 @@ func convertAnnotations(annotations *[]Annotation, specVersion SpecVersion) {
 		return
 	}
 
-	if specVersion < SpecVersion1_6 {
-		for i := range *annotations {
-			ann := (*annotations)[i]
+	for i := range *annotations {
+		ann := (*annotations)[i]
 
-			if ann.Annotator == nil {
-				continue
-			}
-
-			convertOrganizationalEntity(ann.Annotator.Organization, specVersion)
-			recurseService(ann.Annotator.Service, serviceConverter(specVersion))
+		if ann.Annotator == nil {
+			continue
 		}
+
+		convertOrganizationalEntity(ann.Annotator.Organization, specVersion)
+		recurseComponent(ann.Annotator.Component, componentConverter(specVersion))
+		recurseService(ann.Annotator.Service, serviceConverter(specVersion))
 	}
 }
 
@@ -640,11 +640,7 @@ func convertTools(tools *ToolsChoice, specVersion SpecVersion) {
 		}
 	}
 
-	if tools.Services != nil {
-		for i := range *tools.Services {
-			convertOrganizationalEntity((*tools.Services)[i].Provider, specVersion)
-		}
-	}
+	convertComponentsAndServices(tools.Components, tools.Services, specVersion)
 
 	if tools.Tools != nil {
 		for i := range *tools.Tools {
@@ -699,6 +695,21 @@ func convertServiceToTool(service Service, _ SpecVersion) *Tool {
 	}
 
 	return &tool
+}
+
+// convertComponentsAndServices applies componentConverter and serviceConverter
+// to every component and service in the given slices, including nested ones.
+func convertComponentsAndServices(components *[]Component, services *[]Service, specVersion SpecVersion) {
+	if components != nil {
+		for i := range *components {
+			recurseComponent(&(*components)[i], componentConverter(specVersion))
+		}
+	}
+	if services != nil {
+		for i := range *services {
+			recurseService(&(*services)[i], serviceConverter(specVersion))
+		}
+	}
 }
 
 func recurseComponent(component *Component, f func(c *Component)) {
